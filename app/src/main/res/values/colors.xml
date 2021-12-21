@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="colorStop">#ff503d</color>
+    <color name="colorPrimary">#006699</color>
+    <color name="colorPrimaryDark">#00517A</color>
+    <color name="colorAccent">#00517A</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorGray">#E9E9E9</color>
+    <color name="colorGrayIntense">#b3b3b3</color>
+    <color name="color_Semitransarent_gray">#66b3b3b3</color>
+    <color name="colorLightGray">#F1F1F1</color>
+    <color name="colorOrangeWarm">#FFC965</color>
+    <color name="colorOrangeWarmLight">#FED376</color>
+    <color name="colorChatBlack">#464646</color>
+    <color name="colorLightYellow">#FFF5A5</color>
+    <color name="colorLightBlue">#229FD0</color>
+    <color name="colorLightCitaYellow">#F8E974</color>
+    <color name="colorLightCitaBlue">#5DB7DA</color>
+    <color name="colorLighterBlue">#6CBEDE</color>
+    <color name="colorTransparent">#006CBEDE</color>
+    <color name="colorSeenBlue">#2970FF</color>
+    <color name="colorScrollBackground">#FFFFFF</color>
+    <color name="walletStyle">#546772</color>
+</resources>

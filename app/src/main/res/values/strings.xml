@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">NosoWallet</string>
+
+    <string name="general_done">Done</string>
+    <string name="general_add">Add</string>
+    <string name="general_back">Back</string>
+
+    <string name="settings_title">Connection Settings</string>
+    <string name="settings_server_label">Server List</string>
+    <string name="settings_address_input_label">Address: </string>
+    <string name="settings_port_input_label">Port: </string>
+    <string name="settings_new_server_title">Add new server address</string>
+    <string name="settings_new_server_error">Invalid IP address or Port</string>
+
+</resources>
