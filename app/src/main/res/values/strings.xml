@@ -1,9 +1,23 @@
 <resources>
-    <string name="app_name">NosoWallet</string>
+    <string name="app_name">NOSOmobile</string>
 
     <string name="general_done">Done</string>
     <string name="general_add">Add</string>
     <string name="general_back">Back</string>
+    <string name="general_copytoclip">Copied to clipboard</string>
+
+    <string name="general_export_success">All wallets exported correctly</string>
+    <string name="general_export_error">Error exporting wallet</string>
+
+    <string name="general_import_error_1">Invalid file, no wallets found</string>
+    <string name="general_import_error_2">Invalid file extension found</string>
+    <string name="general_import_error_3">Import cancelled</string>
+    <string name="general_import_start">Imported </string>
+    <string name="general_import_end_single">new wallet correctly</string>
+    <string name="general_import_end_multi">new wallets correctly</string>
+    <string name="general_import_nonew_wallet">File content 0 new wallets</string>
+
+    <string name="general_create_success">New wallet created with 0 balance</string>
 
     <string name="settings_title">Connection Settings</string>
     <string name="settings_server_label">Server List</string>
@@ -11,5 +25,17 @@
     <string name="settings_port_input_label">Port: </string>
     <string name="settings_new_server_title">Add new server address</string>
     <string name="settings_new_server_error">Invalid IP address or Port</string>
+
+    <string name="wallet_grand_balance">Available Balance</string>
+    <string name="wallet_address_label">Address</string>
+    <string name="wallet_incoming_balance">Incoming</string>
+    <string name="wallet_outgoing_balance">Outgoing</string>
+    <string name="wallet_address_balance">Balance</string>
+
+    <string name="wallet_actions_label">Wallet Actions</string>
+    <string name="wallet_actions_import">Import</string>
+    <string name="wallet_actions_export">Export</string>
+    <string name="wallet_actions_create">New</string>
+
 
 </resources>

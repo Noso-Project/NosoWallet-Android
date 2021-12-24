@@ -14,6 +14,7 @@ import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.crypto.params.ECPublicKeyParameters
 import org.bouncycastle.crypto.signers.DSAKCalculator
 import org.bouncycastle.crypto.signers.ECDSASigner
+import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi
 import org.bouncycastle.jcajce.provider.digest.SHA512
 import org.bouncycastle.jcajce.util.MessageDigestUtils
 import org.bouncycastle.util.encoders.Base64Encoder
@@ -77,7 +78,7 @@ class SignerUtils {
             KeyPairGeneratorInstance = ECKeyPairGenerator()
             KeyPairGeneratorInstance.init(ECKeyGenerationParameters(domain, securerandom))
             askp = KeyPairGeneratorInstance.generateKeyPair()
-            Publickey = (askp.public as ECPublicKeyParameters).q.getEncoded(true)
+            Publickey = (askp.public as ECPublicKeyParameters).q.getEncoded(false)
             Privatekey = (askp.private as ECPrivateKeyParameters).d.toByteArray()
 
             val keyPair = KeyPair()

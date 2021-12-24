@@ -4,13 +4,16 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/drawable/background_corner_rounded.xml" value="0.24427083333333333" />
+        <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/drawable/background_corner_rounded_darkgray.xml" value="0.21851851851851853" />
         <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/drawable/background_corner_rounded_white.xml" value="0.24427083333333333" />
+        <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/drawable/background_rounded_white_actionable.xml" value="0.15462962962962962" />
         <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/drawable/connection_server_row.xml" value="0.24427083333333333" />
         <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/layout-land/activity_welcome.xml" value="0.2" />
-        <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/layout/activity_welcome.xml" value="0.25" />
         <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/layout/connection_server_row.xml" value="0.25" />
         <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/layout/dialog_setup.xml" value="0.22" />
+        <entry key="..\:/Users/Steve/Documents/GitHub/AndroidProyects/NosoWallet/app/src/main/res/layout/wallet_address_row.xml" value="0.33" />
       </map>
     </option>
   </component>

@@ -9,10 +9,40 @@ class NOSObjects {
 
 }
 
+class ConcensusData {
+    var Value:String = ""
+    var Count:Int = 0
+}
+
+class NodeInfo {
+    var Address:String = ""
+    var Port:Int = 8080
+    var Connections:Long = 0
+    var Lastblock:Long = 0
+    var Pendings:Long = 0
+    var Delta:Long = 0
+    var Branch:String = ""
+    var Version:String = ""
+    var UTCTime:Long = 0
+}
+
+class SumaryData {
+    var Hash = ""
+    var Custom = ""
+    var Balance:Long = -1
+    var Score:Long = -1
+    var LastOP:Long = -1
+}
+
+class PendingData {
+    var Incoming:Long = 0
+    var Outgoing:Long = 0
+}
+
 open class ServerObject:RealmObject() {
-    @PrimaryKey var address:String = "localhost"
-    var port:Int = 8080
-    var default:Boolean = false
+    @PrimaryKey var Address:String = "localhost"
+    var Port:Int = 8080
+    var isDefault:Boolean = false
 }
 
 class Options : Serializable {
@@ -27,6 +57,14 @@ class Options : Serializable {
     var JustUpdated:Boolean = false
     var VersionPage:String = "https://nosocoin.com"
     var UsePool = false
+}
+
+class PendingInfo {
+    var TO_Type:String = ""
+    var TO_Sender:String = ""
+    var TO_Receiver:String = ""
+    var TO_Amount:Long = 0
+    var TO_Fee:Long = 0
 }
 
 class OrderData : Serializable {
@@ -51,10 +89,10 @@ class WalletObject : Serializable {
     var Custom:String? = null
     var PublicKey:String? = null
     var PrivateKey:String? = null
-    var Balance:Int = 0
-    var Pending:Int = 0
-    var Score:Int = 0
-    var LasOP:Int = 0
+    var Balance:Long = 0
+    var Pending:Long = 0
+    var Score:Long = 0
+    var LastOP:Long = 0
 }
 
 class KeyPair : Serializable {

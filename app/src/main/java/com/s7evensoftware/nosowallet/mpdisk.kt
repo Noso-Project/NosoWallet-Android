@@ -1,15 +1,15 @@
 package com.s7evensoftware.nosowallet
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import java.io.*
+import java.math.BigInteger
 
-class mpdisk {
+class mpDisk {
     companion object {
 
-        fun VerificarArchivos(context: Context){
-            var contador = 0
-
+        fun VerificarArchivos(context: Context, addressList: ArrayList<WalletObject>, addressSummary: ArrayList<SumaryData>, pendingList:ArrayList<PendingData> ){
             if(!directoryexist(context,UpdatesDirectory)){
                 CreateDir(context, UpdatesDirectory)
             }
@@ -27,66 +27,165 @@ class mpdisk {
             }
 
             if(!fileexist(context, MainActivity.UserOptions.Wallet)){
-                Log.e("mpCripto","Crear wallet: "+MainActivity.UserOptions.Wallet)
-                CrearWallet(context)
+                Log.e("mpDisk","Wallet Creation: "+MainActivity.UserOptions.Wallet)
+                CrearWallet(context, addressList, pendingList)
             }else{
-                Log.e("mpCripto","Cargar wallet: "+MainActivity.UserOptions.Wallet)
-                CargarWallet(context, MainActivity.UserOptions.Wallet)
-                mpCripto.GetAddressFromPublicKey(MainActivity.Listadirecciones[0].PublicKey!!)
-            }
-        }
-
-        fun CrearWallet(context: Context) {
-            if(!fileexist(context, WalletFilename)){
-                MainActivity.Listadirecciones.add(mpCripto.CreateNewAddress())
-                val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
-
-                val FileWallet = File(NOSOroot.path, WalletFilename)
-
-                ObjectOutputStream(FileOutputStream(FileWallet)).use {
-                    it.writeObject(MainActivity.Listadirecciones)
-                    MainActivity.UserOptions.Wallet = WalletFilename
-                    Log.e("mpDisk","Escribiendo Informacion de Wallet - OK")
+                Log.e("mpDisk","Loading Wallet: "+MainActivity.UserOptions.Wallet)
+                if(addressList.size < 1){
+                    CargarWallet(context, MainActivity.UserOptions.Wallet, addressList, pendingList)
                 }
             }
+
+            if(fileexist(context, SumaryFilePath)){
+                Log.e("mpDisk","Loading Summary "+ SumaryFilePath)
+                LoadSummary(context, addressSummary)
+            }
         }
 
-        fun SaveWallet(context: Context){
+        fun LoadSummary(context: Context, addressSummary:ArrayList<SumaryData>){
+            val summRef = File(context.getExternalFilesDir(null)!!.path
+                    +File.separator
+                    +NOSPath
+                    +File.separator
+                    +SumaryDirectory
+                    +File.separator
+                    +SumaryFileName)
+            val fileReference = FileInputStream(summRef)
+            var bytes = ByteArray(106)
+
+            try{
+                var count = 0
+                val buffer = BufferedInputStream(fileReference)
+                var read = buffer.read(bytes, 0, bytes.size)
+                while(read != -1){
+                    val sumData = SumaryData()
+                    sumData.Hash = String(bytes.copyOfRange(1,bytes[0].toInt()+1))
+                    sumData.Custom = String(bytes.copyOfRange(42,42+bytes[41].toInt()))
+
+                    val balanceArray = bytes.copyOfRange(82,90)
+                    balanceArray.reverse() // Big Endian to Little Endian conversion
+                    sumData.Balance = BigInteger(balanceArray).toLong()
+
+                    val scoreArray = bytes.copyOfRange(91,98)
+                    scoreArray.reverse() // Big Endian to Little Endian conversion
+                    sumData.Score = BigInteger(scoreArray).toLong()
+
+                    val lastopArray = bytes.copyOfRange(99,106)
+                    lastopArray.reverse() // Big Endian to Little Endian conversion
+                    sumData.LastOP = BigInteger(lastopArray).toLong()
+
+                    addressSummary.add(sumData)
+                    count++
+                    read = buffer.read(bytes, 0, bytes.size)
+                }
+                Log.e("mpDisk","$count Wallets Loaded from Summary")
+                buffer.close()
+            }catch (e:Exception){
+                fileReference?.close()
+            }
+        }
+
+        fun CrearWallet(context: Context, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>) {
+            if(!fileexist(context, WalletFilename)){
+                addressList.add(mpCripto.CreateNewAddress())
+                pendingList.add(PendingData())
+                SaveWallet(context, addressList)
+            }
+        }
+
+        fun SaveWallet(context: Context, listaDirecciones: ArrayList<WalletObject>): Int{
             val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
             val FileWallet = File(NOSOroot.path, WalletFilename)
-            ObjectOutputStream(FileOutputStream(FileWallet)).use {
-                it.writeObject(MainActivity.Listadirecciones)
-                Log.e("mpDisk","Escribiendo Informacion de Wallet - OK")
+            val outputByteArray = ByteArrayOutputStream()
+            val dataoutputStream = DataOutputStream(outputByteArray)
+            writeWalletFile(dataoutputStream, listaDirecciones)
+
+            try{
+                //Write wallet.pkw file
+                val fileOutputStream = FileOutputStream(FileWallet)
+                outputByteArray.writeTo(fileOutputStream)
+                outputByteArray.flush();outputByteArray.close()
+                fileOutputStream.flush();fileOutputStream.close()
+
+                //Write wallet.pkw.bak file
+                val backUpWallet = File(FileWallet.parentFile.path+File.separator+WalletBackUpFile)
+                FileWallet.copyTo(backUpWallet, true)
+                Log.e("mpDisk","Wallet file written - OK")
+                return R.string.general_export_success
+            }catch (e:Exception){
+                dataoutputStream.close()
+                outputByteArray.close()
+                Log.e("mpDisk","Unable to write wallet file - ERR")
+                return R.string.general_export_error
             }
         }
 
-        fun CargarWallet(context: Context, wallet:String){
-            //var contador = 0
-            if(fileexist(context, wallet)){
-                val FileWallet = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath, wallet)
-                ObjectInputStream(FileInputStream(FileWallet)).use {
-                    MainActivity.Listadirecciones = it.readObject() as ArrayList<WalletObject>
-                    Log.e("mpDisk","Cargar Wallet - OK")
+        fun ExportWallet(context: Context, FileWallet: Uri?, listaDirecciones:ArrayList<WalletObject>): Int {
+            val outputByteArray = ByteArrayOutputStream()
+            val dataoutputStream = DataOutputStream(outputByteArray)
+            writeWalletFile(dataoutputStream, listaDirecciones)
+
+            try{
+                val fileOutputStream = context.contentResolver.openOutputStream(FileWallet!!)
+                outputByteArray.writeTo(fileOutputStream)
+
+                outputByteArray.flush();fileOutputStream?.flush()
+                fileOutputStream?.close();outputByteArray.close()
+                return R.string.general_export_success
+            }catch (e:Exception){
+                dataoutputStream.close();outputByteArray.close()
+                Log.e("mpDisk","Unable to write wallet file - ERR")
+                return R.string.general_export_error
+            }
+        }
+
+        private fun writeWalletFile(dataoutputStream: DataOutputStream, listaDirecciones: ArrayList<WalletObject>) {
+            for(wallet in listaDirecciones){
+                var hashArray = wallet.Hash?.toByteArray()?.copyOf(40)
+                var customArray:ByteArray? = ByteArray(40)
+                if(wallet.Custom != null){
+                    customArray = wallet.Custom?.toByteArray()?.copyOf(40)
                 }
+                val publicArray = wallet.PublicKey?.toByteArray()?.copyOf(255)
+                val privateArray = wallet.PrivateKey?.toByteArray()?.copyOf(255)
+
+                dataoutputStream.write(wallet.Hash?.length?.toByte()?.toInt()?:0) //String header -> # of chars
+                dataoutputStream.write(hashArray)
+                dataoutputStream.write(wallet.Custom?.length?.toByte()?.toInt()?:0) //String header -> # of chars
+                dataoutputStream.write(customArray)
+                dataoutputStream.write(wallet.PublicKey?.length?.toByte()?.toInt()?:0) //String header -> # of chars
+                dataoutputStream.write(publicArray)
+                dataoutputStream.write(wallet.PrivateKey?.length?.toByte()?.toInt()?:0) //String header -> # of chars
+                dataoutputStream.write(privateArray)
+                dataoutputStream.writeLong(wallet.Balance)
+                dataoutputStream.writeLong(wallet.Pending)
+                dataoutputStream.writeLong(wallet.Score)
+                dataoutputStream.writeLong(wallet.LastOP)
+            }
+        }
+
+        fun CargarWallet(
+            context: Context,
+            wallet: String,
+            addressList: ArrayList<WalletObject>,
+            pendingList: ArrayList<PendingData>
+        ){
+            if(fileexist(context, wallet)){
+                mpParser.parseInternalWallet(
+                    context,
+                    File(context.getExternalFilesDir(null)!!.path
+                            +File.separator
+                            +NOSPath
+                            +File.separator
+                            +wallet),
+                    addressList,
+                    pendingList
+                )
             }
         }
 
         fun CrearArchivoOpciones(context:Context) {
             val Options = Options()
-                /*mapOf(
-                "language" to 0,
-                "Port" to 8080,
-                "GetNodes" to false,
-                "PoolInfo" to "",
-                "Wallet" to "NOSODATA"+File.separator+"wallet.pkw",
-                "AutoServer" to false,
-                "AutoConnect" to true,
-                "Auto_Updater" to false,
-                "JustUpdated" to false,
-                "VersionPage" to "https://nosocoin.com",
-                "UsePool" to false
-            )*/
-
             val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
 
             if(NOSOroot.mkdirs()){
@@ -101,25 +200,6 @@ class mpdisk {
             }else{
                 Log.e("mpDisk","Creacion de directorio fallo - ERROR")
             }
-
-        /* ALT FILE CREATION METHOD
-            val resolver = context.contentResolver
-            val FileOptions = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, OptionsFileName)
-                put(MediaStore.MediaColumns.MIME_TYPE, "application/psk")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS+File.separator+NOSPath)
-            }
-
-            val fileReference = resolver.insert(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), FileOptions)
-            val outputStream = resolver.openOutputStream(fileReference!!)
-
-            ObjectOutputStream(outputStream)
-                .use {
-                    it.writeObject(Options)
-                    MainActivity.UserOptions = Options
-                    Log.e("mpDisk", "Escribi el archivo de opciones")
-                }
-        */
         }
 
         fun CargarOpciones(context:Context) {
@@ -153,10 +233,8 @@ class mpdisk {
                         +File.separator
                         +NOSPath
                         +File.separator
-                        +SummaryFileName)
-            if(file.exists()){
-                Log.e("mpDisk","Ya existe Summary.zip - OK")
-            }else{
+                        + ZipSumaryFileName)
+            if(!file.exists()){
                 if(file.createNewFile()){
                     Log.e("mpDisk","Summary file created - OK")
                 }else{

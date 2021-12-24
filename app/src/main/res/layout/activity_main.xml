@@ -4,96 +4,194 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/walletStyle"
     android:orientation="vertical"
+    android:weightSum="1"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/main_address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Prueba Prueba 2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:background="@color/black"
-        android:layout_margin="10dp">
-        <TextView
-            android:id="@+id/main_console_output"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"/>
-
-    </ScrollView>
-
-    <Button
-        android:id="@+id/main_importar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Importar"
-        />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/background_corner_rounded_white"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:layout_margin="10dp">
-        <TextView
+        android:padding="10dp">
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Destination"/>
-        <EditText
-            android:id="@+id/main_transfer_destination"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:text="NOSO"
+                android:textColor="@color/colorChatBlack"
+                android:textSize="30dp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorChatBlack"
+                android:layout_marginTop="-10dp"
+                android:paddingHorizontal="11dp"
+                android:text="m  o  b  i  l  e"
+                />
+        </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|right">
+
+            <ImageButton
+                android:id="@+id/main_settings"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/ic_settings" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingHorizontal="10dp"
+        android:paddingBottom="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="top">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginHorizontal="5dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/wallet_actions_create" /> />
+                    <ImageButton
+                        android:id="@+id/main_wallet_create"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_corner_rounded_white_actionable"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_baseline_create_new_24"
+                        app:tint="@color/black" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginHorizontal="5dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/wallet_actions_import" />
+                    <ImageButton
+                        android:id="@+id/main_wallet_import"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_corner_rounded_white_actionable"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_import_icon"
+                        app:tint="@color/black" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginHorizontal="5dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/wallet_actions_export" />
+                    <ImageButton
+                        android:id="@+id/main_wallet_export"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_corner_rounded_white_actionable"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_export_icon"
+                        app:tint="@color/black" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:paddingVertical="10dp"
+                android:layout_marginRight="5dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:text="@string/wallet_grand_balance" />
+                <TextView
+                    android:id="@+id/main_grand_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="0.00000000"
+                    android:textSize="20dp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/main_address_list"
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:background="@drawable/background_corner_rounded_white" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="10dp">
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/background_corner_rounded_white"
+        android:orientation="vertical"
+        android:padding="10dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Amount"
-            android:imeOptions="actionNext"/>
-        <EditText
-            android:id="@+id/main_transfer_amount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:imeOptions="actionNext"
-            />
-    </LinearLayout>
+            android:text="hola" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="10dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Destination"/>
-        <EditText
-            android:id="@+id/main_transfer_description"
-            android:layout_width="match_parent"
+            android:text="hola" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textAutoCorrect|textAutoComplete"
-            android:imeOptions="actionDone"/>
+            android:text="hola" />
+
     </LinearLayout>
 
-    <Button
-        android:id="@+id/main_transfer_send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enviar"
-        />
 
 </LinearLayout>

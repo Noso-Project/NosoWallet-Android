@@ -1,13 +1,19 @@
 package com.s7evensoftware.nosowallet
 
+const val NODE_TIMEOUT        = 1500
+const val DELTA_TRIGGER       = true // ff false then nodes with Delta > 0 will be excluded from node selection
+
 const val NOSPath             = "NOSODATA" // directory
 const val OptionsFileName     = "options.psk" //psk
-const val SummaryFileName     = "summary.zip" //psk
+const val ZipSumaryFileName   = "sumary.zip" //zip
+const val SumaryDirectory     = "data" // directory
+const val SumaryFileName      = "sumary.psk" //psk
+const val SumaryFilePath      = "data/sumary.psk" // sumary path file
 const val BotDataFilename     = "botdata.psk" // psk
 const val NodeDataFilename    = "nodes.psk" // psk
 const val NTPDataFilename     = "ntpservers.psk" // psk
 const val WalletFilename      = "wallet.pkw" // pkw
-const val SumarioFilename     = "sumary.psk" // psk
+const val WalletBackUpFile    = "wallet.pkw.bak" // pkw
 const val LanguageFileName    = "noso.lng" // lng
 const val BlockDirectory      = "BLOCKS/" // directory
 const val MarksDirectory      = "SUMMARKS/" // directory

@@ -23,7 +23,7 @@ class mpCripto {
             MyData.Balance = 0
             MyData.Pending = 0
             MyData.Score = 0
-            MyData.LasOP = 0
+            MyData.LastOP = 0
             return MyData
         }
 
@@ -35,27 +35,11 @@ class mpCripto {
             var sumatoria:Int
 
             PubSHAHashed = HashSha256String(PubKey)
-            //Log.e("mCripto","PubHashHashed: "+PubSHAHashed)
-            MainActivity.output += "\nPubHashHashed: $PubSHAHashed"
             Hash1 = HashMD160String(PubSHAHashed)
-            //Log.e("mpCripto","Hash1: "+Hash1)
-            MainActivity.output += "\nHash1: $Hash1"
-
             Hash1 = BMHexto58(Hash1, BigInteger("58"))
-            //Log.e("mpCripto","Hash1: "+Hash1)
-            MainActivity.output += "\nHash1: $Hash1"
-
             sumatoria = BMB58resumen(Hash1)
-            //Log.e("mpCripto","Sumatoria: "+sumatoria)
-            MainActivity.output += "\nSumatoria: $sumatoria"
             clave = BMDecto58(sumatoria.toString())
-            //Log.e("mpCripto","Clave: "+clave)
-            MainActivity.output += "\nClave: $clave"
             Hash2 = Hash1+clave
-            //Log.e("mpCripto","Hash2: "+Hash2)
-            MainActivity.output += "\nHash2: $Hash2"
-            //Log.e("mpCripto","New Address: "+CoinChar+Hash2)
-            MainActivity.output += "\nNew Address: $CoinChar$Hash2"
             return CoinChar+Hash2
         }
 

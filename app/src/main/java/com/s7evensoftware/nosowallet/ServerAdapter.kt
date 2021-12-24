@@ -8,10 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.s7evensoftware.nosowallet.databinding.ConnectionServerRowBinding
 import io.realm.RealmResults
 
-class ServerAdapter(callback:onServerSelected): RecyclerView.Adapter<ServerAdapter.Server>(){
+class ServerAdapter(callback:OnServerSelected): RecyclerView.Adapter<ServerAdapter.Server>(){
 
     private var ServerList: RealmResults<ServerObject>? = null
-    private var callback:onServerSelected? = null
+    private var callback:OnServerSelected? = null
 
     init {
         this.callback = callback
@@ -40,13 +40,15 @@ class ServerAdapter(callback:onServerSelected): RecyclerView.Adapter<ServerAdapt
 
     inner class Server(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
-        private var rowBinding: ConnectionServerRowBinding = ConnectionServerRowBinding.bind(itemView)
-
         fun setServer(server:ServerObject){
-            rowBinding.connectionRowAddress.text = server.address
-            rowBinding.connectionRowPort.text = server.port.toString()
-            Log.e("Adapter","Server: "+server.address+" - Default: "+server.default)
-            if(server.default){
+            var rowBinding = ConnectionServerRowBinding.bind(itemView)
+
+            rowBinding.connectionRowContainer.tag = server
+            rowBinding.connectionRowContainer.setOnClickListener(this)
+            rowBinding.connectionRowAddress.text = server.Address
+            rowBinding.connectionRowPort.text = server.Port.toString()
+            Log.e("Adapter","Server: "+server.Address+" - Default: "+server.isDefault)
+            if(server.isDefault){
                 rowBinding.connectionRowDefault.visibility = View.VISIBLE
             }else{
                 rowBinding.connectionRowDefault.visibility = View.GONE
@@ -54,11 +56,11 @@ class ServerAdapter(callback:onServerSelected): RecyclerView.Adapter<ServerAdapt
         }
 
         override fun onClick(v: View) {
-            callback?.selectServer(v)
+            callback?.onSelectServer(v)
         }
     }
 
-    public interface onServerSelected {
-        fun selectServer(v:View)
+    interface OnServerSelected {
+        fun onSelectServer(v: View)
     }
 }

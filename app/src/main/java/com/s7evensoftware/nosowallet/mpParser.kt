@@ -57,18 +57,6 @@ class mpParser {
 
             // Get Wallet Balance
             //CoinsAvailable =
-
-
-
-
-
-
-
-
-
-
-
-
         }
 
 
@@ -102,28 +90,32 @@ class mpParser {
             return false
         }
 
-        fun ImportWallet(context: Context, resultCode: Int, data: Intent?){
-            var Cartera = ""
-            var CarteraFile: File
-            var DatoLeido:ArrayList<WalletObject>
-            var Contador = 0
-            var Nuevos = 0
-
+        fun ImportWallet(context: Context, resultCode: Int, data: Intent?, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
             if(resultCode == Activity.RESULT_OK){
                 data?.data.also {
-                    if(parseKotlinWallet(context, it!!)){
-                        Log.e("mParser","Kotlin Wallet Imported - OK")
-                    }else if(parsePascalWallet(context, it!!)){
-                        Log.e("mParser","Pascal Wallet Imported - OK")
+                    if(getFileExtension(it!!.lastPathSegment!!).equals(".pkw") || getFileExtension(it!!.lastPathSegment!!).equals(".pkw.bak")){
+                        Log.e("mParser","Wallet File Imported - OK")
+                        return parseExternalWallet(context, it!!, addressList,pendingList)
                     }else{
-                        Log.e("mParser","Unable to parse wallet file - ERR")
+                        Log.e("mParser","Wrong file extension - ERR")
+                        return -2
                     }
                 }
             }
+            return -3
         }
 
-        fun WalletExists(wallet:WalletObject):Boolean {
-            for(w in MainActivity.Listadirecciones){
+        fun ExportWallet(context: Context, resultCode: Int, data: Intent?, listaDirecciones: ArrayList<WalletObject>):Int {
+            if(resultCode == Activity.RESULT_OK){
+                data?.data.also {
+                    return mpDisk.ExportWallet(context, it, listaDirecciones)
+                }
+            }
+            return R.string.general_export_error
+        }
+
+        fun WalletExists(wallet:WalletObject, listaDirecciones: ArrayList<WalletObject>):Boolean {
+            for(w in listaDirecciones){
                 if(wallet.Hash.equals(w.Hash)){
                     return true
                 }
@@ -131,47 +123,14 @@ class mpParser {
             return false
         }
 
-        fun parseKotlinWallet(context: Context, uriRef: Uri):Boolean{
-            val resolver = context.contentResolver
-            val fileReference = resolver.openInputStream(uriRef)
-
-            try {
-                ObjectInputStream(fileReference).use {
-                    val newWallets = it.readObject() as ArrayList<WalletObject>
-                    var nuevos = 0
-                    for(wallet in newWallets){
-                        if(IsValidAddress(wallet.Hash!!)){
-                            if(!WalletExists(wallet)){
-                                MainActivity.Listadirecciones.add(wallet)
-                                nuevos++
-                                Log.e("mpParser","## Wallet Info: ")
-                                Log.e("mpParser","# Address: "+wallet.Hash)
-                                Log.e("mpParser","# PublicKey: "+wallet.PublicKey)
-                                Log.e("mpParser","# PrivateKey: "+wallet.PrivateKey)
-                            }else{
-                                Log.e("mpParser","Ignoring wallet already exists: "+wallet.Hash)
-                            }
-                        }else{
-                            Log.e("mpParser","Ignoring invalid wallet : "+wallet.Hash)
-                        }
-                    }
-                    if(nuevos>0){
-                        mpdisk.SaveWallet(context)
-                        Log.e("mpParser","Saving with $nuevos new wallet(s)")
-                    }
-                }
-                return true
-            }catch (e:Exception){
-                Log.e("mpParser","Error: "+e.message)
-                fileReference?.close()
-                return false
-            }
-        }
-
-        fun parsePascalWallet(context: Context, uriRef: Uri):Boolean{
-            val resolver = context.contentResolver
-            val fileReference = resolver.openInputStream(uriRef)
-            val bytes = ByteArray(getFileSize(context, uriRef).toInt())
+        fun parseInternalWallet(
+            context: Context,
+            fileRef: File,
+            addressList: ArrayList<WalletObject>,
+            pendingList: ArrayList<PendingData>
+        ):Boolean{
+            val fileReference = FileInputStream(fileRef)
+            var bytes = ByteArray(fileRef.length().toInt())
 
             try{
                 val buffer = BufferedInputStream(fileReference)
@@ -181,59 +140,71 @@ class mpParser {
                 fileReference?.close()
                 return false
             }
+            return parseWallet(context, bytes, addressList, pendingList) > 0
+        }
 
-            val rawData = String(bytes)
-            var impData = rawData
+        fun parseExternalWallet(context: Context, uriRef: Uri, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
+            val resolver = context.contentResolver
+            val fileReference = resolver.openInputStream(uriRef)
+            var bytes = ByteArray(getFileSize(context, uriRef).toInt())
+
+            try{
+                val buffer = BufferedInputStream(fileReference)
+                buffer.read(bytes, 0, bytes.size)
+                buffer.close()
+            }catch (e:Exception){
+                fileReference?.close()
+                return -1
+            }
+            return parseWallet(context, bytes, addressList, pendingList)
+        }
+
+        fun parseWallet(context:Context, upbytes:ByteArray, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
             var nuevos = 0
+            var current:ByteArray? = upbytes.copyOfRange(0, 625)
+            var bytes = upbytes.copyOfRange(626, upbytes.size)
 
-            while(impData.indexOf("N") != -1){
+            while(current != null){
+                // Current Block = Wallet
+                var Address = String(current.copyOfRange(1,current[0].toInt()+1))
+                var Custom = String(current.copyOfRange(43,43+current[42].toInt()+1))
+                var PublicKey = String(current.copyOfRange(83,83+current[82].toInt()))
+                var PrivateKey = String(current.copyOfRange(339,339+current[338].toInt()))
 
-                var addressPart = ""
-                var PublicKey = ""
-                var PrivateKey = ""
-
-                impData = impData.substring(impData.indexOf("N"))
-
-                for(c in impData){
-                    if(Character.getNumericValue(c) >= 0){
-                        addressPart += c
-                    }else{
-                        impData = impData.substring(impData.indexOf(c))
-                        break
-                    }
-                }
-
-                impData = impData.substring(impData.indexOf("X")+1)
-                PublicKey = impData.substring(0, 88)
-
-                impData = impData.substring(89)
-                impData = impData.substring(impData.indexOf(",")+1)
-
-                PrivateKey = impData.substring(0, 44)
-                impData = impData.substring(45)
-
-                if(IsValidAddress(addressPart)){
+                if(IsValidAddress(Address)){
                     val newWallet = WalletObject()
-                    newWallet.Hash = addressPart
+                    newWallet.Hash = Address
+                    newWallet.Custom = Custom
                     newWallet.PublicKey = PublicKey
                     newWallet.PrivateKey = PrivateKey
 
-                    if(!WalletExists(newWallet)){
-                        MainActivity.Listadirecciones.add(newWallet)
+                    if(!WalletExists(newWallet,addressList)){
+                        addressList.add(newWallet)
+                        pendingList.add(PendingData())
                         nuevos++
 
                         Log.e("mpParser","## Wallet Info: ")
-                        Log.e("mpParser","# Address: $addressPart")
+                        Log.e("mpParser","# Address: $Address")
                         Log.e("mpParser","# PublicKey: $PublicKey")
                         Log.e("mpParser","# PrivateKey: $PrivateKey")
                     }else{
                         Log.e("mpParser","Ignoring wallet already exists: "+newWallet.Hash)
                     }
                 }else{
-                    Log.e("mpParser","Ignoring invalid wallet : "+addressPart)
+                    Log.e("mpParser","Ignoring invalid wallet : "+Address)
+                }
+
+                // Search next block
+                if(bytes.size >= 626){
+                    current = bytes.copyOfRange(0, 625)
+                    bytes = bytes.copyOfRange(626, bytes.size)
+                }else{
+                    Log.e("mpParser","No more blocks")
+                    current = null
                 }
             }
-            return  true
+            mpDisk.SaveWallet(context, addressList)
+            return nuevos
         }
 
         fun getFileName(context: Context, uri: Uri): String? {
