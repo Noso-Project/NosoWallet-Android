@@ -37,7 +37,7 @@ class mpDisk {
             }
 
             if(fileexist(context, SumaryFilePath)){
-                Log.e("mpDisk","Loading Summary "+ SumaryFilePath)
+                Log.e("mpDisk", "Loading Summary $SumaryFilePath")
                 LoadSummary(context, addressSummary)
             }
         }
@@ -81,7 +81,7 @@ class mpDisk {
                 Log.e("mpDisk","$count Wallets Loaded from Summary")
                 buffer.close()
             }catch (e:Exception){
-                fileReference?.close()
+                fileReference.close()
             }
         }
 
@@ -189,7 +189,7 @@ class mpDisk {
             val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
 
             if(NOSOroot.mkdirs()){
-                Log.e("mpDisk","Directory NOSODATA creado - OK")
+                Log.e("mpDisk","Directory NOSODATA created - OK")
                 val FileOptions = File(NOSOroot.path, OptionsFileName)
 
                 ObjectOutputStream(FileOutputStream(FileOptions)).use {
@@ -198,7 +198,7 @@ class mpDisk {
                     Log.e("mpDisk","Options file written - OK")
                 }
             }else{
-                Log.e("mpDisk","Creacion de directorio fallo - ERROR")
+                Log.e("mpDisk","Directory creation failed - ERROR")
             }
         }
 
@@ -207,7 +207,7 @@ class mpDisk {
             ObjectInputStream(FileInputStream(FileOptions)).use {
                 val Options = it.readObject()
                 MainActivity.UserOptions = Options as Options
-                Log.e("mpDisk","Archivo de configuracion cargado - OK")
+                Log.e("mpDisk","Settings filed loaded - OK")
             }
         }
 
@@ -220,9 +220,9 @@ class mpDisk {
                         +File.separator
                         +dirName)
             if(file.mkdirs()){
-                Log.e("mpDisk","Crear Directorio: "+dirName+" - OK")
+                Log.e("mpDisk","Directory creation: $dirName - OK")
             }else{
-                Log.e("mpDisk","Crear Directorio: "+dirName+" - ERR")
+                Log.e("mpDisk","Directory creation: $dirName - ERR")
             }
         }
 

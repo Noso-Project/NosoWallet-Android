@@ -9,6 +9,8 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="colorStop">#ff503d</color>
+    <color name="colorGreenSync">#0fad56</color>
+    <color name="colorRedUnsync">#6c3133</color>
     <color name="colorPrimary">#006699</color>
     <color name="colorPrimaryDark">#00517A</color>
     <color name="colorAccent">#00517A</color>

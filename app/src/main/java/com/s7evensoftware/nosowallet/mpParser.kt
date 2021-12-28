@@ -12,54 +12,6 @@ import java.io.*
 class mpParser {
     companion object{
 
-        fun SendCrypto(Destination: String, Amount: String, Reference: String){
-            var reference:String
-            var Monto:Int; var Comision:Int
-            var MontoToShow:Int;var ComisionToShow:Int
-            var Contador:Int
-            var Restante:Int
-            var ArrayTrfrs = ArrayList<OrderData>()
-            var CurrTime:String
-            var TrxLinea:Int = 0
-            var OrderHashString:String
-            var OrderString:String
-            var AliasIndex:Int
-            var Procesar:Boolean = true
-            var ResultOrderID = ""
-            var CoinsAvailable:Int
-
-            if(Destination.isBlank() || Destination.isEmpty() || Amount.isEmpty() || Amount.isBlank()){
-                Log.e("mpParser","Transferencia fallida, parametros invalidos")
-                return
-            }
-
-            if(!IsValidAddress(Destination)){
-                Log.e("mpParser","Transferencia fallida, invalid destination address")
-                return
-            }
-
-            Monto = Integer.parseInt(Amount)
-
-            if(Reference.isEmpty() || Reference.isBlank()){
-                reference = "null"
-            }
-
-            if(Monto < 0){
-                Log.e("mpParser","Transferencia fallida, invalid amount (negativa or zero)")
-                return
-            }
-
-            // Transaction Process
-            Comision = mpCoin.GetFee(Monto)
-            MontoToShow = Monto
-            ComisionToShow = Comision
-            Restante = Monto+Comision
-
-            // Get Wallet Balance
-            //CoinsAvailable =
-        }
-
-
         fun showExplorer(importWalletTask: ActivityResultLauncher<Intent>) {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 type = "*/*"

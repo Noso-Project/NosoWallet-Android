@@ -2,6 +2,7 @@ package com.s7evensoftware.nosowallet
 
 const val NODE_TIMEOUT        = 1500
 const val DELTA_TRIGGER       = true // ff false then nodes with Delta > 0 will be excluded from node selection
+const val DEFAULT_SYNC_DELAY  = 10000L
 
 const val NOSPath             = "NOSODATA" // directory
 const val OptionsFileName     = "options.psk" //psk
@@ -38,6 +39,8 @@ const val CoinSimbol = "NOSO"              // Coin 3 chars
 const val CoinName = "Noso"                // Coin name
 const val CoinChar = "N"                   // Char for addresses
 
-const val Comisiontrfr = 10000             // Amount/Comisiontrfr = 0.01% of the amount
-const val MinimunFee = 10                  // Minimun fee for transfer
+const val Comisiontrfr      = 10000             // Amount/Comisiontrfr = 0.01% of the amount
+const val MinimunFee        = 10L                  // Minimun fee for transfer
+const val Protocol          = 1
+const val ProgramVersion    = "1.0"
 

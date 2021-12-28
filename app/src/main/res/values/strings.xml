@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">NOSOmobile</string>
 
+    <string name="sharedpref_netstate_lastblock">LASTBLOCK_SAVE_KEY</string>
+    <string name="sharedpref_netstate_lastbranch">LASTBRANCH_SAVE_KEY</string>
+
     <string name="general_done">Done</string>
     <string name="general_add">Add</string>
     <string name="general_back">Back</string>
@@ -18,6 +21,23 @@
     <string name="general_import_nonew_wallet">File content 0 new wallets</string>
 
     <string name="general_create_success">New wallet created with 0 balance</string>
+
+    <string name="general_sendfunds_error0">Select an address from the list to send the noso</string>
+    <string name="general_sendfunds_error1">Destination cannot be empty</string>
+    <string name="general_sendfunds_error2">Invalid destination address</string>
+    <string name="general_sendfunds_error3">Cannot send funds FROM and TO the same address</string>
+    <string name="general_sendfunds_error4">Invalid amount to send</string>
+
+    <string name="general_send_funds_title">Send funds</string>
+    <string name="general_send_funds_to">Destination: </string>
+    <string name="general_send_funds_from">From: </string>
+    <string name="general_send_funds_amount">Amount: </string>
+    <string name="general_send_funds_ref">Reference: </string>
+    <string name="general_send_funds_clean">Clear</string>
+    <string name="general_send_funds_send">Send</string>
+    <string name="general_send_funds_send_confirm">Confirm</string>
+    <string name="general_send_funds_cancel">Cancel</string>
+    <string name="general_send_funds_close">Close</string>
 
     <string name="settings_title">Connection Settings</string>
     <string name="settings_server_label">Server List</string>

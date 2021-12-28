@@ -1,6 +1,8 @@
 package com.s7evensoftware.nosowallet
 
 import android.util.Log
+import java.math.BigInteger
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.collections.ArrayList
@@ -27,9 +29,17 @@ class mpFunctions {
             var result:NodeInfo? = null
             var selectedNode:NodeInfo? = null
             var ArrT:ArrayList<ConcensusData>
+            var CTime = 0L
             var CBlock = 0L
             var CBranch = ""
             var CPending = 0L
+
+            // Get the consensus unix time
+            ArrT = ArrayList()
+            for(node in NODEarray){
+                addValue(node.UTCTime.toString(), ArrT)
+                CTime = getHighest(ArrT).toLong()
+            }
 
             // Get the consensus block number
             ArrT = ArrayList()
@@ -53,17 +63,16 @@ class mpFunctions {
             }
 
             if(
-                !viewModel.WalletSynced &&
+                !viewModel.WalletSynced.value!! &&
                 CBlock == viewModel.LastBlock.value &&
                 CBranch.equals(viewModel.LastSummary.value)
             ){
-                viewModel.WalletSynced = true
+                viewModel.WalletSynced.postValue(true)
             }
 
-            if((CBlock > viewModel.LastBlock.value?:0) || CPending > viewModel.LastPendingCount.value?:0){
-                selectedNode = getRandomServer(NODEarray, CBlock, CBranch, CPending)
-                Log.e("mpFunctions","Node Selected -> ${selectedNode.Address}:${selectedNode.Port}")
-            }
+            //Select a random server for the upcoming requests
+            selectedNode = getRandomServer(NODEarray, CBlock, CBranch, CPending)
+            viewModel.LastNodeSelected = selectedNode
 
             if(CBlock > viewModel.LastBlock.value?:0){
                 result = selectedNode
@@ -73,15 +82,26 @@ class mpFunctions {
             }
 
             if(CPending > viewModel.LastPendingCount.value?:0){
-                val Pending_String = mpNetwork.getPendings(selectedNode!!.Address,selectedNode.Port)
+                val Pending_String = mpNetwork.getPendings(selectedNode!!.Address,selectedNode.Port, viewModel)
                 ProcessPendings(
                     Pending_String,
                     viewModel.AdddressList.value!!,
                     viewModel.AddressSummary.value!!,
-                    viewModel.PendingList.value!!
+                    viewModel.PendingList.value!!,
                 )
+                viewModel.LastPendingCount.postValue(CPending)
             }
 
+            if(viewModel.RealTimeValue.value!! > (CTime*1000-500) || viewModel.RealTimeValue.value!! < (CTime*1000+500)){
+                Log.e("mpFuncion","Clocked sync not needed")
+            }else{
+                viewModel.RealTimeValue.postValue(CTime*1000)
+                Log.e("mpFunction","Clocked Synchronized")
+            }
+
+            if((CBlock > viewModel.LastBlock.value?:0) || CPending > viewModel.LastPendingCount.value?:0){
+                viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value!!+1)
+            }
             return result
         }
 
@@ -102,6 +122,109 @@ class mpFunctions {
             return candidateServer[randomIndex]
         }
 
+        fun SendFundsFromAddress(
+            origin:String,
+            destination:String,
+            amount:Long,
+            fee:Long,
+            reference:String,
+            ordertime:Long,
+            line:Int,
+            lastBlock:Long,
+            addressList: ArrayList<WalletObject>,
+            addressSummary: ArrayList<SumaryData>
+        ): OrderData {
+            var AvailableAmount:Long; var AmountTrfr:Long;var FeeTrfr:Long
+            var OrderInfo = OrderData()
+
+            AvailableAmount = addressList[WalletAddressIndex(origin, addressList, addressSummary)].Balance-getAddressPendingPays(origin)
+            if(AvailableAmount > fee){
+                FeeTrfr = fee
+            }else{
+                FeeTrfr = AvailableAmount
+            }
+
+            if(AvailableAmount > (amount+fee)){
+                AmountTrfr = amount
+            }else{
+                AmountTrfr = AvailableAmount-fee
+            }
+
+            if(AmountTrfr < 0){
+                AmountTrfr = 0
+            }
+
+            OrderInfo.OrderID = ""
+            OrderInfo.OrderLines = 1
+            OrderInfo.OrderType = "TRFR"
+            OrderInfo.TimeStamp = ordertime
+            OrderInfo.Reference = reference
+            OrderInfo.TrxLine = line
+            OrderInfo.Sender = addressList[WalletAddressIndex(origin, addressList, addressSummary)].PublicKey
+            OrderInfo.Address = addressList[WalletAddressIndex(origin, addressList, addressSummary)].Hash
+            OrderInfo.Receiver = destination
+            OrderInfo.AmountFee = FeeTrfr
+            OrderInfo.AmountTrf = AmountTrfr
+            OrderInfo.Signature = mpCripto.getStringSigned(
+                ordertime.toString()+
+                          origin+
+                          destination+
+                          AmountTrfr.toString()+
+                          FeeTrfr.toString()+
+                          line.toString(),
+                addressList[WalletAddressIndex(origin, addressList, addressSummary)].PrivateKey!!
+            )
+            OrderInfo.TrfrID = getTransferHash(
+                ordertime.toString()+
+                        origin+
+                        destination+
+                        amount.toString()+
+                        lastBlock.toString()
+            )
+            return OrderInfo
+        }
+
+        fun getStringFromOrder(order:OrderData):String {
+            return order.OrderType+" "+
+                    order.OrderID+" "+
+                    order.OrderLines.toString()+" "+
+                    order.OrderType+" "+
+                    order.TimeStamp.toString()+" "+
+                    order.Reference+" "+
+                    order.TrxLine.toString()+" "+
+                    order.Sender+" "+
+                    order.Address+" "+
+                    order.Receiver+" "+
+                    order.AmountFee.toString()+" "+
+                    order.AmountTrf.toString()+" "+
+                    order.Signature+" "+
+                    order.TrfrID
+        }
+
+        fun getPTCEcn(ordertype:String):String {
+            return "NSL"+ordertype+" "+Protocol.toString()+" "+ProgramVersion+" "+(System.currentTimeMillis()/1000)+" "
+        }
+
+        fun getOrderHash(textLine:String):String {
+            var Result = mpCripto.HashSha256String(textLine)
+            return "OR"+mpCripto.BMHexto58(Result, BigInteger("36"))
+        }
+
+        fun getTransferHash(textLine:String):String {
+            var Resultado = ""
+            var Sumatoria:String;var Clave:String
+
+            Resultado = mpCripto.HashSha256String(textLine)
+            Resultado = mpCripto.BMHexto58(Resultado, BigInteger("58"))
+            Sumatoria = mpCripto.BMB58resumen(Resultado).toString()
+            Clave = mpCripto.BMDecto58(Sumatoria)
+            return "tR"+Resultado+Clave
+        }
+
+        fun getAddressPendingPays(address:String):Long {
+            return 0L
+        }
+
         fun ProcessPendings(
             input:String,
             addressList: ArrayList<WalletObject>,
@@ -110,8 +233,13 @@ class mpFunctions {
         ){
             var ThisOrder:String
             var Add_index:Int
-
             val tokens = StringTokenizer(input)
+
+            //Clear pendings before recalculate
+            for(pending in pendingList){
+                pending.Incoming = 0L
+                pending.Outgoing = 0L
+            }
 
             while(tokens.hasMoreTokens()){
                 ThisOrder = tokens.nextToken()
@@ -220,5 +348,29 @@ class mpFunctions {
                 ArrT.add(ThisItem)
             }
         }
+
+        fun getDateFromUNIX(time:Long):String{
+            try {
+                val formatter = SimpleDateFormat("dd/MM/YYYY")
+                formatter.timeZone = TimeZone.getTimeZone("UTC")
+                return formatter.format(time)
+            }catch (e:Exception){
+                Log.e("mpFunctions","Error parsing date")
+            }
+            return "00/00/0000"
+        }
+
+        fun getTimeFromUNIX(time:Long):String{
+            try {
+                val formatter = SimpleDateFormat("HH:mm:ss a")
+                formatter.timeZone = TimeZone.getTimeZone("UTC")
+                return formatter.format(time)
+            }catch (e:Exception){
+                Log.e("mpFunctions","Error parsing date")
+            }
+            return "00:00:00"
+        }
+
+
     }
 }

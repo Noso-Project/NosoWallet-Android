@@ -1,5 +1,6 @@
 package com.s7evensoftware.nosowallet
 
+import android.util.Base64
 import android.util.Log
 import org.bouncycastle.crypto.digests.RIPEMD160Digest
 import org.bouncycastle.util.encoders.Hex
@@ -43,6 +44,120 @@ class mpCripto {
             return CoinChar+Hash2
         }
 
+        fun SendTo(origin:String, destination:String, amount:Long, reference:String, lastblock:Long, addressList:ArrayList<WalletObject>, addressSummary:ArrayList<SumaryData>, viewModel:MainViewModel):String {
+            var Result:String
+            var CurrTime:Long
+            var Fee:Long
+            //var ShowAmount:Long; var ShowFee:Long
+            var Remaining:Long
+            var CoinsAvailable:Long
+            var KeepProcess:Boolean = true
+            var ArrayTrfrs = ArrayList<OrderData>()
+            var Counter = 0
+            var OrderHashString:String
+            var TrxLine = 0
+            var ResultOrderID = ""
+            var OrderString:String
+            var PreviousRefresh:Int
+
+            CurrTime = System.currentTimeMillis()/1000
+            Fee = GetFee(amount)
+            //ShowAmount = amount
+            //ShowFee = Fee
+            Remaining = amount+Fee
+            CoinsAvailable = mpFunctions.GetAddressBalanceFromSummary(origin,addressSummary)
+            if(Remaining <= CoinsAvailable){
+                OrderHashString = CurrTime.toString()
+
+                //Order list with origin in front
+                val orderedList = addressList.clone() as ArrayList<WalletObject>
+                for(wallet in orderedList){
+                    if(wallet.Hash == origin){
+                        orderedList.remove(wallet)
+                        orderedList.add(0, wallet)
+                        break
+                    }
+                }
+
+                var Amount = amount // Amount == needed Amount
+                while(Amount > 0){
+                    Log.e("mpCripto","Collecting balance from: "+orderedList[Counter].Hash+" balance: "+orderedList[Counter].Balance)
+                    if((orderedList[Counter].Balance-mpFunctions.getAddressPendingPays(orderedList[Counter].Hash!!))>0){
+                        TrxLine += 1
+                        ArrayTrfrs.add(
+                            mpFunctions.SendFundsFromAddress(
+                                orderedList[Counter].Hash!!,
+                                destination,
+                                Amount,
+                                Fee,
+                                reference,
+                                CurrTime,
+                                TrxLine,
+                                lastblock,
+                                addressList,
+                                addressSummary
+                            )
+                        )
+                        Fee = Fee+ArrayTrfrs.last().AmountFee
+                        Amount = Amount-ArrayTrfrs.last().AmountTrf
+                        OrderHashString = OrderHashString+ArrayTrfrs.last().TrfrID
+                    }
+                    Counter++
+                }
+
+                for(tr in ArrayTrfrs){
+                    tr.OrderID = mpFunctions.getOrderHash(TrxLine.toString()+OrderHashString)
+                    tr.OrderLines = TrxLine
+                }
+                ResultOrderID = mpFunctions.getOrderHash(TrxLine.toString()+OrderHashString)
+                Result = ResultOrderID
+                OrderString = mpFunctions.getPTCEcn("ORDER")+"ORDER "+TrxLine.toString()+" $"
+                for(tr in ArrayTrfrs){
+                    OrderString += mpFunctions.getStringFromOrder(tr)+" $"
+                }
+                OrderString = OrderString.substring(0, OrderString.length-2)
+                mpNetwork.sendOrder(OrderString,viewModel)
+            }
+
+            return ""
+        }
+
+        fun GetFee(amount:Long):Long {
+            val result = amount/ Comisiontrfr
+            if(result < MinimunFee){
+                return MinimunFee
+            }
+            return result
+        }
+
+        fun getStringSigned(stringtoSign:String, privateKey: String):String {
+            var MessageAsBytes:ByteArray
+            var Signature: ByteArray
+
+            MessageAsBytes = java.util.Base64.getDecoder().decode(stringtoSign)
+            Signature = SignerUtils.SignMessage(
+                MessageAsBytes,
+                java.util.Base64.getDecoder().decode(privateKey),
+                KeyType.SECP256K1
+            )
+            return String(java.util.Base64.getEncoder().encode(Signature))
+        }
+
+        fun VerifySignedString(
+            stringtoverify:String,
+            signedhash:String,
+            publickey:String
+        ):Boolean {
+            var MessageAsBytes = java.util.Base64.getDecoder().decode(stringtoverify)
+            var Signature = java.util.Base64.getDecoder().decode(signedhash)
+            return SignerUtils.VerifySignature(
+                Signature,
+                MessageAsBytes,
+                java.util.Base64.getDecoder().decode(publickey),
+                KeyType.SECP256K1
+            )
+        }
+
         //Returns the SHA256 of a String in CAPITAL
         fun HashSha256String(StringToHash:String):String {
             var Source = StringToHash.toByteArray()
@@ -50,6 +165,15 @@ class mpCripto {
             val Digest = MessageDigestInstance.digest(Source)
             val result = Digest.fold("", { str, it -> str + "%02x".format(it) })
             return result.uppercase() //Display the digest in capital letter ?? ECO: not sure why
+        }
+
+        //Returns the SHA1 of a String in CAPITAL
+        fun HashSha1String(StringToHash:String):String {
+            var Source = StringToHash.toByteArray()
+            val MessageDigestInstance = MessageDigest.getInstance("SHA-1")
+            val Digest = MessageDigestInstance.digest(Source)
+            val result = Digest.fold("", { str, it -> str + "%02x".format(it) })
+            return result
         }
 
         fun HashMD160String(StringToHash:String):String {
@@ -125,7 +249,7 @@ class mpCripto {
             return r
         }
 
-        //Pascal Like
+        // Method replicated form Nosowallet
         fun BMHexto58(numerohex:String, alphabetnumber:BigInteger):String {
             var decimalValue:String
             var ResultadoDiv:DivResult

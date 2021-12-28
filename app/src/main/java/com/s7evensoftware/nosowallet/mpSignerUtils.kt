@@ -1,27 +1,20 @@
 package com.s7evensoftware.nosowallet
 
-import android.util.Base64
-import android.util.Log
-import org.bouncycastle.asn1.ocsp.Signature
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.asn1.x9.X9ECParameters
-import org.bouncycastle.crypto.*
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair
+import org.bouncycastle.crypto.AsymmetricCipherKeyPairGenerator
+import org.bouncycastle.crypto.digests.SHA1Digest
 import org.bouncycastle.crypto.ec.CustomNamedCurves
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator
 import org.bouncycastle.crypto.params.ECDomainParameters
 import org.bouncycastle.crypto.params.ECKeyGenerationParameters
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.crypto.params.ECPublicKeyParameters
-import org.bouncycastle.crypto.signers.DSAKCalculator
+import org.bouncycastle.crypto.signers.DSADigestSigner
 import org.bouncycastle.crypto.signers.ECDSASigner
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi
-import org.bouncycastle.jcajce.provider.digest.SHA512
-import org.bouncycastle.jcajce.util.MessageDigestUtils
-import org.bouncycastle.util.encoders.Base64Encoder
 import java.math.BigInteger
-import java.security.KeyPairGenerator
 import java.security.SecureRandom
-import java.security.interfaces.ECPrivateKey
+import java.util.*
 
 
 class mpSignerUtils {
@@ -51,9 +44,8 @@ class SignerUtils {
 
         }
 
-        fun GetSigner(): java.security.Signature? {
-            val sign_o = java.security.Signature.getInstance(SigningAlgorithm)
-            return sign_o
+        fun GetSigner(): DSADigestSigner {
+            return DSADigestSigner(ECDSASigner(),SHA1Digest())
         }
 
         fun GetCurve(keyType: KeyType): X9ECParameters {
@@ -63,7 +55,6 @@ class SignerUtils {
         fun GetDomain(curve: X9ECParameters): ECDomainParameters {
             return ECDomainParameters(curve.curve, curve.g, curve.n, curve.h, curve.seed)
         }
-
 
         fun GenerateECKeyPair(AKeyType: KeyType): KeyPair {
             var LCurve:X9ECParameters
@@ -78,22 +69,22 @@ class SignerUtils {
             KeyPairGeneratorInstance = ECKeyPairGenerator()
             KeyPairGeneratorInstance.init(ECKeyGenerationParameters(domain, securerandom))
             askp = KeyPairGeneratorInstance.generateKeyPair()
+
             Publickey = (askp.public as ECPublicKeyParameters).q.getEncoded(false)
             Privatekey = (askp.private as ECPrivateKeyParameters).d.toByteArray()
 
             val keyPair = KeyPair()
-            keyPair.PublicKey = String(java.util.Base64.getEncoder().encode(Publickey))
-            keyPair.PrivateKey = String(java.util.Base64.getEncoder().encode(Privatekey))
+            keyPair.PublicKey = String(Base64.getEncoder().encode(Publickey))
+            keyPair.PrivateKey = String(Base64.getEncoder().encode(Privatekey))
             return keyPair
         }
 
-        /*
         fun SignMessage(
             message: ByteArray,
             PrivateKey: ByteArray,
             AKeyType: KeyType): ByteArray
         {
-            var LSigner:Signer
+            var LSigner:DSADigestSigner
             var LRecreatedPrivKey:ECPrivateKeyParameters
             var LCurve:X9ECParameters
             var domain:ECDomainParameters
@@ -101,33 +92,35 @@ class SignerUtils {
             LCurve = GetCurve(AKeyType)
             domain = GetDomain(LCurve)
             LRecreatedPrivKey = ECPrivateKeyParameters(BigInteger(1, PrivateKey), domain)
-            //LSigner = GetSigner()
 
+            LSigner = GetSigner()
+            LSigner.init(true, LRecreatedPrivKey)
+            LSigner.update(message, 0, message.size)
+            val signature = LSigner.generateSignature()
 
+            return signature
         }
-
 
         fun VerifySignature(
-            signature: ByteArray,
-            message: ByteArray,
-            PublicKey: ByteArray,
-            AKeyType: KeyType):Boolean
-        {
+            signature:ByteArray,
+            message:ByteArray,
+            publicKey: ByteArray,
+            keyType: KeyType
+        ):Boolean {
+            var LSigner:DSADigestSigner
+            var LRecreatedPublicKey: ECPublicKeyParameters
+            var LCurve: X9ECParameters
+            var Domain: ECDomainParameters
 
+            LCurve = GetCurve(keyType)
+            Domain = GetDomain(LCurve)
+            LRecreatedPublicKey = ECPublicKeyParameters(LCurve.curve.decodePoint(publicKey), Domain)
+            LSigner = GetSigner()
+
+            LSigner.init(false, LRecreatedPublicKey)
+            LSigner.update(message, 0, message.size)
+
+            return LSigner.verifySignature(signature)
         }
-
-        fun ByteToString(Value: ByteArray): String {
-
-        }
-
-        fun StrToByte(Value:String): ByteArray {
-
-        }
-
-         */
-
     }
-
-
-
 }

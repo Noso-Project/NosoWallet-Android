@@ -22,6 +22,10 @@ class ServerAdapter(callback:OnServerSelected): RecyclerView.Adapter<ServerAdapt
         ServerList = servers
     }
 
+    fun indexOf(server:ServerObject):Int{
+        return ServerList?.indexOf(server)?:0
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Server {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.connection_server_row, parent, false)
         return Server(view)

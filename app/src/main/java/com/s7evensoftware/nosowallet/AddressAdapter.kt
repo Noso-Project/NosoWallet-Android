@@ -9,6 +9,7 @@ import com.s7evensoftware.nosowallet.databinding.WalletAddressRowBinding
 class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.Address>() {
 
     private var AddressList:ArrayList<WalletObject>? = null
+    private var PendingList:ArrayList<PendingData>? = null
     private var callback:OnCopyDone? = null
 
     init {
@@ -17,6 +18,11 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
 
     fun setAddressList(value: ArrayList<WalletObject>?) {
         AddressList = value
+        notifyDataSetChanged()
+    }
+
+    fun setPendingList(value: ArrayList<PendingData>?) {
+        PendingList = value
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Address {
@@ -25,7 +31,7 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
     }
 
     override fun onBindViewHolder(holder: Address, position: Int) {
-        holder.setAddress(AddressList!!.get(position))
+        holder.setAddress(AddressList!![position], PendingList!![position])
     }
 
     override fun getItemCount(): Int {
@@ -37,18 +43,25 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
 
     fun addNewWallet(newWallet: WalletObject) {
         AddressList?.add(newWallet)
+        PendingList?.add(PendingData())
         notifyItemInserted(AddressList!!.indexOf(newWallet))
     }
 
     inner class Address(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        fun setAddress(wallet: WalletObject){
+        fun setAddress(wallet: WalletObject, pendingData: PendingData){
             var rowbinding = WalletAddressRowBinding.bind(itemView)
             rowbinding.walletAddressRowAddress.text = wallet.Hash
+            rowbinding.walletAddressRowIncoming.text = mpCoin.Long2Currency(pendingData.Incoming)
+            rowbinding.walletAddressRowOutgoing.text = mpCoin.Long2Currency(pendingData.Outgoing)
             rowbinding.walletAddressRowBalance.text = mpCoin.Long2Currency(wallet.Balance)
 
             // To Copy the Address into the clipboard
             rowbinding.walletAddressRowCopy.tag = wallet.Hash
+            rowbinding.walletAddressRowSetsend.tag = wallet.Hash
+            rowbinding.walletAddressRowContainer.tag = wallet.Hash
             rowbinding.walletAddressRowCopy.setOnClickListener(this)
+            rowbinding.walletAddressRowSetsend.setOnClickListener(this)
+            rowbinding.walletAddressRowContainer.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -56,11 +69,18 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
                 R.id.wallet_address_row_copy -> {
                     callback?.onAddressCopied(v.tag as String)
                 }
+                R.id.wallet_address_row_setsend -> {
+                    callback?.onSourceForSendFunds(v.tag as String)
+                }
+                R.id.wallet_address_row_container -> {
+                    callback?.onSourceForSendFunds(v.tag as String)
+                }
             }
         }
     }
 
     interface OnCopyDone {
         fun onAddressCopied(address:String)
+        fun onSourceForSendFunds(address: String)
     }
 }

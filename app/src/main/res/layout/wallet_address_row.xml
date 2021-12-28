@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/wallet_address_row_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/background_corner_rounded_white_actionable">
@@ -52,6 +53,14 @@
                         android:background="@drawable/background_corner_rounded_darkgray"
                         android:padding="3dp"
                         android:src="@drawable/ic_baseline_content_copy_24"/>
+                    <ImageButton
+                        android:id="@+id/wallet_address_row_setsend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:background="@drawable/background_corner_rounded_darkgray"
+                        android:padding="3dp"
+                        android:src="@drawable/ic_baseline_exit_to_app_24"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

@@ -72,14 +72,14 @@ class OrderData : Serializable {
     var OrderID:String? = null
     var OrderLines:Int = -1
     var OrderType: String? = ""
-    var TimeStamp:Int = -1
+    var TimeStamp:Long = -1L
     var Reference:String? = null
     var TrxLine:Int = -1
     var Sender:String? = null // La clave publica de quien envia
     var Address:String? = null
     var Receiver:String? = null
-    var AmmountFee:Int = -1
-    var AmmountTrf:Int = -1
+    var AmountFee:Long = -1
+    var AmountTrf:Long = -1
     var Signature:String? = null
     var TrfrID:String? = null
 }
