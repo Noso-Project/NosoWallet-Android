@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import java.io.*
 
@@ -57,10 +56,10 @@ class mpParser {
             return -3
         }
 
-        fun ExportWallet(context: Context, resultCode: Int, data: Intent?, listaDirecciones: ArrayList<WalletObject>):Int {
+        fun ExportWallet(resultCode: Int, data: Intent?, listaDirecciones: ArrayList<WalletObject>):Int {
             if(resultCode == Activity.RESULT_OK){
                 data?.data.also {
-                    return mpDisk.ExportWallet(context, it, listaDirecciones)
+                    return mpDisk.ExportWallet(it, listaDirecciones)
                 }
             }
 
@@ -97,7 +96,7 @@ class mpParser {
                 fileReference?.close()
                 return false
             }
-            return parseWallet(context, bytes, addressList, pendingList) > 0
+            return parseWallet(bytes, addressList, pendingList) > 0
         }
 
         fun parseExternalWallet(context: Context, uriRef: Uri, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
@@ -113,10 +112,10 @@ class mpParser {
                 fileReference?.close()
                 return -1
             }
-            return parseWallet(context, bytes, addressList, pendingList)
+            return parseWallet(bytes, addressList, pendingList)
         }
 
-        fun parseWallet(context:Context, upbytes:ByteArray, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
+        fun parseWallet(upbytes:ByteArray, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
             var nuevos = 0
             var current:ByteArray? = upbytes.copyOfRange(0, 625)
             var bytes = upbytes.copyOfRange(626, upbytes.size)
@@ -160,7 +159,7 @@ class mpParser {
                     current = null
                 }
             }
-            mpDisk.SaveWallet(context, addressList)
+            mpDisk.SaveWallet(addressList)
             return nuevos
         }
 

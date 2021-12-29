@@ -7,6 +7,7 @@ import java.security.MessageDigest
 
 class mpCripto {
     companion object {
+
         fun CreateNewAddress():WalletObject {
             var MyData = WalletObject()
             var Address:String
@@ -97,6 +98,7 @@ class mpCripto {
 
                 for(tr in ArrayTrfrs){
                     tr.OrderID = mpFunctions.getOrderHash(TrxLine.toString()+OrderHashString)
+                    Log.e("mpCripto","new OrderID -> ${tr.OrderID}")
                     tr.OrderLines = TrxLine
                 }
                 ResultOrderID = mpFunctions.getOrderHash(TrxLine.toString()+OrderHashString)
@@ -121,8 +123,6 @@ class mpCripto {
         fun getStringSigned(stringtoSign:String, privateKey: String):String {
             var MessageAsBytes:ByteArray
             var Signature: ByteArray
-
-
 
             MessageAsBytes = org.bouncycastle.util.encoders.Base64.decode(stringtoSign)
             Signature = SignerUtils.SignMessage(

@@ -19,7 +19,8 @@ const val LanguageFileName    = "noso.lng" // lng
 const val BlockDirectory      = "BLOCKS/" // directory
 const val MarksDirectory      = "SUMMARKS/" // directory
 const val UpdatesDirectory    = "UPDATES/" // directory
-const val LogsDirectory       = "LOGS/" // directory
+const val LogsDirectory       = "LOGS" // directory
+const val LogsFilename        = "error_log.txt" // directory
 const val ExceptLogFilename   = "exceptlog" // txt
 const val ResumenFilename     = "blchhead" // nos
 const val MyTrxFilename       = "mytrx" // nos
@@ -43,4 +44,5 @@ const val Comisiontrfr      = 10000             // Amount/Comisiontrfr = 0.01% o
 const val MinimunFee        = 10L                  // Minimun fee for transfer
 const val Protocol          = 1
 const val ProgramVersion    = "1.0"
+
 

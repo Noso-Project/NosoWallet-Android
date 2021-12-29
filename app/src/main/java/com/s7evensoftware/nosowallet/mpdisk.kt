@@ -2,48 +2,54 @@ package com.s7evensoftware.nosowallet
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import java.io.*
 import java.math.BigInteger
 
 class mpDisk {
     companion object {
 
-        fun VerificarArchivos(context: Context, addressList: ArrayList<WalletObject>, pendingList:ArrayList<PendingData> ){
-            if(!directoryexist(context,UpdatesDirectory)){
-                CreateDir(context, UpdatesDirectory)
+        lateinit var context:Context
+
+        @JvmName("setContext1") // fix for declaration name
+        fun setContext(context: Context){
+            this.context = context
+        }
+
+        fun VerifyFiles(addressList: ArrayList<WalletObject>, pendingList:ArrayList<PendingData> ){
+            if(!directoryexist(UpdatesDirectory)){
+                CreateDir(UpdatesDirectory)
             }
 
-            if(!directoryexist(context, MarksDirectory)){
-                CreateDir(context, MarksDirectory)
+            if(!directoryexist(MarksDirectory)){
+                CreateDir(MarksDirectory)
             }
 
-            if(!directoryexist(context, LogsDirectory)){
-                CreateDir(context, LogsDirectory)
+            if(!directoryexist(LogsDirectory)){
+                CreateDir(LogsDirectory)
             }
 
-            if(!directoryexist(context, ExceptLogFilename)){
+            if(!directoryexist(ExceptLogFilename)){
                 //CreateDir(context, UpdatesDirectory)
             }
 
-            if(!fileexist(context, MainActivity.UserOptions.Wallet)){
+            if(!fileexist(MainActivity.UserOptions.Wallet)){
                 Log.e("mpDisk","Wallet Creation: "+MainActivity.UserOptions.Wallet)
-                CrearWallet(context, addressList, pendingList)
+                CreateWallet(addressList, pendingList)
             }else{
                 Log.e("mpDisk","Loading Wallet: "+MainActivity.UserOptions.Wallet)
                 if(addressList.size < 1){
-                    CargarWallet(context, MainActivity.UserOptions.Wallet, addressList, pendingList)
+                    LoadWallet(MainActivity.UserOptions.Wallet, addressList, pendingList)
                 }
             }
 
-            if(fileexist(context, SumaryFilePath)){
+            if(fileexist(SumaryFilePath)){
                 Log.e("mpDisk", "Loading Summary $SumaryFilePath")
-                LoadSummary(context)
+                LoadSummary()
             }
         }
 
         //New method, loaded to DB
-        fun LoadSummary(context: Context){
+        fun LoadSummary(){
             val summRef = File(context.getExternalFilesDir(null)!!.path
                     +File.separator
                     +NOSPath
@@ -89,15 +95,15 @@ class mpDisk {
             }
         }
 
-        fun CrearWallet(context: Context, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>) {
-            if(!fileexist(context, WalletFilename)){
+        fun CreateWallet(addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>) {
+            if(!fileexist(WalletFilename)){
                 addressList.add(mpCripto.CreateNewAddress())
                 pendingList.add(PendingData())
-                SaveWallet(context, addressList)
+                SaveWallet(addressList)
             }
         }
 
-        fun SaveWallet(context: Context, listaDirecciones: ArrayList<WalletObject>): Int{
+        fun SaveWallet(listaDirecciones: ArrayList<WalletObject>): Int{
             val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
             val FileWallet = File(NOSOroot.path, WalletFilename)
             val outputByteArray = ByteArrayOutputStream()
@@ -124,7 +130,7 @@ class mpDisk {
             }
         }
 
-        fun ExportWallet(context: Context, FileWallet: Uri?, listaDirecciones:ArrayList<WalletObject>): Int {
+        fun ExportWallet(FileWallet: Uri?, listaDirecciones:ArrayList<WalletObject>): Int {
             val outputByteArray = ByteArrayOutputStream()
             val dataoutputStream = DataOutputStream(outputByteArray)
             writeWalletFile(dataoutputStream, listaDirecciones)
@@ -168,13 +174,12 @@ class mpDisk {
             }
         }
 
-        fun CargarWallet(
-            context: Context,
+        fun LoadWallet(
             wallet: String,
             addressList: ArrayList<WalletObject>,
             pendingList: ArrayList<PendingData>
         ){
-            if(fileexist(context, wallet)){
+            if(fileexist(wallet)){
                 mpParser.parseInternalWallet(
                     context,
                     File(context.getExternalFilesDir(null)!!.path
@@ -188,7 +193,7 @@ class mpDisk {
             }
         }
 
-        fun CrearArchivoOpciones(context:Context) {
+        fun CreateOptionsFile() {
             val Options = Options()
             val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
 
@@ -206,7 +211,7 @@ class mpDisk {
             }
         }
 
-        fun CargarOpciones(context:Context) {
+        fun LoadOptions() {
             val FileOptions = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath, OptionsFileName)
             ObjectInputStream(FileInputStream(FileOptions)).use {
                 val Options = it.readObject()
@@ -216,7 +221,7 @@ class mpDisk {
         }
 
         /* Create dir inside NOSODATA */
-        fun CreateDir(context: Context, dirName:String){
+        fun CreateDir(dirName:String){
             val file = File(
                 context.getExternalFilesDir(null)!!.path
                         +File.separator
@@ -231,7 +236,7 @@ class mpDisk {
         }
 
         /* Create Summary file inside NOSODATA */
-        fun CreateSummFile(context: Context){
+        fun CreateSummFile(){
             val file = File(
                 context.getExternalFilesDir(null)!!.path
                         +File.separator
@@ -247,8 +252,37 @@ class mpDisk {
             }
         }
 
+        fun appendLog(origen:String, content:String){
+            val fileLog = File(
+                context.getExternalFilesDir(null)!!.path
+                        +File.separator
+                        +NOSPath
+                        +File.separator
+                        +LogsDirectory
+                        +File.separator
+                        +LogsFilename)
+
+            if(!fileLog.exists()){
+                fileLog.createNewFile()
+            }
+
+            try{
+                val buffWrt = BufferedWriter(FileWriter(fileLog, true))
+                val currentTime = System.currentTimeMillis()
+                val formattedLine = mpFunctions.getDateFromUNIX(currentTime)+" "+
+                                    mpFunctions.getTimeFromUNIX(currentTime)+" : "+
+                                    origen+" -> "+
+                                    content
+                buffWrt.append(formattedLine)
+                buffWrt.newLine()
+                buffWrt.close()
+            }catch (i:IOException){
+                Log.e("mpDisk","Error writing log file")
+            }
+        }
+
         /* Check if file exists in NOSODATA directory */
-        fun fileexist(context:Context, fileName: String): Boolean {
+        fun fileexist(fileName: String): Boolean {
             val file = File(
                 context.getExternalFilesDir(null)!!.path
                         +File.separator
@@ -259,7 +293,7 @@ class mpDisk {
         }
 
         /* Check if dir exists in NOSODATA directory */
-        fun directoryexist(context:Context, pathName: String): Boolean {
+        fun directoryexist(pathName: String): Boolean {
             val file = File(
                 context.getExternalFilesDir(null)!!.path
                 +File.separator

@@ -17,10 +17,10 @@ class ConcensusData {
 class NodeInfo {
     var Address:String = ""
     var Port:Int = 8080
-    var Connections:Long = 0
-    var Lastblock:Long = 0
-    var Pendings:Long = 0
-    var Delta:Long = 0
+    var Connections:Long = 0L
+    var Lastblock:Long = 0L
+    var Pendings:Long = 0L
+    var Delta:Long = 0L
     var Branch:String = ""
     var Version:String = ""
     var UTCTime:Long = 0

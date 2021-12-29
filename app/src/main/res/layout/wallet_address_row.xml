@@ -30,7 +30,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/colorChatBlack"
-                        android:textSize="10dp"
+                        android:textSize="10sp"
                         android:text="@string/wallet_address_label"
                         />
                     <TextView
@@ -38,7 +38,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
-                        android:textSize="15dp"
+                        android:textSize="15sp"
                         android:text="N4NsDwKdQJ17RqcAYNpRuSHbkKF28Ct"
                         />
                 </LinearLayout>
@@ -79,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorChatBlack"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:text="@string/wallet_incoming_balance"/>
                 <TextView
                     android:id="@+id/wallet_address_row_incoming"
@@ -99,7 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorChatBlack"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:text="@string/wallet_outgoing_balance"/>
                 <TextView
                     android:id="@+id/wallet_address_row_outgoing"
@@ -119,7 +119,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorChatBlack"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:text="@string/wallet_address_balance"/>
                 <TextView
                     android:id="@+id/wallet_address_row_balance"

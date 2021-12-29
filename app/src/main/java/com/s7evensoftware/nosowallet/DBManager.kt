@@ -1,6 +1,5 @@
 package com.s7evensoftware.nosowallet
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmResults

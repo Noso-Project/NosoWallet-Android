@@ -1,6 +1,6 @@
 package com.s7evensoftware.nosowallet
 
-import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.*
@@ -77,13 +77,18 @@ class mpFunctions {
             }
 
             if(CPending > viewModel.LastPendingCount.value?:0){
-                val Pending_String = mpNetwork.getPendings(selectedNode!!.Address,selectedNode.Port, viewModel)
-                ProcessPendings(
-                    Pending_String,
-                    viewModel.AdddressList.value!!,
-                    viewModel.PendingList.value!!
-                )
-                viewModel.LastPendingCount.postValue(CPending)
+                val pending_String = mpNetwork.getPendings(selectedNode!!.Address,selectedNode.Port, viewModel)
+                if(pending_String != "ERROR"){
+                    ProcessPendings(
+                        pending_String,
+                        viewModel.AdddressList.value!!,
+                        viewModel.PendingList.value!!,
+                        viewModel.LastPendingCount,
+                        CPending
+                    )
+                }else{
+                    mpDisk.appendLog("mpFunctions", "Request pendings failed")
+                }
             }
 
             if(viewModel.RealTimeValue.value!! > (CTime*1000-500) || viewModel.RealTimeValue.value!! < (CTime*1000+500)){
@@ -111,7 +116,8 @@ class mpFunctions {
                     candidateServer.add(server)
                 }
             }
-            val randomIndex = ThreadLocalRandom.current().nextInt(candidateServer.size)
+            //val randomIndex = ThreadLocalRandom.current().nextInt(candidateServer.size)
+            val randomIndex = 2
             return candidateServer[randomIndex]
         }
 
@@ -218,9 +224,11 @@ class mpFunctions {
         }
 
         fun ProcessPendings(
-            input:String,
+            input: String,
             addressList: ArrayList<WalletObject>,
-            pendingList: ArrayList<PendingData>
+            pendingList: ArrayList<PendingData>,
+            lastPendingCount: MutableLiveData<Long>,
+            CPending:Long
         ){
             var ThisOrder:String
             var Add_index:Int
@@ -248,6 +256,7 @@ class mpFunctions {
                     }
                 }
             }
+            lastPendingCount.postValue(CPending)
         }
 
         fun AddressSummaryIndex(address: String, addressSummary: ArrayList<SumaryData>):Int {
@@ -368,7 +377,7 @@ class mpFunctions {
 
         fun getTimeFromUNIX(time:Long):String{
             try {
-                val formatter = SimpleDateFormat("HH:mm:ss a")
+                val formatter = SimpleDateFormat("HH:mm:ss")
                 formatter.timeZone = TimeZone.getTimeZone("UTC")
                 return formatter.format(time)
             }catch (e:Exception){

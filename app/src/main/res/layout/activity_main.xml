@@ -145,7 +145,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12dp"
+                    android:textSize="12sp"
                     android:text="@string/wallet_grand_balance" />
                 <TextView
                     android:id="@+id/main_grand_balance"
@@ -153,7 +153,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:text="0.00000000"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textStyle="bold"/>
             </LinearLayout>
         </LinearLayout>
@@ -218,7 +218,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorChatBlack"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     android:text="24/12/2021"
                     />
                 <TextView
@@ -226,7 +226,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorChatBlack"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     android:text="22:49:10"
                     />
             </LinearLayout>
@@ -259,7 +259,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/colorChatBlack"
                     android:text="@string/general_send_funds_title"/>
@@ -280,7 +280,7 @@
                     android:id="@+id/main_send_funds_from"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="12dp"
+                    android:textSize="12sp"
                     android:enabled="false"
                     android:textAlignment="textEnd"
                     android:textColor="@color/colorBlack"
@@ -350,7 +350,7 @@
                     android:id="@+id/main_send_funds_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="12dp"
+                    android:textSize="12sp"
                     android:textAlignment="textEnd"
                     android:textColor="@color/colorBlack"
                     android:inputType="number|text"
@@ -375,7 +375,7 @@
                     android:id="@+id/main_send_funds_reference"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="12dp"
+                    android:textSize="12sp"
                     android:textAlignment="textEnd"
                     android:textColor="@color/colorBlack"
                     android:paddingVertical="6dp"

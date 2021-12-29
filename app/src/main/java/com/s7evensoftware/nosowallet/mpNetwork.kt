@@ -1,7 +1,6 @@
 package com.s7evensoftware.nosowallet
 
 import android.content.Context
-import android.util.Log
 import io.ktor.utils.io.core.*
 import java.io.*
 import java.net.ConnectException
@@ -57,9 +56,8 @@ class mpNetwork {
                     true
                 )
                 val inputStream = clientSocket.getInputStream()
-                val buffinstream = BufferedInputStream(inputStream)
 
-                mpDisk.CreateSummFile(context)
+                mpDisk.CreateSummFile()
 
                 clientChannel.println("GETZIPSUMARY")
 
@@ -74,14 +72,10 @@ class mpNetwork {
                 val fos = FileOutputStream(zSumaryFile, false)
                 var bytes = ByteArray(8192)
                 var read: Int = inputStream.read(bytes)
-                var count = 0
                 while (read != -1) {
-                    count += read
-                    Log.e("mpNetwork","Reading bytes $read")
                     fos.write(bytes, 0, read)
                     read = inputStream.read(bytes)
                 }
-                Log.e("mpNetwork","Read $count bytes in total")
 
                 fos.flush() // Flush File output stream
                 fos.close() // Close file output stream
@@ -185,7 +179,7 @@ class mpNetwork {
                 viewModel.ConnectionError.postValue(true)
                 Log.e("mpNetwork","Unhandled Exception: "+e.printStackTrace().toString())
             }
-            return ""
+            return "ERROR"
         }
     }
 }

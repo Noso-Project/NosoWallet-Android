@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ScrollView
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
     }
     var exportWalletTask = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        val result = mpParser.ExportWallet(this, it.resultCode, it.data, viewModel.AdddressList.value!!)
+        val result = mpParser.ExportWallet(it.resultCode, it.data, viewModel.AdddressList.value!!)
         if(result != -1 ) Toast.makeText(this, result, Toast.LENGTH_SHORT).show() // -1 = export cancelled
     }
     private var serverAdapter:ServerAdapter? = null
@@ -76,6 +75,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // set context for read/write tasks
+        mpDisk.setContext(this)
 
         //Start built in DB
         Realm.init(this)
@@ -89,6 +90,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         val view = binding.root
 
         // Prepare external components and permissions
+
         RequestPermissions()
         PerformInitialization()
         RestoreBlockBranchInfo()
@@ -170,7 +172,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 if(syncNode != null){ // null == false || not null == nodeInfo
                     Log.e("Sync","Consensus failed, syncing")
                     if(mpNetwork.getSummary(applicationContext, syncNode.Address, syncNode.Port, viewModel)){
-                        mpDisk.LoadSummary(applicationContext)
+                        mpDisk.LoadSummary()
                         viewModel.WalletSynced.postValue(true)
                         SaveBlockBranchInfo()
                     }
@@ -499,11 +501,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
     fun PerformInitialization() {
         if(!directoryexist(NOSPath)){
-            mpDisk.CrearArchivoOpciones(this)
+            mpDisk.CreateOptionsFile()
         }else{
-            mpDisk.CargarOpciones(this)
+            mpDisk.LoadOptions()
         }
-        mpDisk.VerificarArchivos(this, viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
+        mpDisk.VerifyFiles(viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
         addressAdapter?.notifyDataSetChanged()
     }
 
@@ -668,7 +670,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 val newAddress = mpCripto.CreateNewAddress()
                 addressAdapter?.addNewWallet(newAddress)
 
-                mpDisk.SaveWallet(this, viewModel.AdddressList.value!!)
+                mpDisk.SaveWallet(viewModel.AdddressList.value!!)
                 Toast.makeText(this,R.string.general_create_success,Toast.LENGTH_SHORT).show()
             }
             R.id.main_wallet_import -> {
