@@ -10,6 +10,7 @@
     <string name="general_copytoclip">Copied to clipboard</string>
 
     <string name="general_export_success">All wallets exported correctly</string>
+    <string name="general_export_cancelled"></string>
     <string name="general_export_error">Error exporting wallet</string>
 
     <string name="general_import_error_1">Invalid file, no wallets found</string>

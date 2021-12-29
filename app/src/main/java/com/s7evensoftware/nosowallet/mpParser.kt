@@ -63,6 +63,11 @@ class mpParser {
                     return mpDisk.ExportWallet(context, it, listaDirecciones)
                 }
             }
+
+            if(resultCode == Activity.RESULT_CANCELED){
+                return -1
+            }
+
             return R.string.general_export_error
         }
 

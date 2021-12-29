@@ -12,6 +12,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
     var exportWalletTask = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         val result = mpParser.ExportWallet(this, it.resultCode, it.data, viewModel.AdddressList.value!!)
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
+        if(result != -1 ) Toast.makeText(this, result, Toast.LENGTH_SHORT).show() // -1 = export cancelled
     }
     private var serverAdapter:ServerAdapter? = null
     private var addressAdapter:AddressAdapter? = null
@@ -436,6 +437,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         dialogBinding.settingsAddServer.setOnClickListener(this)
         dialogBinding.settingsAddServerDone.setOnClickListener(this)
         dialogBinding.settingsDeleteServer.setOnClickListener(this)
+        dialogBinding.settingsAddServerBack.setOnClickListener(this)
         dialogBinding.settingsServerList.visibility = View.VISIBLE
         dialogBinding.settingsAddServerContainer.visibility = View.GONE
 
@@ -714,6 +716,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                         }
                 }
             }
+            R.id.settings_add_server_back -> {
+                val settingsServerList = viewModel.SettingsDialog?.findViewById<RecyclerView>(R.id.settings_server_list)
+                val settingsAddServerContainer = viewModel.SettingsDialog?.findViewById<ScrollView>(R.id.settings_add_server_container)
+                settingsServerList?.visibility = View.VISIBLE
+                settingsAddServerContainer?.visibility = View.GONE
+            }
             R.id.settings_add_server_done -> {
                 if(
                     viewModel
@@ -736,6 +744,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     val settingsAddServerContainer = viewModel.SettingsDialog?.findViewById<ScrollView>(R.id.settings_add_server_container)
                     settingsServerList?.visibility = View.VISIBLE
                     settingsAddServerContainer?.visibility = View.GONE
+
+                    settingsAddServerContainer?.findViewById<EditText>(R.id.settings_add_server_address_input)?.let {
+                        it.setText("")
+                    }
+
+                    settingsAddServerContainer?.findViewById<EditText>(R.id.settings_add_server_port_input)?.let {
+                        it.setText("")
+                    }
                 }else{
                     Snackbar.make(v, R.string.settings_new_server_error, Snackbar.LENGTH_LONG).show()
                 }
