@@ -1,6 +1,5 @@
 package com.s7evensoftware.nosowallet
 
-import android.accounts.NetworkErrorException
 import android.content.Context
 import android.util.Log
 import io.ktor.utils.io.core.*
@@ -118,7 +117,7 @@ class mpNetwork {
         fun sendOrder(orderString:String, viewModel: MainViewModel):String {
             val serverAddress = InetSocketAddress(viewModel.LastNodeSelected?.Address?:"192.210.226.118", viewModel.LastNodeSelected?.Port?:8080)
 
-            Log.e("mpNetwork","Sending Order to ${viewModel.LastNodeSelected?.Address} Port: ${viewModel.LastNodeSelected?.Port}")
+            Log.e("mpNetwork","Sending Order to ${viewModel.LastNodeSelected?.Address?:"192.210.226.118"} Port: ${viewModel.LastNodeSelected?.Port}")
             Log.e("mpNetwork",orderString)
             try{
                 val clientSocket = Socket()

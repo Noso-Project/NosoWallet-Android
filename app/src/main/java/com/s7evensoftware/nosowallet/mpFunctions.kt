@@ -10,24 +10,19 @@ import kotlin.collections.ArrayList
 class mpFunctions {
     companion object {
 
-        fun UpdateWalletFromSummary(addressList: ArrayList<WalletObject>, addressSummary: ArrayList<SumaryData>){
+        fun UpdateWalletFromSummary(addressList: ArrayList<WalletObject>){
             for(wallet in addressList){
-                wallet.Balance = GetAddressBalanceFromSummary(wallet.Hash?:"nohash", addressSummary)
+                wallet.Balance = GetAddressBalanceFromSummary(wallet.Hash?:"nohash")
             }
         }
 
-        fun GetAddressBalanceFromSummary(address:String, addressSummary: ArrayList<SumaryData>):Long {
-            for(summary in addressSummary){
-                if(summary.Hash.equals(address)){
-                    return summary.Balance
-                }
-            }
-            return 0L
+        fun GetAddressBalanceFromSummary(address:String):Long {
+            return DBManager.getAddressBalance(address)
         }
 
         fun Concensus(NODEarray:ArrayList<NodeInfo>, viewModel:MainViewModel):NodeInfo? {
             var result:NodeInfo? = null
-            var selectedNode:NodeInfo? = null
+            var selectedNode: NodeInfo?
             var ArrT:ArrayList<ConcensusData>
             var CTime = 0L
             var CBlock = 0L
@@ -86,8 +81,7 @@ class mpFunctions {
                 ProcessPendings(
                     Pending_String,
                     viewModel.AdddressList.value!!,
-                    viewModel.AddressSummary.value!!,
-                    viewModel.PendingList.value!!,
+                    viewModel.PendingList.value!!
                 )
                 viewModel.LastPendingCount.postValue(CPending)
             }
@@ -106,7 +100,6 @@ class mpFunctions {
         }
 
         private fun getRandomServer(NODEarray: ArrayList<NodeInfo>, block:Long, brach:String, pendings:Long): NodeInfo {
-            Log.e("mpFunctions","Selecting random server")
             val candidateServer = ArrayList<NodeInfo>()
             for(server in NODEarray){
                 if(
@@ -131,13 +124,12 @@ class mpFunctions {
             ordertime:Long,
             line:Int,
             lastBlock:Long,
-            addressList: ArrayList<WalletObject>,
-            addressSummary: ArrayList<SumaryData>
+            addressList: ArrayList<WalletObject>
         ): OrderData {
             var AvailableAmount:Long; var AmountTrfr:Long;var FeeTrfr:Long
             var OrderInfo = OrderData()
 
-            AvailableAmount = addressList[WalletAddressIndex(origin, addressList, addressSummary)].Balance-getAddressPendingPays(origin)
+            AvailableAmount = addressList[WalletAddressIndex(origin, addressList)].Balance-getAddressPendingPays(origin)
             if(AvailableAmount > fee){
                 FeeTrfr = fee
             }else{
@@ -160,8 +152,8 @@ class mpFunctions {
             OrderInfo.TimeStamp = ordertime
             OrderInfo.Reference = reference
             OrderInfo.TrxLine = line
-            OrderInfo.Sender = addressList[WalletAddressIndex(origin, addressList, addressSummary)].PublicKey
-            OrderInfo.Address = addressList[WalletAddressIndex(origin, addressList, addressSummary)].Hash
+            OrderInfo.Sender = addressList[WalletAddressIndex(origin, addressList)].PublicKey
+            OrderInfo.Address = addressList[WalletAddressIndex(origin, addressList)].Hash
             OrderInfo.Receiver = destination
             OrderInfo.AmountFee = FeeTrfr
             OrderInfo.AmountTrf = AmountTrfr
@@ -172,7 +164,7 @@ class mpFunctions {
                           AmountTrfr.toString()+
                           FeeTrfr.toString()+
                           line.toString(),
-                addressList[WalletAddressIndex(origin, addressList, addressSummary)].PrivateKey!!
+                addressList[WalletAddressIndex(origin, addressList)].PrivateKey!!
             )
             OrderInfo.TrfrID = getTransferHash(
                 ordertime.toString()+
@@ -228,7 +220,6 @@ class mpFunctions {
         fun ProcessPendings(
             input:String,
             addressList: ArrayList<WalletObject>,
-            addressSummary: ArrayList<SumaryData>,
             pendingList: ArrayList<PendingData>
         ){
             var ThisOrder:String
@@ -246,11 +237,11 @@ class mpFunctions {
                 if(ThisOrder != ""){
                     val pendingInfo = stringToOrderData(ThisOrder)
                     if(pendingInfo.TO_Type.equals("TRFR")){
-                        Add_index = WalletAddressIndex(pendingInfo.TO_Sender, addressList, addressSummary)
+                        Add_index = WalletAddressIndex(pendingInfo.TO_Sender, addressList)
                         if(Add_index >= 0){
                             pendingList[Add_index].Outgoing = pendingList[Add_index].Outgoing+pendingInfo.TO_Amount+pendingInfo.TO_Fee
                         }
-                        Add_index = WalletAddressIndex(pendingInfo.TO_Receiver, addressList, addressSummary)
+                        Add_index = WalletAddressIndex(pendingInfo.TO_Receiver, addressList)
                         if(Add_index >= 0){
                             pendingList[Add_index].Incoming = pendingList[Add_index].Incoming+pendingInfo.TO_Amount
                         }
@@ -270,8 +261,8 @@ class mpFunctions {
             return -1
         }
 
-        fun WalletAddressIndex(address:String, addressList:ArrayList<WalletObject>, addressSummary: ArrayList<SumaryData>):Int{
-            if(!mpParser.IsValidAddress(address) && AddressSummaryIndex(address, addressSummary) < 0 ){
+        fun WalletAddressIndex(address:String, addressList:ArrayList<WalletObject>):Int{
+            if(!mpParser.IsValidAddress(address) && DBManager.getSummarySize() < 0 ){
                 return -1
             }
 
@@ -281,6 +272,21 @@ class mpFunctions {
                 }
             }
             return -1
+        }
+
+        fun getMaximumToSend(amount:Long):Long {
+            var Available:Long
+            var Maximum:Long
+            var Fee:Long
+            var SenT:Long
+            var Diff:Long
+
+            Available = amount
+            Maximum = (Available * Comisiontrfr) / (Comisiontrfr + 1)
+            Fee = Maximum / Comisiontrfr
+            SenT = Maximum + Fee
+            Diff = Available-SenT
+            return Maximum + Diff
         }
 
         fun stringToOrderData(input:String):PendingInfo {

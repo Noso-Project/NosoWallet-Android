@@ -44,33 +44,27 @@ class mpCripto {
             return CoinChar+Hash2
         }
 
-        fun SendTo(origin:String, destination:String, amount:Long, reference:String, lastblock:Long, addressList:ArrayList<WalletObject>, addressSummary:ArrayList<SumaryData>, viewModel:MainViewModel):String {
-            var Result:String
+        fun SendTo(origin:String, destination:String, amount:Long, reference:String, viewModel:MainViewModel):String {
             var CurrTime:Long
             var Fee:Long
-            //var ShowAmount:Long; var ShowFee:Long
             var Remaining:Long
             var CoinsAvailable:Long
-            var KeepProcess:Boolean = true
             var ArrayTrfrs = ArrayList<OrderData>()
             var Counter = 0
             var OrderHashString:String
             var TrxLine = 0
-            var ResultOrderID = ""
+            var ResultOrderID:String
             var OrderString:String
-            var PreviousRefresh:Int
 
             CurrTime = System.currentTimeMillis()/1000
             Fee = GetFee(amount)
-            //ShowAmount = amount
-            //ShowFee = Fee
             Remaining = amount+Fee
-            CoinsAvailable = mpFunctions.GetAddressBalanceFromSummary(origin,addressSummary)
+            CoinsAvailable = mpFunctions.GetAddressBalanceFromSummary(origin)
             if(Remaining <= CoinsAvailable){
                 OrderHashString = CurrTime.toString()
 
                 //Order list with origin in front
-                val orderedList = addressList.clone() as ArrayList<WalletObject>
+                val orderedList = viewModel.AdddressList.value!!.clone() as ArrayList<WalletObject>
                 for(wallet in orderedList){
                     if(wallet.Hash == origin){
                         orderedList.remove(wallet)
@@ -81,7 +75,6 @@ class mpCripto {
 
                 var Amount = amount // Amount == needed Amount
                 while(Amount > 0){
-                    Log.e("mpCripto","Collecting balance from: "+orderedList[Counter].Hash+" balance: "+orderedList[Counter].Balance)
                     if((orderedList[Counter].Balance-mpFunctions.getAddressPendingPays(orderedList[Counter].Hash!!))>0){
                         TrxLine += 1
                         ArrayTrfrs.add(
@@ -93,9 +86,8 @@ class mpCripto {
                                 reference,
                                 CurrTime,
                                 TrxLine,
-                                lastblock,
-                                addressList,
-                                addressSummary
+                                viewModel.LastBlock.value!!,
+                                viewModel.AdddressList.value!!
                             )
                         )
                         Fee = Fee+ArrayTrfrs.last().AmountFee
@@ -110,15 +102,13 @@ class mpCripto {
                     tr.OrderLines = TrxLine
                 }
                 ResultOrderID = mpFunctions.getOrderHash(TrxLine.toString()+OrderHashString)
-                Result = ResultOrderID
                 OrderString = mpFunctions.getPTCEcn("ORDER")+"ORDER "+TrxLine.toString()+" $"
                 for(tr in ArrayTrfrs){
                     OrderString += mpFunctions.getStringFromOrder(tr)+" $"
                 }
                 OrderString = OrderString.substring(0, OrderString.length-2)
-                mpNetwork.sendOrder(OrderString,viewModel)
+                return mpNetwork.sendOrder(OrderString,viewModel)
             }
-
             return ""
         }
 

@@ -336,6 +336,16 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorWhite"
                     android:text="@string/general_send_funds_amount"/>
+                <ImageView
+                    android:id="@+id/main_send_funds_amount_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="4dp"
+                    android:padding="3dp"
+                    android:background="@drawable/background_corner_rounded_actionable"
+                    android:src="@drawable/ic_baseline_paid_24"
+                    app:tint="@color/black" />
                 <EditText
                     android:id="@+id/main_send_funds_amount"
                     android:layout_width="match_parent"
@@ -348,7 +358,6 @@
                     android:text="0.00000000"
                     android:paddingVertical="6dp"
                     android:paddingHorizontal="10dp"
-                    android:layout_marginLeft="10dp"
                     android:background="@drawable/background_corner_rounded_dark"/>
             </LinearLayout>
 

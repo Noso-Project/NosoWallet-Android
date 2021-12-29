@@ -31,7 +31,6 @@ import kotlinx.coroutines.*
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
-
 class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, ServerAdapter.OnServerSelected, AddressAdapter.OnCopyDone {
     companion object {
         lateinit var UserOptions: Options
@@ -69,8 +68,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
     private var serverAdapter:ServerAdapter? = null
     private var addressAdapter:AddressAdapter? = null
-
-
 
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext
@@ -152,7 +149,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
 
     private fun UpdateWalletFromSummary() {
-        mpFunctions.UpdateWalletFromSummary(viewModel.AdddressList.value!!, viewModel.AddressSummary.value!!)
+        viewModel.AdddressList.value?.let {
+            mpFunctions.UpdateWalletFromSummary(it)
+        }
     }
 
     private fun SummarySync() {
@@ -170,13 +169,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 if(syncNode != null){ // null == false || not null == nodeInfo
                     Log.e("Sync","Consensus failed, syncing")
                     if(mpNetwork.getSummary(applicationContext, syncNode.Address, syncNode.Port, viewModel)){
-                        mpDisk.LoadSummary(applicationContext, viewModel.AddressSummary.value!!)
-                        viewModel.REF_Addresses = true
-                        //val addressSummary = viewModel.AddressSummary.value
-                        //viewModel.WalletSynced = (addressSummary?.last()?.LastOP ?: 0) == viewModel.LastBlock.value
+                        mpDisk.LoadSummary(applicationContext)
                         viewModel.WalletSynced.postValue(true)
                         SaveBlockBranchInfo()
-                        viewModel.REF_Status = true
                     }
                 }else{
                     viewModel.WalletSynced.postValue(true)
@@ -257,36 +252,45 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                             binding.mainSendFundsAmount.setText(final)
                                             binding.mainSendFundsAmount.setSelection(start)
                                         }else{
-                                            Log.e("TextWatcher","New char is$newChar and next char is: ${s?.substring(start+1,start+2)}")
-                                            if(s?.substring(start+1,start+2) != "." && s?.substring(s.indexOf("."))?.length?:0 < 9){
-                                                var afterDot = s?.substring(s.indexOf("."))
-                                                while(afterDot?.length != 9){
-                                                    afterDot += "0"
-                                                }
-                                                var final = s?.substring(0, start) + afterDot
-
-                                                if(start == 0){
-                                                    final = "0"+final
-                                                    replaceFirstZero = true
-                                                }
-
+                                            // Case of integer wiht dot at the end
+                                            if((s?.length?.minus(1))!! < (start+2)){
+                                                val final = s.toString()+"00000000"
                                                 ignoreNext = true
                                                 binding.mainSendFundsAmount.setText(final)
                                                 binding.mainSendFundsAmount.setSelection(start+count)
                                             }else{
-                                                var final =
-                                                    s?.substring(0, start+count)+
-                                                            s?.substring(start+count,start+count+9)?.replace(".","")
+                                                // Case of . before .
+                                                if(s?.substring(start+1,start+2) != "." && s?.substring(s.indexOf("."))?.length?:0 < 9){
+                                                    var afterDot = s?.substring(s.indexOf("."))
+                                                    while(afterDot?.length != 9){
+                                                        afterDot += "0"
+                                                    }
+                                                    var final = s?.substring(0, start) + afterDot
 
-                                                if(start == 0){
-                                                    final = "0"+final
-                                                    replaceFirstZero = true
+                                                    if(start == 0){
+                                                        final = "0"+final
+                                                        replaceFirstZero = true
+                                                    }
+
+                                                    ignoreNext = true
+                                                    binding.mainSendFundsAmount.setText(final)
+                                                    binding.mainSendFundsAmount.setSelection(start+count)
+                                                }else{
+                                                    if(s?.substring(start+count)?.indexOf(".") != -1){
+                                                        var final =
+                                                            s?.substring(0, start+count)+
+                                                                    s?.substring(start+count,start+count+9)?.replace(".","")
+
+                                                        if(start == 0){
+                                                            final = "0"+final
+                                                            replaceFirstZero = true
+                                                        }
+
+                                                        ignoreNext = true
+                                                        binding.mainSendFundsAmount.setText(final)
+                                                        binding.mainSendFundsAmount.setSelection(start+count+(if(start == 0) 1 else 0))
+                                                    }
                                                 }
-
-                                                ignoreNext = true
-                                                binding.mainSendFundsAmount.setText(final)
-                                                binding.mainSendFundsAmount.setSelection(start+count+(if(start == 0) 1 else 0))
-
                                             }
                                         }
                                     }else if(newChar?.matches("[0-9]".toRegex()) == true){
@@ -331,16 +335,58 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 }
 
                 override fun afterTextChanged(s: Editable?) {
-                    if(s.toString().length > 0){
-                        viewModel.SendFunds_Amount =
-                            s.toString()
-                                .replace(".","")
-                                .replace(",","")
-                                .toLong()
+                    if(s.toString().isNotEmpty()){
+                        val isCommaCase = s?.indexOf(",")
+                        val isPointCase = s?.indexOf(".")
+
+                        if(isCommaCase != -1){
+                            val integer = s?.substring(0,isPointCase?:0)
+                            var decimal = s?.substring(isPointCase?:0)?.replace(",","")
+
+                            if(decimal?.length?:0 > 8){
+                                decimal = decimal?.substring(0,8)
+                            }else{
+                                while(decimal?.length?:0 < 8){
+                                    decimal += "0"
+                                }
+                            }
+                            viewModel.SendFunds_Amount = (integer+decimal).toLong()
+                        }
+
+                        if(isPointCase != -1){
+                            val integer = s?.substring(0,isPointCase?:0)
+                            var decimal = s?.substring(isPointCase?:0)?.replace(".","")
+
+                            if(decimal?.length?:0 > 8){
+                                decimal = decimal?.substring(0,8)
+                            }else{
+                                while(decimal?.length?:0 < 8){
+                                    decimal += "0"
+                                }
+                            }
+                            viewModel.SendFunds_Amount = (integer+decimal).toLong()
+                        }
+
+                        if(isPointCase == -1 && isCommaCase == -1){
+                            viewModel.SendFunds_Amount = (s.toString()+"00000000").toLong()
+                        }
+                    }else{
+                        viewModel.SendFunds_Amount = 0L
+                    }
+
+                    viewModel.AvailableBalance.value?.let {
+                        if(
+                            viewModel.SendFunds_Amount > 0L &&
+                            viewModel.SendFunds_Amount <= mpFunctions.getMaximumToSend(it)
+                        ){
+                            binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_check_circle_24))
+                        }else{
+                            binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_cancel_24))
+                        }
                     }
                 }
-            }
-        )
+            })
+
 
         //Prepare Wallet List container
         addressAdapter = AddressAdapter(this)
@@ -348,6 +394,19 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         addressAdapter?.setAddressList(viewModel.AdddressList.value)
         binding.mainAddressList.layoutManager = LinearLayoutManager(this)
         binding.mainAddressList.adapter = addressAdapter
+
+        //Order Success/Fail Observer
+        viewModel.TriggerSuccessError.observe(this, {
+            if(it > 0){
+                if(it.mod(2) == 0){
+                    Toast.makeText(applicationContext, R.string.general_sendfunds_success, Toast.LENGTH_SHORT).show()
+                    viewModel.TriggerSuccessError.value = 0
+                }else{
+                    Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error_conn, Snackbar.LENGTH_SHORT).show()
+                    viewModel.TriggerSuccessError.value = 0
+                }
+            }
+        })
 
         //Sync Observer
         viewModel.WalletSynced.observe(this, {
@@ -442,23 +501,28 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         }else{
             mpDisk.CargarOpciones(this)
         }
-        mpDisk.VerificarArchivos(this, viewModel.AdddressList.value!!, viewModel.AddressSummary.value!!, viewModel.PendingList.value!!)
+        mpDisk.VerificarArchivos(this, viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
         addressAdapter?.notifyDataSetChanged()
     }
 
     private fun CalculateGrandBalance(){
         viewModel.UpdateBalanceTrigger.observe(this, {
-            Log.e("Main","Calculate Balance Called")
             UpdateWalletFromSummary()  // Individual Balance Update
             var total:Long = 0
-            if(viewModel.AdddressList.value != null && viewModel.AdddressList.value!!.size > 0){
-                for(wallet in viewModel.AdddressList.value!!){
-                    total += wallet.Balance
-                }
-                for(pending in viewModel.PendingList.value!!){
-                    total -= pending.Outgoing
+            viewModel.AdddressList.value?.let {
+                if(it.size > 0){
+                    for(wallet in it){
+                        total += wallet.Balance
+                    }
+
+                    viewModel.PendingList.value?.let {
+                        for(pending in it){
+                            total -= pending.Outgoing
+                        }
+                    }
                 }
             }
+            viewModel.AvailableBalance.value = total
             binding.mainGrandBalance.text = mpCoin.Long2Currency(total)
             addressAdapter?.notifyDataSetChanged()
         })
@@ -494,15 +558,23 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                         if(mpParser.IsValidAddress(viewModel.SendFunds_TO)){
                             if(viewModel.SendFunds_TO != viewModel.SendFunds_FROM){
                                 if(viewModel.SendFunds_Amount > 0L){
-                                    //Disable modificatiosn until confirmed or cancelled
-                                    binding.mainSendFundsDestination.isEnabled = false
-                                    binding.mainSendFundsAmount.isEnabled = false
-                                    binding.mainSendFundsReference.isEnabled = false
+                                    viewModel.AvailableBalance.value?.let {
+                                        if(
+                                            viewModel.SendFunds_Amount <= mpFunctions.getMaximumToSend(it)
+                                        ){
+                                            //Disable modificatiosn until confirmed or cancelled
+                                            binding.mainSendFundsDestination.isEnabled = false
+                                            binding.mainSendFundsAmount.isEnabled = false
+                                            binding.mainSendFundsReference.isEnabled = false
 
-                                    binding.mainSendFundsClose.visibility = View.GONE
-                                    binding.mainSendFundsSend.visibility = View.GONE
-                                    binding.mainSendFundsCancel.visibility = View.VISIBLE
-                                    binding.mainSendFundsSendConfirm.visibility = View.VISIBLE
+                                            binding.mainSendFundsClose.visibility = View.GONE
+                                            binding.mainSendFundsSend.visibility = View.GONE
+                                            binding.mainSendFundsCancel.visibility = View.VISIBLE
+                                            binding.mainSendFundsSendConfirm.visibility = View.VISIBLE
+                                        }else{
+                                            Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error5, Snackbar.LENGTH_SHORT).show()
+                                        }
+                                    }
                                 }else{
                                     Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error4, Snackbar.LENGTH_SHORT).show()
                                 }
@@ -520,22 +592,63 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 }
             }
             R.id.main_send_funds_send_confirm -> {
-                viewModel.WalletSynced.value.let {
-                    if(it == true){
+                viewModel.WalletSynced.value?.let {
+                    if(it){
                         launch{
-                            mpCripto.SendTo(
-                                viewModel.SendFunds_FROM,
-                                viewModel.SendFunds_TO,
-                                viewModel.SendFunds_Amount,
-                                viewModel.SendFubds_Ref,
-                                viewModel.LastBlock.value!!,
-                                viewModel.AdddressList.value!!,
-                                viewModel.AddressSummary.value!!,
-                                viewModel
-                            )
+                            var order_pending = true
+                            val outgoing = viewModel.SendFunds_FROM
+                            val incoming = viewModel.SendFunds_TO
+                            val balance = viewModel.SendFunds_Amount
+                            val ref = viewModel.SendFubds_Ref
+
+                            while(order_pending){
+                                val res = mpCripto.SendTo(
+                                    outgoing,
+                                    incoming,
+                                    balance,
+                                    ref,
+                                    viewModel
+                                )
+
+                                if(res == "ok"){
+                                    val out = mpFunctions.WalletAddressIndex(outgoing, viewModel.AdddressList.value!!)
+                                    val inc = mpFunctions.WalletAddressIndex(incoming, viewModel.AdddressList.value!!)
+                                    if(out != -1){
+                                        viewModel.PendingList.value?.let {
+                                            it[out].Outgoing += balance+mpCoin.GetFee(balance)
+                                        }
+                                    }
+                                    if(inc != -1){
+                                        viewModel.PendingList.value?.let {
+                                            it[out].Incoming += balance
+                                        }
+                                    }
+                                    viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
+                                    viewModel.TriggerSuccessError.postValue(viewModel.TriggerSuccessError.value!!+2)
+                                    order_pending = false
+                                }else{
+                                    viewModel.TriggerSuccessError.postValue(viewModel.TriggerSuccessError.value!!+1)
+                                    delay(DEFAULT_SYNC_DELAY)
+                                }
+                            }
                         }
+                        binding.mainSendFundsFrom.setText("")
+                        binding.mainSendFundsReference.setText("")
+                        binding.mainSendFundsAmount.setText("0.00000000")
+                        binding.mainSendFundsDestination.setText("")
+
+                        binding.mainSendFundsDestination.isEnabled = true
+                        binding.mainSendFundsAmount.isEnabled = true
+                        binding.mainSendFundsReference.isEnabled = true
+
+                        binding.mainSendFundsClose.visibility = View.VISIBLE
+                        binding.mainSendFundsSend.visibility = View.VISIBLE
+                        binding.mainSendFundsCancel.visibility = View.GONE
+                        binding.mainSendFundsSendConfirm.visibility = View.GONE
+
+                        viewModel.isSendFundsOpen.value = false
                     }else{
-                        Log.e("Main","Wallet is not Sync, wait for syncronization")
+                        Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error_sync, Snackbar.LENGTH_SHORT).show()
                     }
                 }
             }

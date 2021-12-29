@@ -3,7 +3,6 @@ package com.s7evensoftware.nosowallet
 import android.util.Log
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.RealmQuery
 import io.realm.RealmResults
 
 object DBManager {
@@ -44,6 +43,39 @@ object DBManager {
             Log.e("DBManager","Creating Seed Nodes - OK")
         }else{
             Log.e("DBManager","Seed Nodes Loaded - OK")
+        }
+        realmDB.close()
+    }
+
+    fun getSummarySize():Int {
+        val realmDB = Realm.getInstance(config)
+        val size = realmDB.where(SumaryData::class.java).count().toInt()
+        realmDB.close()
+        return size
+    }
+
+    fun getAddressBalance(address:String):Long {
+        val realmDB = Realm.getInstance(config)
+        realmDB.where(SumaryData::class.java).equalTo("Hash",address).findFirst()?.let {
+            return it.Balance
+        }
+        return 0L
+    }
+
+    fun addSummaryFromList(addressSummary: ArrayList<SumaryData>) {
+        val realmDB = Realm.getInstance(config)
+        realmDB.executeTransaction {
+            for(summary in addressSummary){
+                it.insert(summary)
+            }
+        }
+        realmDB.close()
+    }
+
+    fun clearSummary(){
+        val realmDB = Realm.getInstance(config)
+        realmDB.executeTransaction {
+            it.delete(SumaryData::class.java)
         }
         realmDB.close()
     }

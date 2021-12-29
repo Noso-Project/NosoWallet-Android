@@ -26,8 +26,8 @@ class NodeInfo {
     var UTCTime:Long = 0
 }
 
-class SumaryData {
-    var Hash = ""
+open class SumaryData:RealmObject() {
+    @PrimaryKey var Hash = ""
     var Custom = ""
     var Balance:Long = -1
     var Score:Long = -1

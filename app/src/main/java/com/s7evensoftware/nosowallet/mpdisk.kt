@@ -9,7 +9,7 @@ import java.math.BigInteger
 class mpDisk {
     companion object {
 
-        fun VerificarArchivos(context: Context, addressList: ArrayList<WalletObject>, addressSummary: ArrayList<SumaryData>, pendingList:ArrayList<PendingData> ){
+        fun VerificarArchivos(context: Context, addressList: ArrayList<WalletObject>, pendingList:ArrayList<PendingData> ){
             if(!directoryexist(context,UpdatesDirectory)){
                 CreateDir(context, UpdatesDirectory)
             }
@@ -38,11 +38,12 @@ class mpDisk {
 
             if(fileexist(context, SumaryFilePath)){
                 Log.e("mpDisk", "Loading Summary $SumaryFilePath")
-                LoadSummary(context, addressSummary)
+                LoadSummary(context)
             }
         }
 
-        fun LoadSummary(context: Context, addressSummary:ArrayList<SumaryData>){
+        //New method, loaded to DB
+        fun LoadSummary(context: Context){
             val summRef = File(context.getExternalFilesDir(null)!!.path
                     +File.separator
                     +NOSPath
@@ -51,6 +52,7 @@ class mpDisk {
                     +File.separator
                     +SumaryFileName)
             val fileReference = FileInputStream(summRef)
+            val addressSummary = ArrayList<SumaryData>()
             var bytes = ByteArray(106)
 
             try{
@@ -80,6 +82,8 @@ class mpDisk {
                 }
                 Log.e("mpDisk","$count Wallets Loaded from Summary")
                 buffer.close()
+                DBManager.clearSummary() // Erase current Summary data
+                DBManager.addSummaryFromList(addressSummary) // Write list to the DB
             }catch (e:Exception){
                 fileReference.close()
             }

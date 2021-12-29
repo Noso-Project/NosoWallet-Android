@@ -14,8 +14,8 @@ class MainViewModel: ViewModel() {
 
     var AdddressList = MutableLiveData(ArrayList<WalletObject>())
     var PendingList = MutableLiveData(ArrayList<PendingData>())
-    var AddressSummary = MutableLiveData(ArrayList<SumaryData>())
     var UpdateBalanceTrigger = MutableLiveData(0)
+    var AvailableBalance = MutableLiveData(0L)
     var SYNC_ENABLED = true
     var SYNC_FAILURES = 0
     var SYNC_DELAY:Long = DEFAULT_SYNC_DELAY
@@ -26,13 +26,7 @@ class MainViewModel: ViewModel() {
     var WalletSynced = MutableLiveData(false)
     var ConnectionError = MutableLiveData(false)
 
-    var REF_Addresses = false
-    var REF_Status = false
-    var REF_Nodes = false
-    var LastSyncExecution = MutableLiveData(0L)
-
     var RealTimeValue = MutableLiveData(System.currentTimeMillis())
-
 
     var isSendFundsOpen = MutableLiveData(false)
     var SendFunds_TO = ""
@@ -40,5 +34,6 @@ class MainViewModel: ViewModel() {
     var SendFunds_Amount = 0L
     var SendFubds_Ref= ""
     var LastNodeSelected:NodeInfo? = null
+    var TriggerSuccessError = MutableLiveData(0)
 
 }
