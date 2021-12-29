@@ -1,6 +1,5 @@
 package com.s7evensoftware.nosowallet
 
-import android.util.Log
 import kotlin.math.absoluteValue
 
 class mpCoin {

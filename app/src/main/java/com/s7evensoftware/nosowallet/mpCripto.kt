@@ -1,7 +1,5 @@
 package com.s7evensoftware.nosowallet
 
-import android.util.Base64
-import android.util.Log
 import org.bouncycastle.crypto.digests.RIPEMD160Digest
 import org.bouncycastle.util.encoders.Hex
 import java.math.BigInteger

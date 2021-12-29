@@ -18,7 +18,6 @@ class ServerAdapter(callback:OnServerSelected): RecyclerView.Adapter<ServerAdapt
     }
 
     fun setServers(servers: RealmResults<ServerObject>?) {
-        Log.e("Adapter","Agregando lista de: "+servers!!.size+" servidores")
         ServerList = servers
     }
 
@@ -51,7 +50,6 @@ class ServerAdapter(callback:OnServerSelected): RecyclerView.Adapter<ServerAdapt
             rowBinding.connectionRowContainer.setOnClickListener(this)
             rowBinding.connectionRowAddress.text = server.Address
             rowBinding.connectionRowPort.text = server.Port.toString()
-            Log.e("Adapter","Server: "+server.Address+" - Default: "+server.isDefault)
             if(server.isDefault){
                 rowBinding.connectionRowDefault.visibility = View.VISIBLE
             }else{

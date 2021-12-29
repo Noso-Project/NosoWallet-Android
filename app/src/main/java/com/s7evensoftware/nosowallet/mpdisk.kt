@@ -242,7 +242,7 @@ class mpDisk {
                 if(file.createNewFile()){
                     Log.e("mpDisk","Summary file created - OK")
                 }else{
-                    Log.e("mpDisk","Error creating summary.zip - OK")
+                    Log.e("mpDisk","Error creating summary.zip - ERR")
                 }
             }
         }
