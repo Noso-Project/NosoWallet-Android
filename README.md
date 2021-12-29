@@ -13,3 +13,7 @@ To build from source you'll need a working installation of [Android Studio](http
 
 This library is already included in the build source under app/libs, however to ensure that you have the latest version you can get it from [BouncyCastle Official Website](https://www.bouncycastle.org/latest_releases.html) in .jar format
 
+The way to add the library to the project is by adding the implementation line in build.gradle(app Module), it has to be under "app/libs" folder
+![image](https://user-images.githubusercontent.com/53009062/147697515-8ce4be92-7dcf-4d24-9732-f31beb8fde43.png)
+
+
