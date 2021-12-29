@@ -116,8 +116,7 @@ class mpFunctions {
                     candidateServer.add(server)
                 }
             }
-            //val randomIndex = ThreadLocalRandom.current().nextInt(candidateServer.size)
-            val randomIndex = 2
+            val randomIndex = ThreadLocalRandom.current().nextInt(candidateServer.size)
             return candidateServer[randomIndex]
         }
 
