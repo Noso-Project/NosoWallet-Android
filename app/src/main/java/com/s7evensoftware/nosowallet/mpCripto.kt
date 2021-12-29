@@ -124,13 +124,16 @@ class mpCripto {
             var MessageAsBytes:ByteArray
             var Signature: ByteArray
 
-            MessageAsBytes = java.util.Base64.getDecoder().decode(stringtoSign)
+
+
+            MessageAsBytes = org.bouncycastle.util.encoders.Base64.decode(stringtoSign)
             Signature = SignerUtils.SignMessage(
                 MessageAsBytes,
-                java.util.Base64.getDecoder().decode(privateKey),
+                org.bouncycastle.util.encoders.Base64.decode(privateKey),
                 KeyType.SECP256K1
             )
-            return String(java.util.Base64.getEncoder().encode(Signature))
+
+            return String(org.bouncycastle.util.encoders.Base64.encode(Signature))
         }
 
         fun VerifySignedString(
@@ -138,12 +141,12 @@ class mpCripto {
             signedhash:String,
             publickey:String
         ):Boolean {
-            var MessageAsBytes = java.util.Base64.getDecoder().decode(stringtoverify)
-            var Signature = java.util.Base64.getDecoder().decode(signedhash)
+            var MessageAsBytes = org.bouncycastle.util.encoders.Base64.decode(stringtoverify)
+            var Signature = org.bouncycastle.util.encoders.Base64.decode(signedhash)
             return SignerUtils.VerifySignature(
                 Signature,
                 MessageAsBytes,
-                java.util.Base64.getDecoder().decode(publickey),
+                org.bouncycastle.util.encoders.Base64.decode(publickey),
                 KeyType.SECP256K1
             )
         }

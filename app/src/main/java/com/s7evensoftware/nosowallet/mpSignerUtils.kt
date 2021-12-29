@@ -14,8 +14,6 @@ import org.bouncycastle.crypto.signers.DSADigestSigner
 import org.bouncycastle.crypto.signers.ECDSASigner
 import java.math.BigInteger
 import java.security.SecureRandom
-import java.util.*
-
 
 class mpSignerUtils {
     companion object {
@@ -74,8 +72,8 @@ class SignerUtils {
             Privatekey = (askp.private as ECPrivateKeyParameters).d.toByteArray()
 
             val keyPair = KeyPair()
-            keyPair.PublicKey = String(Base64.getEncoder().encode(Publickey))
-            keyPair.PrivateKey = String(Base64.getEncoder().encode(Privatekey))
+            keyPair.PublicKey = String(org.bouncycastle.util.encoders.Base64.encode(Publickey))
+            keyPair.PrivateKey = String(org.bouncycastle.util.encoders.Base64.encode(Privatekey))
             return keyPair
         }
 
