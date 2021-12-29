@@ -8,6 +8,7 @@ import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketTimeoutException
+import java.util.zip.ZipError
 import java.util.zip.ZipFile
 
 class mpNetwork {
@@ -56,6 +57,7 @@ class mpNetwork {
                     true
                 )
                 val inputStream = clientSocket.getInputStream()
+                val buffinstream = BufferedInputStream(inputStream)
 
                 mpDisk.CreateSummFile(context)
 
@@ -72,11 +74,18 @@ class mpNetwork {
                 val fos = FileOutputStream(zSumaryFile, false)
                 var bytes = ByteArray(8192)
                 var read: Int = inputStream.read(bytes)
-
+                var count = 0
                 while (read != -1) {
+                    count += read
+                    Log.e("mpNetwork","Reading bytes $read")
                     fos.write(bytes, 0, read)
                     read = inputStream.read(bytes)
                 }
+                Log.e("mpNetwork","Read $count bytes in total")
+
+                fos.flush() // Flush File output stream
+                fos.close() // Close file output stream
+                clientSocket.close()
 
                 Log.e("Welcome", "Summary Zip-File Written - OK")
 
@@ -104,9 +113,11 @@ class mpNetwork {
                 }
             }catch (t:SocketTimeoutException){
                 Log.e("Welcome-Err","Request failed to $address$ -> Timed Out")
-            }catch (c:ConnectException){ // No internet ?
+            }catch (c:ConnectException) { // No internet ?
                 viewModel.ConnectionError.postValue(true) // Report Connection Error
-                Log.e("mpNetwork","Connection error, check the internet")
+                Log.e("mpNetwork", "Connection error, check the internet")
+            }catch (z:ZipError){
+                Log.e("mpNetwork", "Unzipping error: "+z.message)
             }catch (e:Exception){ // Something else....
                 viewModel.ConnectionError.postValue(true)
                 Log.e("mpNetwork","Unhandled Exception: "+e.printStackTrace().toString())

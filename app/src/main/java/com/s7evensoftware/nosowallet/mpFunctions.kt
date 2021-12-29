@@ -357,7 +357,7 @@ class mpFunctions {
 
         fun getDateFromUNIX(time:Long):String{
             try {
-                val formatter = SimpleDateFormat("dd/MM/YYYY")
+                val formatter = SimpleDateFormat("dd/MM/yyyy")
                 formatter.timeZone = TimeZone.getTimeZone("UTC")
                 return formatter.format(time)
             }catch (e:Exception){
