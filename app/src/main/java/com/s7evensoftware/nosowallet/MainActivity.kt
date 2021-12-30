@@ -440,8 +440,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         dialogBinding.settingsAddServerDone.setOnClickListener(this)
         dialogBinding.settingsDeleteServer.setOnClickListener(this)
         dialogBinding.settingsAddServerBack.setOnClickListener(this)
+        dialogBinding.settingsAppVersion.text = "v "+packageManager.getPackageInfo(packageName, 0).versionName
         dialogBinding.settingsServerList.visibility = View.VISIBLE
         dialogBinding.settingsAddServerContainer.visibility = View.GONE
+
 
         serverAdapter = ServerAdapter(this)
         serverAdapter?.setServers(DBManager.getServers())

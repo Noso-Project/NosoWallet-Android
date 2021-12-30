@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="main_current_noso_title_text_size">30dp</dimen>
+
+    <dimen name="main_netstat_block_hpadding">10dp</dimen>
+    <dimen name="main_netstat_block_vpadding">10dp</dimen>
+    <dimen name="main_sendfunds_date_text_size">10sp</dimen>
+
+</resources>
