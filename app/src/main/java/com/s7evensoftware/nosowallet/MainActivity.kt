@@ -32,9 +32,6 @@ import java.io.File
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, ServerAdapter.OnServerSelected, AddressAdapter.OnCopyDone {
-    companion object {
-        lateinit var UserOptions: Options
-    }
 
     lateinit var binding:ActivityMainBinding
     lateinit var viewModel:MainViewModel
@@ -102,6 +99,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         CalculateGrandBalance()
         SummarySync()
         TimeTask()
+
+        Log.e("Main","Your DPI is: "+getResources().getDisplayMetrics().density)
     }
 
     private fun RestoreSendFundsView() {
@@ -130,12 +129,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         }
     }
 
-    private fun SaveBlockBranchInfo(){
+    private fun SaveBlockBranchInfo(lastBlock:Long, lastBrach:String){
         Log.e("Main","Saving Block and Branch Info")
         val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
         with (sharedPref.edit()) {
-            putInt(getString(R.string.sharedpref_netstate_lastblock), viewModel.LastBlock.value?.toInt()?:0)
-            putString(getString(R.string.sharedpref_netstate_lastbranch), viewModel.LastSummary.value)
+            putLong(getString(R.string.sharedpref_netstate_lastblock), lastBlock)
+            putString(getString(R.string.sharedpref_netstate_lastbranch), lastBrach)
             apply()
         }
     }
@@ -143,7 +142,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     private fun RestoreBlockBranchInfo(){
         Log.e("Main","Restoring Block and Branch Info")
         val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
-        viewModel.LastBlock.value = sharedPref.getInt(getString(R.string.sharedpref_netstate_lastblock), 0).toLong()
+        viewModel.LastBlock.value = sharedPref.getLong(getString(R.string.sharedpref_netstate_lastblock), 0)
         viewModel.LastSummary.value = sharedPref.getString(getString(R.string.sharedpref_netstate_lastbranch), "0")
     }
 
@@ -173,8 +172,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     Log.e("Sync","Consensus failed, syncing")
                     if(mpNetwork.getSummary(applicationContext, syncNode.Address, syncNode.Port, viewModel)){
                         mpDisk.LoadSummary()
+                        viewModel.LastBlock.postValue(syncNode.LastBlock)
+                        viewModel.LastSummary.postValue(syncNode.LastBranch)
                         viewModel.WalletSynced.postValue(true)
-                        SaveBlockBranchInfo()
+                        SaveBlockBranchInfo(syncNode.LastBlock, syncNode.LastBranch)
                     }
                 }else{
                     viewModel.WalletSynced.postValue(true)
@@ -205,6 +206,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             viewModel.SendFunds_TO = it.toString()
         }
 
+        // Order Ref
+        binding.mainSendFundsReference.addTextChangedListener {
+            viewModel.SendFunds_Ref = it.toString()
+        }
+
         // Transfer amount
         binding.mainSendFundsAmount.addTextChangedListener(object : TextWatcher
             {
@@ -222,67 +228,54 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if(!ignoreNext){
-                        if(s?.isEmpty() == true){
-                            ignoreNext = true
-                            binding.mainSendFundsAmount.setText("0.00000000")
-                        }else if(s?.indexOf(".") != -1){ // Parse the input only if has decimals, other way can be passed as it is
-                            s?.substring(start, start+count).let { newChar ->  // get the only new char typed
-                                if(newChar?.length?:0 > 1){ // if is more than one char then is a paste
-                                    if(s?.matches("[0-9]+\\.[0-9]+".toRegex()) == true){ // Check if is a valid input
-                                        if(s.indexOf(".") != -1){
-                                            // Fill 0's at the end if is not long enough
-                                            var afterDot = s?.substring(s.indexOf("."))
-                                            while(afterDot?.length != 9){
-                                                afterDot += "0"
-                                            }
+                    try {
+                        if(!ignoreNext){
+                            if(s?.isEmpty() == true){
+                                ignoreNext = true
+                                binding.mainSendFundsAmount.setText("0.00000000")
+                            }else if(s?.indexOf(".") != -1){ // Parse the input only if has decimals, other way can be passed as it is
+                                s?.substring(start, start+count).let { newChar ->  // get the only new char typed
+                                    if(newChar?.length?:0 > 1){ // if is more than one char then is a paste
+                                        if(s?.matches("[0-9]+\\.[0-9]+".toRegex()) == true){ // Check if is a valid input
+                                            if(s.indexOf(".") != -1){
+                                                // Fill 0's at the end if is not long enough
+                                                var afterDot = s?.substring(s.indexOf("."))
+                                                while(afterDot?.length != 9){
+                                                    afterDot += "0"
+                                                }
 
-                                            var final = s?.substring(0, s.indexOf(".")) + afterDot
+                                                var final = s?.substring(0, s.indexOf(".")) + afterDot
 
-                                            ignoreNext = true
-                                            binding.mainSendFundsAmount.setText(final)
-                                            binding.mainSendFundsAmount.setSelection(start+count)
-                                        }
-                                    }else{ // If is not valid, restore the previous value
-                                        ignoreNext = true
-                                        binding.mainSendFundsAmount.setText(savedBeforePaste)
-                                    }
-                                }else{ // Case of 1 new char only
-                                    if(newChar == "." || newChar == ","){ // If the input is a ./,
-                                        if(s?.indexOf(".") != start && s?.indexOf('.')?:0 < start){
-                                            var final = s?.substring(0, start)+s?.substring(start+count)
-                                            ignoreNext = true
-                                            binding.mainSendFundsAmount.setText(final)
-                                            binding.mainSendFundsAmount.setSelection(start)
-                                        }else{
-                                            // Case of integer wiht dot at the end
-                                            if((s?.length?.minus(1))!! < (start+2)){
-                                                val final = s.toString()+"00000000"
                                                 ignoreNext = true
                                                 binding.mainSendFundsAmount.setText(final)
                                                 binding.mainSendFundsAmount.setSelection(start+count)
+                                            }
+                                        }else{ // If is not valid, restore the previous value
+                                            ignoreNext = true
+                                            binding.mainSendFundsAmount.setText(savedBeforePaste)
+                                        }
+                                    }else{ // Case of 1 new char only
+                                        if(newChar == "." || newChar == ","){ // If the input is a ./,
+                                            if(s?.indexOf(".") != start && s?.indexOf('.')?:0 < start){
+                                                var final = s?.substring(0, start)+s?.substring(start+count)
+                                                ignoreNext = true
+                                                binding.mainSendFundsAmount.setText(final)
+                                                binding.mainSendFundsAmount.setSelection(start)
                                             }else{
-                                                // Case of . before .
-                                                if(s?.substring(start+1,start+2) != "." && s?.substring(s.indexOf("."))?.length?:0 < 9){
-                                                    var afterDot = s?.substring(s.indexOf("."))
-                                                    while(afterDot?.length != 9){
-                                                        afterDot += "0"
-                                                    }
-                                                    var final = s?.substring(0, start) + afterDot
-
-                                                    if(start == 0){
-                                                        final = "0"+final
-                                                        replaceFirstZero = true
-                                                    }
-
+                                                // Case of integer wiht dot at the end
+                                                if((s?.length?.minus(1))!! < (start+2)){
+                                                    val final = s.toString()+"00000000"
                                                     ignoreNext = true
                                                     binding.mainSendFundsAmount.setText(final)
                                                     binding.mainSendFundsAmount.setSelection(start+count)
                                                 }else{
-                                                    if(s?.substring(start+count)?.indexOf(".") != -1){
-                                                        var final =
-                                                            s?.substring(0, start+count)+
-                                                                    s?.substring(start+count,start+count+9)?.replace(".","")
+                                                    // Case of . before .
+                                                    if(s?.substring(start+1,start+2) != "." && s?.substring(s.indexOf("."))?.length?:0 < 9){
+                                                        var afterDot = s?.substring(s.indexOf("."))
+                                                        while(afterDot?.length != 9){
+                                                            afterDot += "0"
+                                                        }
+                                                        var final = s?.substring(0, start) + afterDot
 
                                                         if(start == 0){
                                                             final = "0"+final
@@ -291,102 +284,124 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
                                                         ignoreNext = true
                                                         binding.mainSendFundsAmount.setText(final)
-                                                        binding.mainSendFundsAmount.setSelection(start+count+(if(start == 0) 1 else 0))
+                                                        binding.mainSendFundsAmount.setSelection(start+count)
+                                                    }else{
+                                                        if(s?.substring(start+count)?.indexOf(".") != -1){
+                                                            var final =
+                                                                s?.substring(0, start+count)+
+                                                                        s?.substring(start+count,start+count+9)?.replace(".","")
+
+                                                            if(start == 0){
+                                                                final = "0"+final
+                                                                replaceFirstZero = true
+                                                            }
+
+                                                            ignoreNext = true
+                                                            binding.mainSendFundsAmount.setText(final)
+                                                            binding.mainSendFundsAmount.setSelection(start+count+(if(start == 0) 1 else 0))
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    }else if(newChar?.matches("[0-9]".toRegex()) == true){
-                                        val dotpos = s?.indexOf(".")
-                                        if(dotpos?:0 < start){
-                                            if(start-(dotpos?:0) > 8){
-                                                var final = s?.substring(0, start)
-                                                ignoreNext = true
-                                                binding.mainSendFundsAmount.setText(final)
-                                                binding.mainSendFundsAmount.setSelection(start)
-                                            }else{
-                                                if(s?.substring(dotpos?:0)?.length == 10){
-                                                    var final = s?.substring(0, start+count)+s?.substring(start+count+1)
+                                        }else if(newChar?.matches("[0-9]".toRegex()) == true){
+                                            val dotpos = s?.indexOf(".")
+                                            if(dotpos?:0 < start){
+                                                if(start-(dotpos?:0) > 8){
+                                                    var final = s?.substring(0, start)
                                                     ignoreNext = true
                                                     binding.mainSendFundsAmount.setText(final)
-                                                    binding.mainSendFundsAmount.setSelection(start+count)
+                                                    binding.mainSendFundsAmount.setSelection(start)
+                                                }else{
+                                                    if(s?.substring(dotpos?:0)?.length == 10){
+                                                        var final = s?.substring(0, start+count)+s?.substring(start+count+1)
+                                                        ignoreNext = true
+                                                        binding.mainSendFundsAmount.setText(final)
+                                                        binding.mainSendFundsAmount.setSelection(start+count)
+                                                    }
+                                                }
+                                            }else{
+                                                val posbeforedot = s?.substring(0, s.indexOf("."))
+                                                val afterdot = s?.substring(s.indexOf("."))
+                                                if(start == 0 && posbeforedot?.length == 2 && replaceFirstZero){
+                                                    val final = newChar+afterdot
+                                                    Log.e("TextWatcher","Zero replacement: "+final)
+                                                    ignoreNext = true
+                                                    replaceFirstZero = false
+                                                    binding.mainSendFundsAmount.setText(final)
+                                                    binding.mainSendFundsAmount.setSelection(1)
                                                 }
                                             }
                                         }else{
-                                            val posbeforedot = s?.substring(0, s.indexOf("."))
-                                            val afterdot = s?.substring(s.indexOf("."))
-                                            if(start == 0 && posbeforedot?.length == 2 && replaceFirstZero){
-                                                val final = newChar+afterdot
-                                                ignoreNext = true
-                                                replaceFirstZero = false
-                                                binding.mainSendFundsAmount.setText(final)
-                                                binding.mainSendFundsAmount.setSelection(1)
-                                            }
+                                            var final = s?.substring(0, start)+s?.substring(start+count)
+                                            ignoreNext = true
+                                            binding.mainSendFundsAmount.setText(final)
+                                            binding.mainSendFundsAmount.setSelection(start)
                                         }
-                                    }else{
-                                        var final = s?.substring(0, start)+s?.substring(start+count)
-                                        ignoreNext = true
-                                        binding.mainSendFundsAmount.setText(final)
-                                        binding.mainSendFundsAmount.setSelection(start)
                                     }
                                 }
                             }
+
+                            // Set value in viewModel
+                            val filteredAmount = binding.mainSendFundsAmount.text.toString()
+                            if(filteredAmount.isNotEmpty()){
+                                val isCommaCase = filteredAmount.indexOf(",")
+                                val isPointCase = filteredAmount.indexOf(".")
+
+                                if(isCommaCase != -1){
+                                    val integer = filteredAmount.substring(0,isPointCase)
+                                    var decimal = filteredAmount.substring(isPointCase)?.replace(",","")
+
+                                    if(decimal.length > 8){
+                                        decimal = decimal.substring(0,8)
+                                    }else{
+                                        while(decimal.length < 8){
+                                            decimal += "0"
+                                        }
+                                    }
+                                    viewModel.SendFunds_Amount = (integer+decimal).toLong()
+                                }
+
+                                if(isPointCase != -1){
+                                    val integer = filteredAmount.substring(0,isPointCase)
+                                    var decimal = filteredAmount.substring(isPointCase)?.replace(".","")
+
+                                    if(decimal.length > 8){
+                                        decimal = decimal.substring(0,8)
+                                    }else{
+                                        while(decimal.length < 8){
+                                            decimal += "0"
+                                        }
+                                    }
+                                    viewModel.SendFunds_Amount = (integer+decimal).toLong()
+                                }
+
+                                if(isPointCase == -1 && isCommaCase == -1){
+                                    viewModel.SendFunds_Amount = (filteredAmount+"00000000").toLong()
+                                }
+                            }else{
+                                viewModel.SendFunds_Amount = 0L
+                            }
+
+                            viewModel.AvailableBalance.value?.let {
+                                if(
+                                    viewModel.SendFunds_Amount > 0L &&
+                                    viewModel.SendFunds_Amount <= mpFunctions.getMaximumToSend(it)
+                                ){
+                                    binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_check_circle_24))
+                                }else{
+                                    binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_cancel_24))
+                                }
+                            }
+                        }else{
+                            ignoreNext = false
                         }
-                    }else{
-                        ignoreNext = false
+                    }catch (e:Exception){
+                        Log.e("TextWatcher","Error in amount filter")
+                        Log.e("TextWatcher","Exception: "+e.message)
                     }
                 }
-
                 override fun afterTextChanged(s: Editable?) {
-                    if(s.toString().isNotEmpty()){
-                        val isCommaCase = s?.indexOf(",")
-                        val isPointCase = s?.indexOf(".")
 
-                        if(isCommaCase != -1){
-                            val integer = s?.substring(0,isPointCase?:0)
-                            var decimal = s?.substring(isPointCase?:0)?.replace(",","")
-
-                            if(decimal?.length?:0 > 8){
-                                decimal = decimal?.substring(0,8)
-                            }else{
-                                while(decimal?.length?:0 < 8){
-                                    decimal += "0"
-                                }
-                            }
-                            viewModel.SendFunds_Amount = (integer+decimal).toLong()
-                        }
-
-                        if(isPointCase != -1){
-                            val integer = s?.substring(0,isPointCase?:0)
-                            var decimal = s?.substring(isPointCase?:0)?.replace(".","")
-
-                            if(decimal?.length?:0 > 8){
-                                decimal = decimal?.substring(0,8)
-                            }else{
-                                while(decimal?.length?:0 < 8){
-                                    decimal += "0"
-                                }
-                            }
-                            viewModel.SendFunds_Amount = (integer+decimal).toLong()
-                        }
-
-                        if(isPointCase == -1 && isCommaCase == -1){
-                            viewModel.SendFunds_Amount = (s.toString()+"00000000").toLong()
-                        }
-                    }else{
-                        viewModel.SendFunds_Amount = 0L
-                    }
-
-                    viewModel.AvailableBalance.value?.let {
-                        if(
-                            viewModel.SendFunds_Amount > 0L &&
-                            viewModel.SendFunds_Amount <= mpFunctions.getMaximumToSend(it)
-                        ){
-                            binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_check_circle_24))
-                        }else{
-                            binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_cancel_24))
-                        }
-                    }
                 }
             })
 
@@ -440,10 +455,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         dialogBinding.settingsAddServerDone.setOnClickListener(this)
         dialogBinding.settingsDeleteServer.setOnClickListener(this)
         dialogBinding.settingsAddServerBack.setOnClickListener(this)
-        dialogBinding.settingsAppVersion.text = "v "+packageManager.getPackageInfo(packageName, 0).versionName
         dialogBinding.settingsServerList.visibility = View.VISIBLE
         dialogBinding.settingsAddServerContainer.visibility = View.GONE
-
+        dialogBinding.settingsAppVersion.text = "v "+packageManager.getPackageInfo(packageName, 0).versionName
 
         serverAdapter = ServerAdapter(this)
         serverAdapter?.setServers(DBManager.getServers())
@@ -504,8 +518,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     fun PerformInitialization() {
         if(!directoryexist(NOSPath)){
             mpDisk.CreateOptionsFile()
-        }else{
-            mpDisk.LoadOptions()
         }
         mpDisk.VerifyFiles(viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
         addressAdapter?.notifyDataSetChanged()
@@ -605,7 +617,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                             val outgoing = viewModel.SendFunds_FROM
                             val incoming = viewModel.SendFunds_TO
                             val balance = viewModel.SendFunds_Amount
-                            val ref = viewModel.SendFubds_Ref
+                            val ref = viewModel.SendFunds_Ref
 
                             while(order_pending){
                                 val res = mpCripto.SendTo(

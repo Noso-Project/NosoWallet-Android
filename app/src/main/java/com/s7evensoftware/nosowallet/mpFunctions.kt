@@ -20,8 +20,8 @@ class mpFunctions {
             return DBManager.getAddressBalance(address)
         }
 
-        fun Concensus(NODEarray:ArrayList<NodeInfo>, viewModel:MainViewModel):NodeInfo? {
-            var result:NodeInfo? = null
+        fun Concensus(NODEarray:ArrayList<NodeInfo>, viewModel:MainViewModel):ConcensusResult? {
+            var result:ConcensusResult? = null
             var selectedNode: NodeInfo?
             var ArrT:ArrayList<ConcensusData>
             var CTime = 0L
@@ -69,14 +69,15 @@ class mpFunctions {
             selectedNode = getRandomServer(NODEarray, CBlock, CBranch, CPending)
             viewModel.LastNodeSelected = selectedNode
 
-            if(CBlock > viewModel.LastBlock.value?:0){
-                result = selectedNode
-                viewModel.LastBlock.postValue(CBlock)
-                viewModel.LastSummary.postValue(CBranch)
-                viewModel.LastPendingCount.postValue(0)
+            if(CBlock > viewModel.LastBlock.value?:0 || DBManager.getSummarySize() == 0){
+                result = ConcensusResult()
+                result.LastBlock = CBlock
+                result.LastBranch = CBranch
+                result.Address = selectedNode.Address
+                result.Port = selectedNode.Port
             }
 
-            if(CPending > viewModel.LastPendingCount.value?:0){
+            if(CPending > viewModel.LastPendingCount.value?:0 || result != null){
                 val pending_String = mpNetwork.getPendings(selectedNode!!.Address,selectedNode.Port, viewModel)
                 if(pending_String != "ERROR"){
                     ProcessPendings(
@@ -84,7 +85,8 @@ class mpFunctions {
                         viewModel.AdddressList.value!!,
                         viewModel.PendingList.value!!,
                         viewModel.LastPendingCount,
-                        CPending
+                        CPending,
+                        viewModel.UpdateBalanceTrigger
                     )
                 }else{
                     mpDisk.appendLog("mpFunctions", "Request pendings failed")
@@ -227,7 +229,8 @@ class mpFunctions {
             addressList: ArrayList<WalletObject>,
             pendingList: ArrayList<PendingData>,
             lastPendingCount: MutableLiveData<Long>,
-            CPending:Long
+            CPending:Long,
+            updateBalanceTrigger:MutableLiveData<Int>
         ){
             var ThisOrder:String
             var Add_index:Int
@@ -255,7 +258,8 @@ class mpFunctions {
                     }
                 }
             }
-            lastPendingCount.postValue(CPending)
+            lastPendingCount.postValue(CPending) // Update Pendings Count
+            updateBalanceTrigger.postValue(updateBalanceTrigger.value!!+1) // Trigger Balance update in GUI
         }
 
         fun AddressSummaryIndex(address: String, addressSummary: ArrayList<SumaryData>):Int {

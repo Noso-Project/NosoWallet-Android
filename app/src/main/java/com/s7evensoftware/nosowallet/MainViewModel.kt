@@ -32,7 +32,7 @@ class MainViewModel: ViewModel() {
     var SendFunds_TO = ""
     var SendFunds_FROM = ""
     var SendFunds_Amount = 0L
-    var SendFubds_Ref= ""
+    var SendFunds_Ref= ""
     var LastNodeSelected:NodeInfo? = null
     var TriggerSuccessError = MutableLiveData(0)
 

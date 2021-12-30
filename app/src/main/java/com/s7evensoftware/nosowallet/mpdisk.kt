@@ -32,13 +32,13 @@ class mpDisk {
                 //CreateDir(context, UpdatesDirectory)
             }
 
-            if(!fileexist(MainActivity.UserOptions.Wallet)){
-                Log.e("mpDisk","Wallet Creation: "+MainActivity.UserOptions.Wallet)
+            if(!fileexist(WalletFilename)){
+                Log.e("mpDisk","Wallet Creation: "+ WalletFilename)
                 CreateWallet(addressList, pendingList)
             }else{
-                Log.e("mpDisk","Loading Wallet: "+MainActivity.UserOptions.Wallet)
+                Log.e("mpDisk","Loading Wallet: "+WalletFilename)
                 if(addressList.size < 1){
-                    LoadWallet(MainActivity.UserOptions.Wallet, addressList, pendingList)
+                    LoadWallet(WalletFilename, addressList, pendingList)
                 }
             }
 
@@ -193,24 +193,27 @@ class mpDisk {
             }
         }
 
+
         fun CreateOptionsFile() {
-            val Options = Options()
             val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
 
             if(NOSOroot.mkdirs()){
                 Log.e("mpDisk","Directory NOSODATA created - OK")
+                /*Unused Options file
                 val FileOptions = File(NOSOroot.path, OptionsFileName)
 
                 ObjectOutputStream(FileOutputStream(FileOptions)).use {
                     it.writeObject(Options)
                     MainActivity.UserOptions = Options
                     Log.e("mpDisk","Options file written - OK")
-                }
+                }*/
             }else{
                 Log.e("mpDisk","Directory creation failed - ERROR")
             }
         }
 
+
+        /*Deprecated method
         fun LoadOptions() {
             val FileOptions = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath, OptionsFileName)
             ObjectInputStream(FileInputStream(FileOptions)).use {
@@ -218,7 +221,7 @@ class mpDisk {
                 MainActivity.UserOptions = Options as Options
                 Log.e("mpDisk","Settings filed loaded - OK")
             }
-        }
+        }*/
 
         /* Create dir inside NOSODATA */
         fun CreateDir(dirName:String){
@@ -263,6 +266,7 @@ class mpDisk {
                         +LogsFilename)
 
             if(!fileLog.exists()){
+                fileLog.parentFile.mkdirs()
                 fileLog.createNewFile()
             }
 

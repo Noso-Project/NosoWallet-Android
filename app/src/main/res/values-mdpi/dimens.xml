@@ -5,7 +5,7 @@
 
     <dimen name="main_netstat_block_hpadding">0dp</dimen>
     <dimen name="main_netstat_block_vpadding">0dp</dimen>
-    <dimen name="main_sendfunds_date_text_size">10sp</dimen>
+    <dimen name="main_netstat_date_text_size">10sp</dimen>
 
 
 </resources>

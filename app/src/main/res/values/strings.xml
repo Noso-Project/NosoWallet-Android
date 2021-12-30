@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">NOSOmobile</string>
 
-    <string name="sharedpref_netstate_lastblock">LASTBLOCK_SAVE_KEY</string>
+    <string name="sharedpref_netstate_lastblock">LASTBLOCKLONG_SAVE_KEY</string>
     <string name="sharedpref_netstate_lastbranch">LASTBRANCH_SAVE_KEY</string>
 
     <string name="general_done">Done</string>
@@ -39,6 +39,7 @@
     <string name="general_send_funds_from">From: </string>
     <string name="general_send_funds_amount">Amount: </string>
     <string name="general_send_funds_ref">Reference: </string>
+    <string name="general_send_funds_useall">Use all funds</string>
     <string name="general_send_funds_clean">Clear</string>
     <string name="general_send_funds_send">Send</string>
     <string name="general_send_funds_send_confirm">Confirm</string>

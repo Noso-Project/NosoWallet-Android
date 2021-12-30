@@ -108,6 +108,8 @@ class mpCripto {
                 }
                 OrderString = OrderString.substring(0, OrderString.length-2)
                 return mpNetwork.sendOrder(OrderString,viewModel)
+            }else{
+                Log.e("mpCripto","Origin with not enough funds, available: $CoinsAvailable, required: $Remaining")
             }
             return ""
         }
@@ -123,6 +125,8 @@ class mpCripto {
         fun getStringSigned(stringtoSign:String, privateKey: String):String {
             var MessageAsBytes:ByteArray
             var Signature: ByteArray
+
+            Log.e("mpCripto", "Atempting to decode: _${stringtoSign}_")
 
             MessageAsBytes = org.bouncycastle.util.encoders.Base64.decode(stringtoSign)
             Signature = SignerUtils.SignMessage(

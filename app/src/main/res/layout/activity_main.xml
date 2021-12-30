@@ -187,7 +187,8 @@
                 android:id="@+id/main_netstat_block_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
+                android:paddingHorizontal="@dimen/main_netstat_block_hpadding"
+                android:paddingVertical="@dimen/main_netstat_block_vpadding"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:backgroundTint="@color/colorLightGray"
@@ -218,7 +219,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorChatBlack"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/main_netstat_date_text_size"
                     android:text="24/12/2021"
                     />
                 <TextView
@@ -226,7 +227,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorChatBlack"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/main_netstat_date_text_size"
                     android:text="22:49:10"
                     />
             </LinearLayout>
@@ -392,39 +393,55 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:orientation="horizontal">
-                <Button
-                    android:id="@+id/main_send_funds_close"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:layout_marginRight="10dp"
-                    android:text="@string/general_send_funds_close"
-                    />
-                <Button
-                    android:id="@+id/main_send_funds_cancel"
-                    android:layout_width="wrap_content"
+                    android:layout_gravity="left"
+                    android:orientation="horizontal">
+                    <CheckBox
+                        android:id="@+id/main_send_funds_useall_check"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/general_send_funds_useall"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:visibility="gone"
-                    android:layout_marginRight="10dp"
-                    android:text="@string/general_send_funds_cancel"
-                    />
-                <Button
-                    android:id="@+id/main_send_funds_send"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:text="@string/general_send_funds_send"
-                    />
-                <Button
-                    android:visibility="gone"
-                    android:id="@+id/main_send_funds_send_confirm"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:backgroundTint="@color/colorOrangeWarm"
-                    android:text="@string/general_send_funds_send_confirm"
-                    />
+                    android:gravity="right">
+                    <Button
+                        android:id="@+id/main_send_funds_close"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:layout_marginRight="10dp"
+                        android:text="@string/general_send_funds_close"
+                        />
+                    <Button
+                        android:id="@+id/main_send_funds_cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:visibility="gone"
+                        android:layout_marginRight="10dp"
+                        android:text="@string/general_send_funds_cancel"
+                        />
+                    <Button
+                        android:id="@+id/main_send_funds_send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:text="@string/general_send_funds_send"
+                        />
+                    <Button
+                        android:visibility="gone"
+                        android:id="@+id/main_send_funds_send_confirm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:backgroundTint="@color/colorOrangeWarm"
+                        android:text="@string/general_send_funds_send_confirm"
+                        />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

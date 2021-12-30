@@ -9,6 +9,15 @@ class NOSObjects {
 
 }
 
+class ConcensusResult {
+    var LastBlock:Long = 0
+    var LasPendingCount:Long = 0
+    var LastBranch:String = ""
+    var Address:String = ""
+    var Port:Int = 8080
+}
+
+
 class ConcensusData {
     var Value:String = ""
     var Count:Int = 0
