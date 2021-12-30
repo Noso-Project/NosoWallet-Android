@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // set context for read/write tasks
+        RequestPermissions()
         mpDisk.setContext(this)
 
         //Start built in DB
@@ -87,8 +88,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         val view = binding.root
 
         // Prepare external components and permissions
-
-        RequestPermissions()
         PerformInitialization()
         RestoreBlockBranchInfo()
         prepareView()

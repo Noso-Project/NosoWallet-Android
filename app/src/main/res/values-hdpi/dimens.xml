@@ -6,6 +6,10 @@
     <dimen name="main_netstat_block_hpadding">5dp</dimen>
     <dimen name="main_netstat_block_vpadding">5dp</dimen>
     <dimen name="main_netstat_date_text_size">10sp</dimen>
+    <dimen name="main_send_funds_button_text">12sp</dimen>
+
+
+
 
 
 </resources>

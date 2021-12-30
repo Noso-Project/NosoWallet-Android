@@ -234,13 +234,15 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="right|center_vertical"
                 >
                 <Button
                     android:id="@+id/main_netstat_open_send"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="0dp"
+                    android:textSize="@dimen/main_send_funds_button_text"
                     android:text="@string/general_send_funds_title"
                     />
             </LinearLayout>
