@@ -141,8 +141,6 @@ class mpParser {
 
                         Log.e("mpParser","## Wallet Info: ")
                         Log.e("mpParser","# Address: $Address")
-                        Log.e("mpParser","# PublicKey: $PublicKey")
-                        Log.e("mpParser","# PrivateKey: $PrivateKey")
                     }else{
                         Log.e("mpParser","Ignoring wallet already exists: "+newWallet.Hash)
                     }
