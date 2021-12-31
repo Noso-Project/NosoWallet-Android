@@ -1,9 +1,7 @@
 package com.s7evensoftware.nosowallet
 
-import android.util.Base64
 import org.bouncycastle.crypto.digests.RIPEMD160Digest
 import org.bouncycastle.util.encoders.Hex
-import java.lang.IllegalArgumentException
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -65,6 +63,7 @@ class mpCripto {
                 OrderHashString = CurrTime.toString()
 
                 //Order list with origin in front
+                @Suppress("UNCHECKED_CAST")
                 val orderedList = viewModel.AdddressList.value!!.clone() as ArrayList<WalletObject>
                 for(wallet in orderedList){
                     if(wallet.Hash == origin){
@@ -92,9 +91,9 @@ class mpCripto {
                                 viewModel.PendingList.value!!
                             )
                         )
-                        Fee = Fee+ArrayTrfrs.last().AmountFee
-                        Amount = Amount-ArrayTrfrs.last().AmountTrf
-                        OrderHashString = OrderHashString+ArrayTrfrs.last().TrfrID
+                        Fee += ArrayTrfrs.last().AmountFee
+                        Amount -= ArrayTrfrs.last().AmountTrf
+                        OrderHashString += ArrayTrfrs.last().TrfrID
                     }
                     Counter++
                 }
@@ -105,6 +104,7 @@ class mpCripto {
                     tr.OrderLines = TrxLine
                 }
                 ResultOrderID = mpFunctions.getOrderHash(TrxLine.toString()+OrderHashString)
+                Log.e("mpCripto","ResultOrderID: $ResultOrderID")
                 OrderString = mpFunctions.getPTCEcn("ORDER")+"ORDER "+TrxLine.toString()+" $"
                 for(tr in ArrayTrfrs){
                     OrderString += mpFunctions.getStringFromOrder(tr)+" $"
@@ -115,7 +115,6 @@ class mpCripto {
                 Log.e("mpCripto","Origin with not enough funds, available: $CoinsAvailable, required: $Remaining")
                 return MISSING_FUNDS
             }
-            return ""
         }
 
         fun GetFee(amount:Long):Long {
@@ -263,7 +262,6 @@ class mpCripto {
 
             decimalValue = BMHexToDec(numerohex).toString()
             while (decimalValue.length >= 2){
-                val save = decimalValue
                 ResultadoDiv = BMDividir(decimalValue, alphabetnumber.toInt())
                 decimalValue = ResultadoDiv.Cociente!!
                 restante = ResultadoDiv.Residuo!!

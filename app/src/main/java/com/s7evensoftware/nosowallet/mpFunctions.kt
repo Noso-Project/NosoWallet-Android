@@ -78,7 +78,7 @@ class mpFunctions {
             }
 
             if(CPending > viewModel.LastPendingCount.value?:0 || result != null){
-                val pending_String = mpNetwork.getPendings(selectedNode!!.Address,selectedNode.Port, viewModel)
+                val pending_String = mpNetwork.getPendings(selectedNode.Address,selectedNode.Port, viewModel)
                 if(pending_String != "ERROR"){
                     ProcessPendings(
                         pending_String,
@@ -211,14 +211,14 @@ class mpFunctions {
         }
 
         fun getTransferHash(textLine:String):String {
-            var Resultado = ""
+            var Resultado:String
             var Sumatoria:String;var Clave:String
 
             Resultado = mpCripto.HashSha256String(textLine)
             Resultado = mpCripto.BMHexto58(Resultado, BigInteger("58"))
             Sumatoria = mpCripto.BMB58resumen(Resultado).toString()
             Clave = mpCripto.BMDecto58(Sumatoria)
-            return "tR"+Resultado+Clave
+            return "tR$Resultado$Clave"
         }
 
         fun getAddressPendingPays(address:String, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Long {

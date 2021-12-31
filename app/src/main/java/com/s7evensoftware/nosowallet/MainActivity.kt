@@ -207,7 +207,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
         //Send all funds enable/disable
         if(viewModel.allowSendAll) binding.mainSendFundsUseallCheck.isChecked = true
-        binding.mainSendFundsUseallCheck.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.mainSendFundsUseallCheck.setOnCheckedChangeListener { _, isChecked ->
             viewModel.allowSendAll = isChecked
         }
 
@@ -251,12 +251,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                         if(s?.matches("[0-9]+\\.[0-9]+".toRegex()) == true){ // Check if is a valid input
                                             if(s.indexOf(".") != -1){
                                                 // Fill 0's at the end if is not long enough
-                                                var afterDot = s?.substring(s.indexOf("."))
-                                                while(afterDot?.length != 9){
+                                                var afterDot = s.substring(s.indexOf("."))
+                                                while(afterDot.length != 9){
                                                     afterDot += "0"
                                                 }
 
-                                                var final = s?.substring(0, s.indexOf(".")) + afterDot
+                                                var final = s.substring(0, s.indexOf(".")) + afterDot
 
                                                 ignoreNext = true
                                                 binding.mainSendFundsAmount.setText(final)
@@ -282,12 +282,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                                     binding.mainSendFundsAmount.setSelection(start+count)
                                                 }else{
                                                     // Case of . before .
-                                                    if(s?.substring(start+1,start+2) != "." && s?.substring(s.indexOf("."))?.length?:0 < 9){
-                                                        var afterDot = s?.substring(s.indexOf("."))
-                                                        while(afterDot?.length != 9){
+                                                    if(s.substring(start+1,start+2) != "." && s.substring(s.indexOf(".")).length < 9){
+                                                        var afterDot = s.substring(s.indexOf("."))
+                                                        while(afterDot.length != 9){
                                                             afterDot += "0"
                                                         }
-                                                        var final = s?.substring(0, start) + afterDot
+                                                        var final = s.substring(0, start) + afterDot
 
                                                         if(start == 0){
                                                             final = "0"+final
@@ -298,13 +298,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                                         binding.mainSendFundsAmount.setText(final)
                                                         binding.mainSendFundsAmount.setSelection(start+count)
                                                     }else{
-                                                        if(s?.substring(start+count)?.indexOf(".") != -1){
+                                                        if(s.substring(start+count).indexOf(".") != -1){
                                                             var final =
-                                                                s?.substring(0, start+count)+
-                                                                        s?.substring(start+count,start+count+9)?.replace(".","")
+                                                                s.substring(0, start+count) +
+                                                                        s.substring(start+count,start+count+9)
+                                                                            .replace(".","")
 
                                                             if(start == 0){
-                                                                final = "0"+final
+                                                                final = "0$final"
                                                                 replaceFirstZero = true
                                                             }
 
@@ -325,7 +326,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                                     binding.mainSendFundsAmount.setSelection(start)
                                                 }else{
                                                     if(s?.substring(dotpos?:0)?.length == 10){
-                                                        var final = s?.substring(0, start+count)+s?.substring(start+count+1)
+                                                        var final = s.substring(0, start+count) + s.substring(start+count+1)
                                                         ignoreNext = true
                                                         binding.mainSendFundsAmount.setText(final)
                                                         binding.mainSendFundsAmount.setSelection(start+count)
@@ -336,7 +337,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                                 val afterdot = s?.substring(s.indexOf("."))
                                                 if(start == 0 && posbeforedot?.length == 2 && replaceFirstZero){
                                                     val final = newChar+afterdot
-                                                    Log.e("TextWatcher","Zero replacement: "+final)
                                                     ignoreNext = true
                                                     replaceFirstZero = false
                                                     binding.mainSendFundsAmount.setText(final)
@@ -361,7 +361,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
                                 if(isCommaCase != -1){
                                     val integer = filteredAmount.substring(0,isPointCase)
-                                    var decimal = filteredAmount.substring(isPointCase)?.replace(",","")
+                                    var decimal =
+                                        filteredAmount.substring(isPointCase).replace(",","")
 
                                     if(decimal.length > 8){
                                         decimal = decimal.substring(0,8)
@@ -375,7 +376,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
                                 if(isPointCase != -1){
                                     val integer = filteredAmount.substring(0,isPointCase)
-                                    var decimal = filteredAmount.substring(isPointCase)?.replace(".","")
+                                    var decimal =
+                                        filteredAmount.substring(isPointCase).replace(".","")
 
                                     if(decimal.length > 8){
                                         decimal = decimal.substring(0,8)
@@ -563,8 +565,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         })
     }
 
+    // Checks for Directory in app root files folder
     private fun directoryexist(pathName: String): Boolean {
-        val file = File(applicationContext.getExternalFilesDir(null)!!.path+File.separator+"NOSODATA")
+        val file = File(applicationContext.getExternalFilesDir(null)!!.path+File.separator+pathName)
         return file.exists()
     }
 

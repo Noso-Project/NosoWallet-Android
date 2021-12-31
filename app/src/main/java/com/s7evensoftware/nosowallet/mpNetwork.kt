@@ -128,7 +128,10 @@ class mpNetwork {
                                         entry.name
                             )
 
-                            uzFile.parentFile.mkdirs() // Create parent directories needed
+                            uzFile.parentFile?.let {
+                                // Create parent directories needed
+                                it.mkdirs()
+                            }
 
                             File(uzFile.path).outputStream().use { output ->
                                 input.copyTo(output)

@@ -79,7 +79,10 @@ class mpParser {
         fun ImportWallet(context: Context, resultCode: Int, data: Intent?, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
             if(resultCode == Activity.RESULT_OK){
                 data?.data.also {
-                    if(getFileExtension(getFileName(context, it!!)).equals(".pkw") || getFileExtension(getFileName(context, it!!)).equals(".pkw.bak")){
+                    if(getFileExtension(getFileName(context, it!!)) == ".pkw" || getFileExtension(getFileName(context,
+                            it
+                        )) == ".pkw.bak"
+                    ){
                         Log.e("mParser","Wallet File Imported - OK")
                         return parseExternalWallet(context, it!!, addressList,pendingList)
                     }else{
@@ -245,7 +248,7 @@ class mpParser {
             }catch (e:Exception){
                 Log.e("mpParser","Failed to obtaine extension: "+e.message)
             }
-            return extPart
+            return extPart.lowercase()
         }
     }
 }
