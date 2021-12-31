@@ -28,6 +28,7 @@ class MainViewModel: ViewModel() {
 
     var RealTimeValue = MutableLiveData(System.currentTimeMillis())
 
+    var allowSendAll = false
     var isSendFundsOpen = MutableLiveData(false)
     var SendFunds_TO = ""
     var SendFunds_FROM = ""

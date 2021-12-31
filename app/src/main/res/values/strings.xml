@@ -31,8 +31,8 @@
     <string name="general_sendfunds_error5">Not enough funds in the available balance</string>
     <string name="general_sendfunds_success">Order placed and sent to the Main Net</string>
     <string name="general_sendfunds_error_sync">Error, wallet is not synchronized</string>
+    <string name="general_sendfunds_amount_err">Not enough balance on this address alone</string>
     <string name="general_sendfunds_error_conn">Connection error, retrying in 10 seconds</string>
-
 
     <string name="general_send_funds_title">Send funds</string>
     <string name="general_send_funds_to">Destination: </string>

@@ -199,6 +199,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         binding.mainSendFundsSend.setOnClickListener(this)
         binding.mainSendFundsSendConfirm.setOnClickListener(this)
 
+        //Send all funds enable/disable
+        if(viewModel.allowSendAll) binding.mainSendFundsUseallCheck.isChecked = true
+        binding.mainSendFundsUseallCheck.setOnCheckedChangeListener { buttonView, isChecked ->
+            viewModel.allowSendAll = isChecked
+        }
+
         //Send Funds Input Text Handlers
         // Destination address
         binding.mainSendFundsDestination.addTextChangedListener {
@@ -415,13 +421,18 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         //Order Success/Fail Observer
         viewModel.TriggerSuccessError.observe(this, {
             if(it > 0){
-                if(it.mod(2) == 0){
-                    Toast.makeText(applicationContext, R.string.general_sendfunds_success, Toast.LENGTH_SHORT).show()
-                    viewModel.TriggerSuccessError.value = 0
-                }else{
-                    Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error_conn, Snackbar.LENGTH_SHORT).show()
-                    viewModel.TriggerSuccessError.value = 0
+                when(it){
+                    1 -> {
+                        Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error_conn, Snackbar.LENGTH_SHORT).show()
+                    }
+                    2 -> {
+                        Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_amount_err, Snackbar.LENGTH_SHORT).show()
+                    }
+                    3 -> {
+                        Toast.makeText(applicationContext, R.string.general_sendfunds_success, Toast.LENGTH_SHORT).show()
+                    }
                 }
+                viewModel.TriggerSuccessError.value = 0
             }
         })
 
@@ -641,10 +652,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                         }
                                     }
                                     viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
-                                    viewModel.TriggerSuccessError.postValue(viewModel.TriggerSuccessError.value!!+2)
+                                    viewModel.TriggerSuccessError.postValue(3) // Success
+                                    order_pending = false
+                                }else if(res == MISSING_FUNDS){
+                                    viewModel.TriggerSuccessError.postValue(2) // Address funds not enough error
                                     order_pending = false
                                 }else{
-                                    viewModel.TriggerSuccessError.postValue(viewModel.TriggerSuccessError.value!!+1)
+                                    viewModel.TriggerSuccessError.postValue(1) // Connection Error
                                     delay(DEFAULT_SYNC_DELAY)
                                 }
                             }

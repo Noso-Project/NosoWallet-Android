@@ -12,9 +12,9 @@
     <dimen name="main_wallet_grand_balance_label">15sp</dimen>
     <dimen name="main_wallet_grand_balance_text">20sp</dimen>
 
-    <dimen name="wallet_row_labels">15sp</dimen>
-    <dimen name="wallet_row_address">20sp</dimen>
-    <dimen name="wallet_row_number_text">15sp</dimen>
+    <dimen name="wallet_row_labels">10sp</dimen>
+    <dimen name="wallet_row_address">15sp</dimen>
+    <dimen name="wallet_row_number_text">12sp</dimen>
 
     <dimen name="main_netstat_block_hpadding">10dp</dimen>
     <dimen name="main_netstat_block_vpadding">10dp</dimen>
