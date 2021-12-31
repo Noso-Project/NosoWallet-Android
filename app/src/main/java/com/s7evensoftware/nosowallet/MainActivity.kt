@@ -103,6 +103,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         TimeTask()
 
         Log.e("Main","Your DPI is: "+getResources().getDisplayMetrics().density)
+
+        mpParser.SpecialBase64Decode("1640932605N4pZF43iAvmK2Jto82d4qfZMAwysDgN4NsDwKdQJ17RqcAYNpRuSHbkKF28Ct100000000100001")
     }
 
     private fun RestoreSendFundsView() {

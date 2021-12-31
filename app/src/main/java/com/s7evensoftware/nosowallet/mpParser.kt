@@ -3,9 +3,11 @@ package com.s7evensoftware.nosowallet
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.icu.number.IntegerWidth
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.result.ActivityResultLauncher
+import org.bson.types.Binary
 import java.io.*
 
 class mpParser {
@@ -19,19 +21,36 @@ class mpParser {
         }
 
         fun SpecialBase64Decode(input:String):ByteArray {
-
             val indexList = ArrayList<Int>()
 
             for(c in input){
                 indexList.add(Base64Alphabet.indexOf(c))
             }
 
+            var binaryString = ""
             for(i in indexList){
-                Log.e("mpParser","Index: "+i)
+                var binary = Integer.toBinaryString(i)
+                while(binary.length < 6) binary = "0"+binary
+                binaryString += binary
             }
 
-            return ByteArray(1)
+            var strAux = binaryString
+            var tempByteArray = ArrayList<Byte>()
 
+            while (strAux.length >= 8){
+                val currentGroup = strAux.substring(0, 8)
+                val intVal = Integer.parseInt(currentGroup, 2)
+                tempByteArray.add(intVal.toByte())
+                strAux = strAux.substring(8)
+            }
+
+            val encodedByteArray = ByteArray(tempByteArray.size)
+
+            for((i,b) in tempByteArray.withIndex()){
+                encodedByteArray[i] = b
+            }
+
+            return encodedByteArray
         }
 
         fun IsValid58(base58Text:String):Boolean {

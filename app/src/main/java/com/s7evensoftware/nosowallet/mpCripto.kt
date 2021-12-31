@@ -129,7 +129,7 @@ class mpCripto {
             var MessageAsBytes:ByteArray
             var Signature: ByteArray
 
-            MessageAsBytes = org.bouncycastle.util.encoders.Base64.decode(stringtoSign)
+            MessageAsBytes = mpParser.SpecialBase64Decode(stringtoSign)
 
             Signature = SignerUtils.SignMessage(
                 MessageAsBytes,
