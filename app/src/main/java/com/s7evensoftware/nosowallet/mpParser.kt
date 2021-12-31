@@ -3,12 +3,12 @@ package com.s7evensoftware.nosowallet
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.icu.number.IntegerWidth
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.result.ActivityResultLauncher
-import org.bson.types.Binary
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileInputStream
 
 class mpParser {
     companion object{
