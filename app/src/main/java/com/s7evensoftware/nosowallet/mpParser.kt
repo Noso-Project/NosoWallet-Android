@@ -200,10 +200,15 @@ class mpParser {
         }
 
         fun getFileExtension(fileName:String):String {
-            var extPart = fileName.substring(fileName.length-4)
-            // In case the file has a backup file extension format: *.pkw.bak
-            if(extPart.uppercase().equals(".BAK")){
-                extPart = fileName.substring(fileName.length-8)
+            var extPart = ".null"
+            try{
+                extPart = fileName.substring(fileName.length-4)
+                // In case the file has a backup file extension format: *.pkw.bak
+                if(extPart.uppercase() == ".BAK"){
+                    extPart = fileName.substring(fileName.length-8)
+                }
+            }catch (e:Exception){
+                Log.e("mpParser","Failed to obtaine extension: "+e.message)
             }
             return extPart
         }
