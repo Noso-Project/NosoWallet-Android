@@ -59,7 +59,7 @@ class mpCripto {
             Fee = GetFee(amount)
             Remaining = amount+Fee
             CoinsAvailable = mpFunctions.GetAddressBalanceFromSummary(origin)
-            if(Remaining <= CoinsAvailable){
+            if(Remaining <= CoinsAvailable || viewModel.allowSendAll){
                 OrderHashString = CurrTime.toString()
 
                 //Order list with origin in front
@@ -110,6 +110,7 @@ class mpCripto {
                 return mpNetwork.sendOrder(OrderString,viewModel)
             }else{
                 Log.e("mpCripto","Origin with not enough funds, available: $CoinsAvailable, required: $Remaining")
+                return MISSING_FUNDS
             }
             return ""
         }

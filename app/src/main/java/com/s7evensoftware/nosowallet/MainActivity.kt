@@ -394,7 +394,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                 ){
                                     binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_check_circle_24))
                                 }else{
-                                    binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_baseline_cancel_24))
+                                    binding.mainSendFundsAmountCheck.setImageDrawable(getDrawable(R.drawable.ic_alertmark_24))
                                 }
                             }
                         }else{
