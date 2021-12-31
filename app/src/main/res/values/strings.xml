@@ -39,7 +39,7 @@
     <string name="general_send_funds_from">From: </string>
     <string name="general_send_funds_amount">Amount: </string>
     <string name="general_send_funds_ref">Reference: </string>
-    <string name="general_send_funds_useall">Use all funds</string>
+    <string name="general_send_funds_useall">Send from all</string>
     <string name="general_send_funds_clean">Clear</string>
     <string name="general_send_funds_send">Send</string>
     <string name="general_send_funds_send_confirm">Confirm</string>
