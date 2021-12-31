@@ -629,7 +629,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             R.id.main_send_funds_send_confirm -> {
                 viewModel.WalletSynced.value?.let {
                     if(it){
-                        /*
                         launch{
                             var fail_count = 0
                             var order_pending = true
@@ -673,7 +672,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                 }
                             }
                         }
-                         */
                         binding.mainSendFundsFrom.setText("")
                         binding.mainSendFundsReference.setText("")
                         binding.mainSendFundsAmount.setText("0.00000000")
