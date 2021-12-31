@@ -113,7 +113,7 @@ class mpDisk {
                         +File.separator
                         +NOSPath
                         +File.separator
-                        +SumaryFileName)
+                        +ZipSumaryFileName)
                 zipFile.delete()
                 Log.e("mpDisk","Delete summary zip and unzipped files - OK")
             }catch (e:java.lang.Exception){
