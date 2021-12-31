@@ -90,8 +90,34 @@ class mpDisk {
                 buffer.close()
                 DBManager.clearSummary() // Erase current Summary data
                 DBManager.addSummaryFromList(addressSummary) // Write list to the DB
+                DeleteSummaryFiles() // Erase .zip and extracted data
             }catch (e:Exception){
                 fileReference.close()
+            }
+        }
+
+        fun DeleteSummaryFiles(){
+            try{
+                val summRef = File(context.getExternalFilesDir(null)!!.path
+                        +File.separator
+                        +NOSPath
+                        +File.separator
+                        +SumaryDirectory)
+
+                for(child in summRef.listFiles()){
+                    child.delete()
+                }
+                summRef.delete()
+
+                val zipFile = File(context.getExternalFilesDir(null)!!.path
+                        +File.separator
+                        +NOSPath
+                        +File.separator
+                        +SumaryFileName)
+                zipFile.delete()
+                Log.e("mpDisk","Delete summary zip and unzipped files - OK")
+            }catch (e:java.lang.Exception){
+                Log.e("mpDisk","Error while deleting files: "+e.message)
             }
         }
 

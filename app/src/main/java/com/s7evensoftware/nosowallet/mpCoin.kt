@@ -5,7 +5,7 @@ import kotlin.math.absoluteValue
 class mpCoin {
     companion object {
         fun GetFee(monto:Long):Long{
-            if(monto/ Comisiontrfr < MinimunFee){
+            if(monto/Comisiontrfr < MinimunFee){
                 return MinimunFee
             }
             return monto / Comisiontrfr

@@ -175,6 +175,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                         viewModel.LastSummary.postValue(syncNode.LastBranch)
                         viewModel.WalletSynced.postValue(true)
                         SaveBlockBranchInfo(syncNode.LastBlock, syncNode.LastBranch)
+                        viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value!!+1)
                     }
                 }else{
                     viewModel.WalletSynced.postValue(true)
