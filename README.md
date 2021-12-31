@@ -1,4 +1,11 @@
 # NosoWallet-Android
+
+[![Build Status](https://github.com/Noso-Project/NosoWallet-Android/workflows/Build/badge.svg?branch=main)](https://github.com/Noso-Project/NosoWallet-Android/actions)
+[![Supports Android](https://img.shields.io/badge/support-Android-blue?logo=Android)](https://github.com/Noso-Project/NosoWallet-Android/releases/latest)
+[![License](https://img.shields.io/github/license/Noso-Project/NosoWallet-Android)](https://github.com/Noso-Project/NosoWallet-Android/blob/master/LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/Noso-Project/NosoWallet-Android?label=latest%20release)](https://github.com/Noso-Project/NosoWallet-Android/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/Noso-Project/NosoWallet-Android/total)](https://github.com/Noso-Project/NosoWallet-Android/releases)
+
 NosoWallet for android, based on: https://github.com/Noso-Project/NosoWallet
 
 ## Running NOSOmobile
