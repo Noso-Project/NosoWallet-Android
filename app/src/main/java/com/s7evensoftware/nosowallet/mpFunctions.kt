@@ -131,12 +131,13 @@ class mpFunctions {
             ordertime:Long,
             line:Int,
             lastBlock:Long,
-            addressList: ArrayList<WalletObject>
+            addressList: ArrayList<WalletObject>,
+            pendingList: ArrayList<PendingData>
         ): OrderData {
             var AvailableAmount:Long; var AmountTrfr:Long;var FeeTrfr:Long
             var OrderInfo = OrderData()
 
-            AvailableAmount = addressList[WalletAddressIndex(origin, addressList)].Balance-getAddressPendingPays(origin)
+            AvailableAmount = addressList[WalletAddressIndex(origin, addressList)].Balance-getAddressPendingPays(origin, addressList, pendingList)
             if(AvailableAmount > fee){
                 FeeTrfr = fee
             }else{
@@ -220,7 +221,11 @@ class mpFunctions {
             return "tR"+Resultado+Clave
         }
 
-        fun getAddressPendingPays(address:String):Long {
+        fun getAddressPendingPays(address:String, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Long {
+            val walletIndex = WalletAddressIndex(address, addressList)
+            if(walletIndex != -1){
+                return pendingList[walletIndex].Outgoing
+            }
             return 0L
         }
 

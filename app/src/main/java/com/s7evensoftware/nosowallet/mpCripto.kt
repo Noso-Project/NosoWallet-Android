@@ -60,7 +60,7 @@ class mpCripto {
             CurrTime = System.currentTimeMillis()/1000
             Fee = GetFee(amount)
             Remaining = amount+Fee
-            CoinsAvailable = mpFunctions.GetAddressBalanceFromSummary(origin)
+            CoinsAvailable = mpFunctions.GetAddressBalanceFromSummary(origin)-mpFunctions.getAddressPendingPays(origin, viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
             if(Remaining <= CoinsAvailable || viewModel.allowSendAll){
                 OrderHashString = CurrTime.toString()
 
@@ -76,7 +76,7 @@ class mpCripto {
 
                 var Amount = amount // Amount == needed Amount
                 while(Amount > 0){
-                    if((orderedList[Counter].Balance-mpFunctions.getAddressPendingPays(orderedList[Counter].Hash!!))>0){
+                    if((orderedList[Counter].Balance-mpFunctions.getAddressPendingPays(orderedList[Counter].Hash!!,viewModel.AdddressList.value!!, viewModel.PendingList.value!!))>0){
                         TrxLine += 1
                         ArrayTrfrs.add(
                             mpFunctions.SendFundsFromAddress(
@@ -88,7 +88,8 @@ class mpCripto {
                                 CurrTime,
                                 TrxLine,
                                 viewModel.LastBlock.value!!,
-                                viewModel.AdddressList.value!!
+                                viewModel.AdddressList.value!!,
+                                viewModel.PendingList.value!!
                             )
                         )
                         Fee = Fee+ArrayTrfrs.last().AmountFee

@@ -635,7 +635,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                             val outgoing = viewModel.SendFunds_FROM
                             val incoming = viewModel.SendFunds_TO
                             val balance = viewModel.SendFunds_Amount
-                            val ref = viewModel.SendFunds_Ref
+                            val ref = viewModel.SendFunds_Ref.replace(" ","_")
 
                             while(order_pending && fail_count < 5){
                                 val res = mpCripto.SendTo(
@@ -680,6 +680,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                         binding.mainSendFundsDestination.isEnabled = true
                         binding.mainSendFundsAmount.isEnabled = true
                         binding.mainSendFundsReference.isEnabled = true
+                        binding.mainSendFundsUseallCheck.isChecked = false
 
                         binding.mainSendFundsClose.visibility = View.VISIBLE
                         binding.mainSendFundsSend.visibility = View.VISIBLE
