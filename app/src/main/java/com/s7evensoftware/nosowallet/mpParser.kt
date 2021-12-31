@@ -80,7 +80,6 @@ class mpParser {
         }
 
         fun parseInternalWallet(
-            context: Context,
             fileRef: File,
             addressList: ArrayList<WalletObject>,
             pendingList: ArrayList<PendingData>

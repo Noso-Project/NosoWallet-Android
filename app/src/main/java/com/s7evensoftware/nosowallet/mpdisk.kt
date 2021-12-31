@@ -181,7 +181,6 @@ class mpDisk {
         ){
             if(fileexist(wallet)){
                 mpParser.parseInternalWallet(
-                    context,
                     File(context.getExternalFilesDir(null)!!.path
                             +File.separator
                             +NOSPath

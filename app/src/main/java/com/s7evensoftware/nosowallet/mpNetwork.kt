@@ -73,30 +73,31 @@ class mpNetwork {
                 clientChannel.println("GETZIPSUMARY")
 
                 val fos = FileOutputStream(zSumaryFile, false)
-                var bytes = ByteArray(8192)
+                var bytes = ByteArray(8213)
 
                 var read: Int = inputStream.read(bytes)
-
-                // Find zipheader to start zip file recreation
                 var breakpoint = 0
-                for(index in 0..bytes.size-1){
-                    if(
-                        bytes[index].toInt() == 0x50 &&
-                        bytes[index+1].toInt() == 0x4b &&
-                        bytes[index+2].toInt() == 0x03 &&
-                        bytes[index+3].toInt() == 0x04
-                    ){
-                        breakpoint = index
-                        break
-                    }
-                }
-
-                // Copy of range of bytes read starting from zip header
-                bytes = bytes.copyOfRange(breakpoint, bytes.size+breakpoint)
-                read = read-(breakpoint) // resize number of bytes read
 
                 while (read != -1) {
-                    fos.write(bytes, 0,read)
+                    if(breakpoint == 0){ // Find zipheader to start zip file recreation
+                        for(index in 0..bytes.size-1){
+                            if(
+                                bytes[index].toInt() == 0x50 &&
+                                bytes[index+1].toInt() == 0x4b &&
+                                bytes[index+2].toInt() == 0x03 &&
+                                bytes[index+3].toInt() == 0x04
+                            ){
+                                breakpoint = index
+                                // Copy of range of bytes read starting from zip header
+                                bytes = bytes.copyOfRange(breakpoint, bytes.size)
+                                read -= breakpoint // resize number of bytes read
+                                fos.write(bytes, 0,read)
+                                break
+                            }
+                        }
+                    }else{
+                        fos.write(bytes, 0,read)
+                    }
                     read = inputStream.read(bytes)
                 }
 
