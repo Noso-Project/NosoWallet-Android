@@ -629,13 +629,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 viewModel.WalletSynced.value?.let {
                     if(it){
                         launch{
+                            var fail_count = 0
                             var order_pending = true
                             val outgoing = viewModel.SendFunds_FROM
                             val incoming = viewModel.SendFunds_TO
                             val balance = viewModel.SendFunds_Amount
                             val ref = viewModel.SendFunds_Ref
 
-                            while(order_pending){
+                            while(order_pending && fail_count < 5){
                                 val res = mpCripto.SendTo(
                                     outgoing,
                                     incoming,
@@ -654,7 +655,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                     }
                                     if(inc != -1){
                                         viewModel.PendingList.value?.let {
-                                            it[out].Incoming += balance
+                                            it[inc].Incoming += balance
                                         }
                                     }
                                     viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
@@ -665,6 +666,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                     order_pending = false
                                 }else{
                                     viewModel.TriggerSuccessError.postValue(1) // Connection Error
+                                    fail_count++
                                     delay(DEFAULT_SYNC_DELAY)
                                 }
                             }
