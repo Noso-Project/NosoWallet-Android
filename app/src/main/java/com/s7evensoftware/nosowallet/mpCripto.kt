@@ -3,6 +3,7 @@ package com.s7evensoftware.nosowallet
 import android.util.Base64
 import org.bouncycastle.crypto.digests.RIPEMD160Digest
 import org.bouncycastle.util.encoders.Hex
+import java.lang.IllegalArgumentException
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -128,7 +129,8 @@ class mpCripto {
             var MessageAsBytes:ByteArray
             var Signature: ByteArray
 
-            MessageAsBytes = Base64.decode(stringtoSign, Base64.DEFAULT)
+            MessageAsBytes = org.bouncycastle.util.encoders.Base64.decode(stringtoSign)
+
             Signature = SignerUtils.SignMessage(
                 MessageAsBytes,
                 org.bouncycastle.util.encoders.Base64.decode(privateKey),

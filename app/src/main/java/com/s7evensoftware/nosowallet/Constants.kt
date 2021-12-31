@@ -36,6 +36,7 @@ const val PoolPaymentsFilename= "poolpays" // txt
 const val HexAlphabet = "0123456789ABCDEF"
 const val B58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 const val B36Alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
+const val Base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
 const val CoinSimbol = "NOSO"              // Coin 3 chars
 const val CoinName = "Noso"                // Coin name

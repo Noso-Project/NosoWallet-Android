@@ -18,6 +18,22 @@ class mpParser {
             importWalletTask.launch(intent)
         }
 
+        fun SpecialBase64Decode(input:String):ByteArray {
+
+            val indexList = ArrayList<Int>()
+
+            for(c in input){
+                indexList.add(Base64Alphabet.indexOf(c))
+            }
+
+            for(i in indexList){
+                Log.e("mpParser","Index: "+i)
+            }
+
+            return ByteArray(1)
+
+        }
+
         fun IsValid58(base58Text:String):Boolean {
             for(c in base58Text){
                 if(B58Alphabet.indexOf(c) == -1){
@@ -44,7 +60,7 @@ class mpParser {
         fun ImportWallet(context: Context, resultCode: Int, data: Intent?, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
             if(resultCode == Activity.RESULT_OK){
                 data?.data.also {
-                    if(getFileExtension(it!!.lastPathSegment!!).equals(".pkw") || getFileExtension(it!!.lastPathSegment!!).equals(".pkw.bak")){
+                    if(getFileExtension(getFileName(context, it!!)).equals(".pkw") || getFileExtension(getFileName(context, it!!)).equals(".pkw.bak")){
                         Log.e("mParser","Wallet File Imported - OK")
                         return parseExternalWallet(context, it!!, addressList,pendingList)
                     }else{
@@ -160,8 +176,8 @@ class mpParser {
             return nuevos
         }
 
-        fun getFileName(context: Context, uri: Uri): String? {
-            var result: String? = null
+        fun getFileName(context: Context, uri: Uri): String {
+            var result = ""
             if (uri.scheme.equals("content")) {
                 val cursor = context.contentResolver.query(uri, null, null, null, null)
                 try {
@@ -174,7 +190,7 @@ class mpParser {
                 }
             }
             if (result == null) {
-                result = uri.path
+                result = uri.path?:""
                 val cut = result!!.lastIndexOf('/')
                 if (cut != -1) {
                     result = result.substring(cut + 1)
