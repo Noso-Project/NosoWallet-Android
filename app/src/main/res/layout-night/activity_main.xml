@@ -30,12 +30,13 @@
                 android:paddingHorizontal="10dp"
                 android:text="NOSO"
                 android:textColor="@color/colorChatBlack"
-                android:textSize="@dimen/main_current_noso_title_text_size"
+                android:textSize="@dimen/main_noso_title_text_size"
                 android:textStyle="bold"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorChatBlack"
+                android:textSize="@dimen/main_noso_subtitle_text_size"
                 android:layout_marginTop="-10dp"
                 android:paddingHorizontal="11dp"
                 android:text="m  o  b  i  l  e"
@@ -49,8 +50,9 @@
 
             <ImageButton
                 android:id="@+id/main_settings"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorTransparent"
                 android:src="@drawable/ic_settings" />
         </LinearLayout>
     </LinearLayout>
@@ -83,13 +85,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/main_wallet_action_text"
                         android:text="@string/wallet_actions_create" /> />
                     <ImageButton
                         android:id="@+id/main_wallet_create"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/background_corner_rounded_white_actionable"
-                        android:padding="5dp"
+                        android:padding="@dimen/main_wallet_button_padding"
                         android:src="@drawable/ic_baseline_create_new_24"
                         app:tint="@color/black" />
                 </LinearLayout>
@@ -103,13 +106,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/main_wallet_action_text"
                         android:text="@string/wallet_actions_import" />
                     <ImageButton
                         android:id="@+id/main_wallet_import"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/background_corner_rounded_white_actionable"
-                        android:padding="5dp"
+                        android:padding="@dimen/main_wallet_button_padding"
                         android:src="@drawable/ic_import_icon"
                         app:tint="@color/black" />
                 </LinearLayout>
@@ -123,13 +127,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/main_wallet_action_text"
                         android:text="@string/wallet_actions_export" />
                     <ImageButton
                         android:id="@+id/main_wallet_export"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/background_corner_rounded_white_actionable"
-                        android:padding="5dp"
+                        android:padding="@dimen/main_wallet_button_padding"
                         android:src="@drawable/ic_export_icon"
                         app:tint="@color/black" />
                 </LinearLayout>
@@ -145,7 +150,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/main_wallet_grand_balance_label"
                     android:text="@string/wallet_grand_balance" />
                 <TextView
                     android:id="@+id/main_grand_balance"
@@ -153,7 +158,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:text="0.00000000"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/main_wallet_grand_balance_text"
                     android:textStyle="bold"/>
             </LinearLayout>
         </LinearLayout>
@@ -242,7 +247,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:minHeight="0dp"
-                    android:textSize="@dimen/main_send_funds_button_text"
+                    android:textSize="@dimen/main_sendfunds_button_text"
                     android:text="@string/general_send_funds_title"
                     />
             </LinearLayout>
@@ -262,7 +267,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/main_sendfunds_text_title"
                     android:textStyle="bold"
                     android:textColor="@color/colorChatBlack"
                     android:text="@string/general_send_funds_title"/>
@@ -275,22 +280,23 @@
                 android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="90dp"
+                    android:layout_width="@dimen/main_sendfunds_label_width"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
+                    android:textSize="@dimen/main_sendfunds_text_labels"
                     android:text="@string/general_send_funds_from"/>
                 <EditText
                     android:id="@+id/main_send_funds_from"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/main_sendfunds_input_text_size"
                     android:enabled="false"
                     android:textAlignment="textEnd"
                     android:textColor="@color/colorWhite"
                     android:text=""
-                    android:paddingVertical="6dp"
-                    android:paddingHorizontal="10dp"
-                    android:layout_marginLeft="10dp"
+                    android:paddingVertical="@dimen/main_sendfunds_input_vpadding"
+                    android:paddingHorizontal="@dimen/main_sendfunds_input_hpadding"
+                    android:layout_marginLeft="@dimen/main_sendfunds_label_left_margin"
                     android:background="@drawable/background_corner_rounded_dark"/>
             </LinearLayout>
 
@@ -300,15 +306,16 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="90dp"
+                    android:layout_width="@dimen/main_sendfunds_label_width"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
+                    android:textSize="@dimen/main_sendfunds_text_labels"
                     android:text="@string/general_send_funds_to"/>
                 <ImageButton
                     android:id="@+id/main_send_funds_paste"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="@dimen/main_sendfunds_label_left_margin"
                     android:layout_marginRight="4dp"
                     android:padding="3dp"
                     android:background="@drawable/background_corner_rounded_actionable"
@@ -318,14 +325,14 @@
                     android:id="@+id/main_send_funds_destination"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/main_sendfunds_input_text_size"
                     android:textAlignment="textEnd"
                     android:textColor="@color/colorWhite"
                     android:inputType="textNoSuggestions|textShortMessage"
                     android:maxLines="1"
                     android:imeOptions="actionNext"
-                    android:paddingVertical="6dp"
-                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="@dimen/main_sendfunds_input_vpadding"
+                    android:paddingHorizontal="@dimen/main_sendfunds_input_hpadding"
                     android:background="@drawable/background_corner_rounded_dark"/>
             </LinearLayout>
 
@@ -335,15 +342,16 @@
                 android:paddingVertical="5dp"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="90dp"
+                    android:layout_width="@dimen/main_sendfunds_label_width"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/main_sendfunds_text_labels"
                     android:text="@string/general_send_funds_amount"/>
                 <ImageView
                     android:id="@+id/main_send_funds_amount_check"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="@dimen/main_sendfunds_label_left_margin"
                     android:layout_marginRight="4dp"
                     android:padding="3dp"
                     android:background="@drawable/background_corner_rounded_actionable"
@@ -353,14 +361,14 @@
                     android:id="@+id/main_send_funds_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/main_sendfunds_input_text_size"
                     android:textAlignment="textEnd"
                     android:textColor="@color/white"
                     android:inputType="number|text"
                     android:imeOptions="actionNext"
                     android:text="0.00000000"
-                    android:paddingVertical="6dp"
-                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="@dimen/main_sendfunds_input_vpadding"
+                    android:paddingHorizontal="@dimen/main_sendfunds_input_hpadding"
                     android:background="@drawable/background_corner_rounded_dark"/>
             </LinearLayout>
 
@@ -370,20 +378,21 @@
                 android:gravity="top"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="90dp"
+                    android:layout_width="@dimen/main_sendfunds_label_width"
                     android:layout_height="match_parent"
                     android:textColor="@color/black"
+                    android:textSize="@dimen/main_sendfunds_text_labels"
                     android:text="@string/general_send_funds_ref"/>
                 <EditText
                     android:id="@+id/main_send_funds_reference"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/main_sendfunds_input_text_size"
                     android:textAlignment="textEnd"
                     android:textColor="@color/colorWhite"
-                    android:paddingVertical="6dp"
-                    android:paddingHorizontal="10dp"
-                    android:layout_marginLeft="10dp"
+                    android:paddingVertical="@dimen/main_sendfunds_input_vpadding"
+                    android:paddingHorizontal="@dimen/main_sendfunds_input_hpadding"
+                    android:layout_marginLeft="@dimen/main_sendfunds_label_left_margin"
                     android:inputType="textShortMessage|textAutoComplete|textAutoCorrect"
                     android:maxLines="2"
                     android:imeOptions="actionDone"
@@ -405,6 +414,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/colorBlack"
+                        android:minHeight="0dp"
+                        android:textSize="@dimen/main_sendfunds_text_labels"
                         android:text="@string/general_send_funds_useall"/>
                 </LinearLayout>
                 <LinearLayout
@@ -416,6 +427,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
+                        android:minHeight="0dp"
                         android:layout_marginRight="10dp"
                         android:text="@string/general_send_funds_close"
                         />
@@ -424,6 +436,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
+                        android:minHeight="0dp"
                         android:visibility="gone"
                         android:layout_marginRight="10dp"
                         android:text="@string/general_send_funds_cancel"
@@ -432,6 +445,7 @@
                         android:id="@+id/main_send_funds_send"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minHeight="0dp"
                         android:layout_gravity="right"
                         android:text="@string/general_send_funds_send"
                         />
@@ -440,6 +454,7 @@
                         android:id="@+id/main_send_funds_send_confirm"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minHeight="0dp"
                         android:layout_gravity="right"
                         android:backgroundTint="@color/colorOrangeWarm"
                         android:text="@string/general_send_funds_send_confirm"

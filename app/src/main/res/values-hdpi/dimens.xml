@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="main_current_noso_title_text_size">30dp</dimen>
+    <dimen name="main_noso_title_text_size">20dp</dimen>
+    <dimen name="main_noso_subtitle_text_size">9dp</dimen>
+    <dimen name="main_noso_subtitle_top_margin">-5dp</dimen>
 
+    <dimen name="main_wallet_action_text">10sp</dimen>
+    <dimen name="main_wallet_button_padding">2dp</dimen>
+
+    <dimen name="main_wallet_balance_vpadding">5dp</dimen>
+    <dimen name="main_wallet_grand_balance_label">10sp</dimen>
+    <dimen name="main_wallet_grand_balance_text">15sp</dimen>
+
+    <dimen name="wallet_row_labels">10sp</dimen>
+    <dimen name="wallet_row_address">12sp</dimen>
+    <dimen name="wallet_row_number_text">10sp</dimen>
 
     <dimen name="main_netstat_block_hpadding">5dp</dimen>
     <dimen name="main_netstat_block_vpadding">5dp</dimen>
     <dimen name="main_netstat_date_text_size">10sp</dimen>
-    <dimen name="main_send_funds_button_text">12sp</dimen>
+    <dimen name="main_netstat_date_text_title">15sp</dimen>
 
+    <dimen name="main_sendfunds_text_title">15sp</dimen>
+    <dimen name="main_sendfunds_text_labels">10sp</dimen>
+    <dimen name="main_sendfunds_button_text">10sp</dimen>
+    <dimen name="main_sendfunds_label_width">60dp</dimen>
+    <dimen name="main_sendfunds_label_left_margin">5dp</dimen>
+    <dimen name="main_sendfunds_input_vpadding">3dp</dimen>
+    <dimen name="main_sendfunds_input_hpadding">5dp</dimen>
+
+    <dimen name="main_sendfunds_input_text_size">8sp</dimen>
 
 
 
