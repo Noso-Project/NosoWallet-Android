@@ -84,7 +84,7 @@ class mpParser {
                         )) == ".pkw.bak"
                     ){
                         Log.e("mParser","Wallet File Imported - OK")
-                        return parseExternalWallet(context, it!!, addressList,pendingList)
+                        return parseExternalWallet(context, it, addressList,pendingList)
                     }else{
                         Log.e("mParser","Wrong file extension - ERR")
                         return -2
@@ -130,7 +130,7 @@ class mpParser {
                 buffer.read(bytes, 0, bytes.size)
                 buffer.close()
             }catch (e:Exception){
-                fileReference?.close()
+                fileReference.close()
                 return false
             }
             return parseWallet(bytes, addressList, pendingList) > 0
@@ -199,7 +199,7 @@ class mpParser {
         }
 
         fun getFileName(context: Context, uri: Uri): String {
-            var result = ""
+            var result:String? = null
             if (uri.scheme.equals("content")) {
                 val cursor = context.contentResolver.query(uri, null, null, null, null)
                 try {
@@ -213,7 +213,7 @@ class mpParser {
             }
             if (result == null) {
                 result = uri.path?:""
-                val cut = result!!.lastIndexOf('/')
+                val cut = result.lastIndexOf('/')
                 if (cut != -1) {
                     result = result.substring(cut + 1)
                 }
