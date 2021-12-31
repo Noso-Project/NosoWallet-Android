@@ -247,6 +247,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                             }else if(s?.indexOf(".") != -1){ // Parse the input only if has decimals, other way can be passed as it is
                                 s?.substring(start, start+count).let { newChar ->  // get the only new char typed
                                     if(newChar?.length?:0 > 1){ // if is more than one char then is a paste
+                                        if(s.toString() == "0.00000000") replaceFirstZero = true
                                         if(s?.matches("[0-9]+\\.[0-9]+".toRegex()) == true){ // Check if is a valid input
                                             if(s.indexOf(".") != -1){
                                                 // Fill 0's at the end if is not long enough
@@ -628,6 +629,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             R.id.main_send_funds_send_confirm -> {
                 viewModel.WalletSynced.value?.let {
                     if(it){
+                        /*
                         launch{
                             var fail_count = 0
                             var order_pending = true
@@ -671,6 +673,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                 }
                             }
                         }
+                         */
                         binding.mainSendFundsFrom.setText("")
                         binding.mainSendFundsReference.setText("")
                         binding.mainSendFundsAmount.setText("0.00000000")
