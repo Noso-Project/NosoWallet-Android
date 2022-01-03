@@ -11,7 +11,6 @@ class NOSObjects {
 
 class ConcensusResult {
     var LastBlock:Long = 0
-    var LasPendingCount:Long = 0
     var LastBranch:String = ""
     var Address:String = ""
     var Port:Int = 8080
@@ -52,20 +51,6 @@ open class ServerObject:RealmObject() {
     @PrimaryKey var Address:String = "localhost"
     var Port:Int = 8080
     var isDefault:Boolean = false
-}
-
-class Options : Serializable {
-    var language:Int = 0
-    var Port:Int = 8080
-    var GetNodes:Boolean = false
-    var PoolInfo:String? = null
-    var Wallet:String = "wallet.pkw"
-    var AutoServer:Boolean = false
-    var AutoConnect:Boolean = true
-    var Auto_Updater:Boolean = false
-    var JustUpdated:Boolean = false
-    var VersionPage:String = "https://nosocoin.com"
-    var UsePool = false
 }
 
 class PendingInfo {

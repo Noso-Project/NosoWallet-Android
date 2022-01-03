@@ -810,11 +810,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
 
     override fun onSelectServer(v: View) {
-        if(!(v.tag as ServerObject).isDefault){
-            viewModel.SettingsServerSelected = v.tag as ServerObject
-            DBManager.setDefaultServer(v.tag as ServerObject)
-            serverAdapter?.notifyDataSetChanged()
-        }
+        viewModel.SettingsServerSelected = v.tag as ServerObject
+        DBManager.setDefaultServer(v.tag as ServerObject)
+        serverAdapter?.notifyDataSetChanged()
     }
 
     override fun onAddressCopied(address: String) {

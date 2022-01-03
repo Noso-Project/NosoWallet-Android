@@ -179,10 +179,10 @@ class mpParser {
                         Log.e("mpParser","## Wallet Info: ")
                         Log.e("mpParser","# Address: $Address")
                     }else{
-                        Log.e("mpParser","Ignoring wallet already exists: "+newWallet.Hash)
+                        Log.e("mpParser","Ignoring wallet, already exists: "+newWallet.Hash)
                     }
                 }else{
-                    Log.e("mpParser","Ignoring invalid wallet : "+Address)
+                    Log.e("mpParser", "Ignoring invalid wallet : $Address")
                 }
 
                 // Search next block
