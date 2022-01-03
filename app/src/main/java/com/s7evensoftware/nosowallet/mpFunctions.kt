@@ -12,7 +12,9 @@ class mpFunctions {
 
         fun UpdateWalletFromSummary(addressList: ArrayList<WalletObject>){
             for(wallet in addressList){
-                wallet.Balance = GetAddressBalanceFromSummary(wallet.Hash?:"nohash")
+                wallet.Hash?.let {
+                    wallet.Balance = GetAddressBalanceFromSummary(it)
+                }
             }
         }
 
@@ -93,11 +95,11 @@ class mpFunctions {
                 }
             }
 
-            if(viewModel.RealTimeValue.value!! > (CTime*1000-500) || viewModel.RealTimeValue.value!! < (CTime*1000+500)){
-                Log.e("mpFuncion","Clocked sync not needed")
+            if(viewModel.RealTimeValue.value!!/1000 > (CTime-1) || viewModel.RealTimeValue.value!!/1000 < (CTime+1)){
+                Log.e("mpFuncion","Clock sync not needed")
             }else{
                 viewModel.RealTimeValue.postValue(CTime*1000)
-                Log.e("mpFunction","Clocked Synchronized")
+                Log.e("mpFunction","Clock Synchronized")
             }
 
             if((CBlock > viewModel.LastBlock.value?:0) || CPending > viewModel.LastPendingCount.value?:0){

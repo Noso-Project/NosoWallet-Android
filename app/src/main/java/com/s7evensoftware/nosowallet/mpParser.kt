@@ -24,7 +24,7 @@ class mpParser {
             val indexList = ArrayList<Int>()
 
             for(c in input){
-                indexList.add(Base64Alphabet.indexOf(c))
+                indexList.add(B64Alphabet.indexOf(c))
             }
 
             var binaryString = ""

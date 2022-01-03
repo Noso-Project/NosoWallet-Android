@@ -162,27 +162,37 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             while(viewModel.SYNC_ENABLED){
                 val NODEarray = ArrayList<NodeInfo>()
 
-                DBManager.getServers()?.forEach {
-                    NODEarray.add(mpNetwork.getNodeStatus(it.Address, it.Port, viewModel))
+                DBManager.getServers()?.forEach { node ->
+                    mpNetwork.getNodeStatus(node.Address, node.Port, viewModel).let { nodestat ->
+                        if(nodestat.Address != ""){
+                            NODEarray.add(nodestat)
+                        }
+                    }
                 }
 
-                // If concensus is true then returns a candidate NodeInfo otherway returns null
-                val syncNode = mpFunctions.Concensus(NODEarray, viewModel)
+                if(NODEarray.size > 0){
+                    // If concensus is true then returns a candidate NodeInfo otherway returns null
+                    val syncNode = mpFunctions.Concensus(NODEarray, viewModel)
 
-                if(syncNode != null){ // null == false || not null == nodeInfo
-                    Log.e("Sync","Consensus failed, syncing")
-                    if(mpNetwork.getSummary(applicationContext, syncNode.Address, syncNode.Port, viewModel)){
-                        mpDisk.LoadSummary()
-                        viewModel.LastBlock.postValue(syncNode.LastBlock)
-                        viewModel.LastSummary.postValue(syncNode.LastBranch)
+                    if(syncNode != null){ // null == false || not null == nodeInfo
+                        Log.e("Sync","Consensus failed, syncing")
+                        if(mpNetwork.getSummary(applicationContext, syncNode.Address, syncNode.Port, viewModel)){
+                            mpDisk.LoadSummary()
+                            viewModel.LastBlock.postValue(syncNode.LastBlock)
+                            viewModel.LastSummary.postValue(syncNode.LastBranch)
+                            viewModel.WalletSynced.postValue(true)
+                            SaveBlockBranchInfo(syncNode.LastBlock, syncNode.LastBranch)
+                            viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value!!+1)
+                        }
+                    }else{
                         viewModel.WalletSynced.postValue(true)
-                        SaveBlockBranchInfo(syncNode.LastBlock, syncNode.LastBranch)
-                        viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value!!+1)
+                        Log.e("Sync","Consensus succeed, no summary sync is needed")
                     }
                 }else{
-                    viewModel.WalletSynced.postValue(true)
-                    Log.e("Sync","Consensus succeed, no summary sync is needed")
+                    viewModel.WalletSynced.postValue(false)
+                    Log.e("Sync","Consensus failed, unable to reach any node")
                 }
+
                 delay(viewModel.SYNC_DELAY)
             }
         }

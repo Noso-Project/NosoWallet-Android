@@ -20,16 +20,8 @@ class mpDisk {
                 CreateDir(UpdatesDirectory)
             }
 
-            if(!directoryexist(MarksDirectory)){
-                CreateDir(MarksDirectory)
-            }
-
             if(!directoryexist(LogsDirectory)){
                 CreateDir(LogsDirectory)
-            }
-
-            if(!directoryexist(ExceptLogFilename)){
-                //CreateDir(context, UpdatesDirectory)
             }
 
             if(!fileexist(WalletFilename)){
@@ -116,8 +108,10 @@ class mpDisk {
                         +ZipSumaryFileName)
                 zipFile.delete()
                 Log.e("mpDisk","Delete summary zip and unzipped files - OK")
+            }catch (s:SecurityException){
+                Log.e("mpDisk","Error while deleting files: "+s.message)
             }catch (e:java.lang.Exception){
-                Log.e("mpDisk","Error while deleting files: "+e.message)
+                Log.e("mpDisk","Unhandled Error while deleting files: "+e.message)
             }
         }
 
@@ -224,14 +218,6 @@ class mpDisk {
 
             if(NOSOroot.mkdirs()){
                 Log.e("mpDisk","Directory NOSODATA created - OK")
-                /*Unused Options file
-                val FileOptions = File(NOSOroot.path, OptionsFileName)
-
-                ObjectOutputStream(FileOutputStream(FileOptions)).use {
-                    it.writeObject(Options)
-                    MainActivity.UserOptions = Options
-                    Log.e("mpDisk","Options file written - OK")
-                }*/
             }else{
                 Log.e("mpDisk","Directory creation failed - ERROR")
             }
@@ -312,7 +298,7 @@ class mpDisk {
                 buffWrt.newLine()
                 buffWrt.close()
             }catch (i:IOException){
-                Log.e("mpDisk","Error writing log file")
+                Log.e("mpDisk","Error writing log file: "+i.message)
             }
         }
 
