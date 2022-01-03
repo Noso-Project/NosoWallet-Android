@@ -293,6 +293,12 @@ class mpDisk {
             if(!fileLog.exists()){
                 fileLog.parentFile.mkdirs()
                 fileLog.createNewFile()
+            }else{
+                if(fileLog.length() >= 1048576){
+                    Log.e("mpDisk","Clearing Logfile - OK")
+                    fileLog.delete()
+                    fileLog.createNewFile()
+                }
             }
 
             try{
