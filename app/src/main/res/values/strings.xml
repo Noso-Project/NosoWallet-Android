@@ -64,5 +64,9 @@
     <string name="wallet_actions_export">Export</string>
     <string name="wallet_actions_create">New</string>
 
+    <string name="import_wallet_title">Import Wallet</string>
+    <string name="import_wallet_from_file">From File</string>
+    <string name="import_wallet_from_qr">From QR</string>
+
 
 </resources>

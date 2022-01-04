@@ -9,6 +9,8 @@ import androidx.activity.result.ActivityResultLauncher
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 class mpParser {
     companion object{
@@ -72,6 +74,21 @@ class mpParser {
                         return true
                     }
                 }
+            }
+            return false
+        }
+
+        fun ImportQRWallet(keys:String, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Boolean{
+            val tokens = StringTokenizer(keys)
+            val publicKey = tokens.nextToken()
+            val privateKey = tokens.nextToken()
+
+            val testSignature = mpCripto.getStringSigned("VERIFICATION",privateKey)
+            val verification = mpCripto.VerifySignedString("VERIFICATION", testSignature, publicKey)
+
+            if(verification){
+                Log.e("mpParser","Valid keys found, inserting")
+                return mpFunctions.InsertAddress(mpCripto.CreateNewAddress(publicKey, privateKey), addressList, pendingList)
             }
             return false
         }

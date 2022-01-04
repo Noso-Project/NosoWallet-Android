@@ -27,6 +27,27 @@ class mpCripto {
             return MyData
         }
 
+        fun CreateNewAddress(public:String, private:String):WalletObject {
+            var MyData = WalletObject()
+            var Address:String
+            var KeysPair:KeyPair
+
+            KeysPair = KeyPair()
+            KeysPair.PublicKey = public
+            KeysPair.PrivateKey = private
+            Address = GetAddressFromPublicKey(KeysPair.PublicKey!!)
+
+            MyData.Hash = Address
+            MyData.Custom = ""
+            MyData.PublicKey = KeysPair.PublicKey
+            MyData.PrivateKey = KeysPair.PrivateKey
+            MyData.Balance = 0
+            MyData.Pending = 0
+            MyData.Score = 0
+            MyData.LastOP = 0
+            return MyData
+        }
+
         fun GetAddressFromPublicKey(PubKey:String):String {
             var PubSHAHashed:String
             var Hash1:String

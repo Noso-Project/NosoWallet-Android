@@ -24,7 +24,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.s7evensoftware.nosowallet.databinding.ActivityMainBinding
+import com.s7evensoftware.nosowallet.databinding.DialogImportWalletBinding
 import com.s7evensoftware.nosowallet.databinding.DialogSetupBinding
 import io.realm.Realm
 import kotlinx.coroutines.*
@@ -35,7 +38,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
     lateinit var binding:ActivityMainBinding
     lateinit var viewModel:MainViewModel
-    var importWalletTask = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+    var importWalletFileTask = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         val result = mpParser.ImportWallet(this, it.resultCode, it.data, viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
         if(result < 0){
             when(result){
@@ -58,6 +61,17 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             viewModel.UpdateBalanceTrigger.value = viewModel.UpdateBalanceTrigger.value?.inc()
         }
 
+    }
+    var importWalletQrTask = registerForActivityResult(ScanContract()){ result ->
+        result.contents?.let { content ->
+            if(
+                mpParser.ImportQRWallet(content, viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
+            ){
+                Toast.makeText(this, "Imported 1 new wallet", Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(this, "Invalid wallet or already exists", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     var exportWalletTask = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         val result = mpParser.ExportWallet(it.resultCode, it.data, viewModel.AdddressList.value!!)
@@ -428,7 +442,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 }
             })
 
-
         //Prepare Wallet List container
         addressAdapter = AddressAdapter(this)
         addressAdapter?.setPendingList(viewModel.PendingList.value)
@@ -475,6 +488,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             binding.mainNetstatDate.text = mpFunctions.getDateFromUNIX(it)
             binding.mainNetstatTime.text = mpFunctions.getTimeFromUNIX(it)
         })
+    }
+
+    private fun prepareImportWalletView(view:View):View{
+        val dialogBinding = DialogImportWalletBinding.bind(view)
+        dialogBinding.dialogImportWalletFile.setOnClickListener(this)
+        dialogBinding.dialogImportWalletQr.setOnClickListener(this)
+        return view
     }
 
     private fun prepareSettingsView(view:View):View{
@@ -723,10 +743,32 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 Toast.makeText(this,R.string.general_create_success,Toast.LENGTH_SHORT).show()
             }
             R.id.main_wallet_import -> {
+                if(viewModel.ImportDialog == null){
+                viewModel.ImportDialog = AlertDialog.Builder(this)
+                    .setTitle("Import Wallet")
+                    .setView(prepareImportWalletView(layoutInflater.inflate(R.layout.dialog_import_wallet, null)))
+                    .setCancelable(true)
+                    .setOnCancelListener {
+                        viewModel.isSettingsOpen = false
+                    }
+                    .create()
+                }
+                viewModel.ImportDialog?.show()
+                viewModel.isImportOpen = true
+            }
+            R.id.dialog_import_wallet_file -> {
+                viewModel.ImportDialog?.dismiss()
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     setType("*/*")
                 }
-                importWalletTask.launch(intent)
+                importWalletFileTask.launch(intent)
+            }
+            R.id.dialog_import_wallet_qr -> {
+                viewModel.ImportDialog?.dismiss()
+                val options = ScanOptions()
+                options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                options.setOrientationLocked(true)
+                importWalletQrTask.launch(options)
             }
             R.id.main_wallet_export -> {
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {

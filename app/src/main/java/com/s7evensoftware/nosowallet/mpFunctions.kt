@@ -293,6 +293,20 @@ class mpFunctions {
             return -1
         }
 
+        fun InsertAddress(wallet:WalletObject, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Boolean {
+            if(!mpParser.WalletExists(wallet, addressList)){
+                addressList.add(wallet)
+                pendingList.add(PendingData())
+                mpDisk.SaveWallet(addressList)
+                Log.e("mpParser","## Wallet Info: ")
+                Log.e("mpParser","# Address: ${wallet.Hash}")
+                return true
+            }else{
+                Log.e("mpParser","Ignoring wallet, already exists: ${wallet.Hash}")
+                return false
+            }
+        }
+
         fun getMaximumToSend(amount:Long):Long {
             var Available:Long
             var Maximum:Long

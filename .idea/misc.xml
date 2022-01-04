@@ -26,12 +26,14 @@
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/drawable-hdpi/ic_baseline_paid_24.xml" value="0.215234375" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/drawable-hdpi/ic_settings.xml" value="0.2171875" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.23177083333333334" />
+        <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/drawable/ic_qricon_24.xml" value="0.1925" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/drawable/ic_settings.xml" value="0.28958333333333336" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout-mdpi/activity_main.xml" value="0.18659420289855072" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout-night-mdpi/activity_main.xml" value="0.18659420289855072" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout-night/activity_main.xml" value="0.33" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout/connection_server_row.xml" value="0.2708333333333333" />
+        <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout/dialog_import_wallet.xml" value="0.33" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout/dialog_setup.xml" value="0.27445652173913043" />
         <entry key="..\:/Users/Steve/Documents/GitHub/NosoWallet-Android/app/src/main/res/layout/wallet_address_row.xml" value="0.33" />
       </map>

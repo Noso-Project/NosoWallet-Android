@@ -6,6 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class MainViewModel: ViewModel() {
+    var ImportDialog:AlertDialog? = null
+    var isImportOpen = false
+
     var SettingsDialog:AlertDialog? = null
     var SettingsAddress = MutableLiveData("")
     var SettingsPort = MutableLiveData("")
