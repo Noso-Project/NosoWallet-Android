@@ -54,13 +54,13 @@
                         android:padding="3dp"
                         android:src="@drawable/ic_baseline_content_copy_24"/>
                     <ImageButton
-                        android:id="@+id/wallet_address_row_setsend"
+                        android:id="@+id/wallet_address_row_qr"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginLeft="8dp"
                         android:background="@drawable/background_corner_rounded_darkgray"
                         android:padding="3dp"
-                        android:src="@drawable/ic_baseline_exit_to_app_24"/>
+                        android:src="@drawable/ic_qricon_18"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

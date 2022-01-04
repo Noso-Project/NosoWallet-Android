@@ -120,8 +120,13 @@ class mpFunctions {
                     candidateServer.add(server)
                 }
             }
-            val randomIndex = ThreadLocalRandom.current().nextInt(candidateServer.size)
-            return candidateServer[randomIndex]
+
+            if(candidateServer.size > 0){
+                ThreadLocalRandom.current().nextInt(candidateServer.size).let {
+                    return candidateServer[it]
+                }
+            }
+            return NodeInfo()
         }
 
         fun SendFundsFromAddress(

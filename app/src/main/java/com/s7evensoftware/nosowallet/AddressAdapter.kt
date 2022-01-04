@@ -57,10 +57,10 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
 
             // To Copy the Address into the clipboard
             rowbinding.walletAddressRowCopy.tag = wallet.Hash
-            rowbinding.walletAddressRowSetsend.tag = wallet.Hash
+            rowbinding.walletAddressRowQr.tag = wallet.Hash
             rowbinding.walletAddressRowContainer.tag = wallet.Hash
             rowbinding.walletAddressRowCopy.setOnClickListener(this)
-            rowbinding.walletAddressRowSetsend.setOnClickListener(this)
+            rowbinding.walletAddressRowQr.setOnClickListener(this)
             rowbinding.walletAddressRowContainer.setOnClickListener(this)
         }
 
@@ -69,8 +69,8 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
                 R.id.wallet_address_row_copy -> {
                     callback?.onAddressCopied(v.tag as String)
                 }
-                R.id.wallet_address_row_setsend -> {
-                    callback?.onSourceForSendFunds(v.tag as String)
+                R.id.wallet_address_row_qr -> {
+                    callback?.onQRGenerationCall(v.tag as String)
                 }
                 R.id.wallet_address_row_container -> {
                     callback?.onSourceForSendFunds(v.tag as String)
@@ -82,5 +82,6 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
     interface OnCopyDone {
         fun onAddressCopied(address:String)
         fun onSourceForSendFunds(address: String)
+        fun onQRGenerationCall(address: String)
     }
 }

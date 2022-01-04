@@ -1,6 +1,7 @@
 package com.s7evensoftware.nosowallet
 
 
+import android.graphics.Bitmap
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,10 @@ class MainViewModel: ViewModel() {
     var SettingsPort = MutableLiveData("")
     var SettingsServerSelected:ServerObject? = null
     var isSettingsOpen = false
+
+    var QRDialog:AlertDialog? = null
+    var currentQR:Bitmap? = null
+    var isQROpen = false
 
     var AdddressList = MutableLiveData(ArrayList<WalletObject>())
     var PendingList = MutableLiveData(ArrayList<PendingData>())

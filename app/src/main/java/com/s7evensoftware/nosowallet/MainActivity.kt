@@ -6,14 +6,14 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.EditText
-import android.widget.ScrollView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -24,9 +24,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import com.s7evensoftware.nosowallet.databinding.ActivityMainBinding
+import com.s7evensoftware.nosowallet.databinding.DialogAddressQrcodeBinding
 import com.s7evensoftware.nosowallet.databinding.DialogImportWalletBinding
 import com.s7evensoftware.nosowallet.databinding.DialogSetupBinding
 import io.realm.Realm
@@ -107,12 +110,27 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         prepareView()
         setContentView(view)
         RestoreSendFundsView()
+        RestoreDialogs()
 
         // Display Content
         CalculateGrandBalance()
         SummarySync()
         TimeTask()
         Log.e("Main","Your DPI is: "+getResources().getDisplayMetrics().density)
+    }
+
+    private fun RestoreDialogs(){
+        if(viewModel.isSettingsOpen && viewModel.SettingsDialog != null){
+            viewModel.SettingsDialog?.show()
+        }
+
+        if(viewModel.isImportOpen && viewModel.ImportDialog != null){
+            viewModel.ImportDialog?.show()
+        }
+
+        if(viewModel.isQROpen && viewModel.QRDialog != null){
+            viewModel.QRDialog?.show()
+        }
     }
 
     private fun RestoreSendFundsView() {
@@ -129,6 +147,18 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
     override fun onDestroy() {
         super.onDestroy()
+        viewModel.SettingsDialog?.let {
+            it.dismiss()
+        }
+
+        viewModel.ImportDialog?.let {
+            it.dismiss()
+        }
+
+        viewModel.QRDialog?.let {
+            it.dismiss()
+        }
+
         coroutineContext.cancel() // Cancel repetitive sync task
     }
 
@@ -490,6 +520,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         })
     }
 
+    private fun prepareQRView(view:View, address:String, qr:Bitmap):View{
+        val dialogBinding = DialogAddressQrcodeBinding.bind(view)
+        dialogBinding.dialogAddressCurrent.text = address
+        dialogBinding.dialogAddressQrcodeViewer.setImageBitmap(qr)
+        return view
+    }
+
     private fun prepareImportWalletView(view:View):View{
         val dialogBinding = DialogImportWalletBinding.bind(view)
         dialogBinding.dialogImportWalletFile.setOnClickListener(this)
@@ -766,6 +803,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             R.id.dialog_import_wallet_qr -> {
                 viewModel.ImportDialog?.dismiss()
                 val options = ScanOptions()
+                options.setPrompt(getString(R.string.import_wallet_from_qr_prompt))
                 options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
                 options.setOrientationLocked(true)
                 importWalletQrTask.launch(options)
@@ -870,4 +908,33 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         binding.mainSendFundsFrom.setText(address)
     }
 
+    override fun onQRGenerationCall(address: String) {
+        val size = 512
+        val bits = QRCodeWriter().encode(address, BarcodeFormat.QR_CODE, size, size)
+        val QRbitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565).also {
+            for ( x in 0 until size) {
+                for ( y in 0 until size){
+                    it.setPixel(x,y, if(bits[x,y]) Color.BLACK else Color.WHITE)
+                }
+            }
+        }
+
+        if(viewModel.QRDialog == null){
+            viewModel.QRDialog = AlertDialog.Builder(this)
+                .setTitle(R.string.qr_dialog_title)
+                .setView(prepareQRView(layoutInflater.inflate(R.layout.dialog_address_qrcode, null), address, QRbitmap))
+                .setCancelable(true)
+                .setOnCancelListener {
+                    viewModel.isSettingsOpen = false
+                }
+                .create()
+        }else{
+            val wallet_addrss = viewModel.QRDialog!!.findViewById<TextView>(R.id.dialog_address_current)
+            val qr_viewer = viewModel.QRDialog!!.findViewById<ImageView>(R.id.dialog_address_qrcode_viewer)
+            wallet_addrss?.text = address
+            qr_viewer?.setImageBitmap(QRbitmap)
+        }
+        viewModel.QRDialog?.show()
+        viewModel.isQROpen = true
+    }
 }
