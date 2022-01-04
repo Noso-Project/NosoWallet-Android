@@ -5,3 +5,4 @@
 - Now any change to the server/nodes list is applied immediately
 - Block and brach information is now incluided in the log
 - Wallet Sync is now displayed correctly if no nodes were reached
+- Wallet import using QR is now implemented
