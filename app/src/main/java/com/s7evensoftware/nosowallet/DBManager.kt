@@ -56,7 +56,9 @@ object DBManager {
     fun getAddressBalance(address:String):Long {
         val realmDB = Realm.getInstance(config)
         realmDB.where(SumaryData::class.java).equalTo("Hash",address).findFirst()?.let {
-            return it.Balance
+            val result = it.Balance
+            realmDB.close()
+            return result
         }
         return 0L
     }
@@ -89,6 +91,7 @@ object DBManager {
         realmDB.executeTransaction {
             it.insert(newServer)
         }
+        realmDB.close()
     }
 
     fun getServers(): RealmResults<ServerObject>? {
@@ -106,6 +109,7 @@ object DBManager {
         realmDB.executeTransaction {
             found?.deleteFromRealm()
         }
+        realmDB.close()
     }
 
     fun setDefaultServer(server: ServerObject) {
@@ -122,6 +126,7 @@ object DBManager {
             preDefault?.isDefault = false
             newDefault?.isDefault = true
         }
+        realmDB.close()
     }
 
 

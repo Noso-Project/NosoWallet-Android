@@ -10,6 +10,7 @@ import io.realm.RealmResults
 class ServerAdapter(callback:OnServerSelected): RecyclerView.Adapter<ServerAdapter.Server>(){
 
     private var ServerList: RealmResults<ServerObject>? = null
+    private var ServerLocalCopy: ArrayList<ServerObject>? = null
     private var callback:OnServerSelected? = null
 
     init {
@@ -18,6 +19,26 @@ class ServerAdapter(callback:OnServerSelected): RecyclerView.Adapter<ServerAdapt
 
     fun setServers(servers: RealmResults<ServerObject>?) {
         ServerList = servers
+        ServerLocalCopy = ArrayList()
+        ServerList?.forEach {
+            val s = ServerObject()
+            s.Address = it.Address
+            s.Port = it.Port
+            ServerLocalCopy?.add(s)
+        }
+    }
+
+    fun deleteServer(server:ServerObject){
+        indexOf(server)
+            ?.let {
+                ServerLocalCopy?.removeAt(it)
+                DBManager.deleteServer(server.Address)
+                notifyItemRemoved(it)
+            }
+    }
+
+    fun getServers(): ArrayList<ServerObject>? {
+        return ServerLocalCopy
     }
 
     fun indexOf(server:ServerObject):Int{

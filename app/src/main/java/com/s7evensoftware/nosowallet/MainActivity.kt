@@ -162,10 +162,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             while(viewModel.SYNC_ENABLED){
                 val NODEarray = ArrayList<NodeInfo>()
 
-                DBManager.getServers()?.forEach { node ->
-                    mpNetwork.getNodeStatus(node.Address, node.Port, viewModel).let { nodestat ->
-                        if(nodestat.Address != ""){
-                            NODEarray.add(nodestat)
+                serverAdapter?.let { source ->
+                    source.getServers()?.forEach { node ->
+                        mpNetwork.getNodeStatus(node.Address, node.Port, viewModel).let { nodestat ->
+                            if(nodestat.Address != ""){
+                                NODEarray.add(nodestat)
+                            }
                         }
                     }
                 }
@@ -211,6 +213,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         binding.mainSendFundsCancel.setOnClickListener(this)
         binding.mainSendFundsSend.setOnClickListener(this)
         binding.mainSendFundsSendConfirm.setOnClickListener(this)
+
+        //Fill seed nodes list
+        serverAdapter = ServerAdapter(this)
+        serverAdapter?.setServers(DBManager.getServers())
 
         //Send all funds enable/disable
         if(viewModel.allowSendAll) binding.mainSendFundsUseallCheck.isChecked = true
@@ -756,13 +762,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 settingsAddServerContainer?.visibility = View.VISIBLE
             }
             R.id.settings_delete_server -> {
-                if(viewModel.SettingsServerSelected != null){
-                    serverAdapter?.indexOf(viewModel.SettingsServerSelected!!)
-                        ?.let {
-                            DBManager.deleteServer(viewModel.SettingsServerSelected!!.Address)
-                            serverAdapter?.notifyItemRemoved(it)
-                            viewModel.SettingsServerSelected = null
-                        }
+                viewModel.SettingsServerSelected?.let { server ->
+                    serverAdapter?.deleteServer(server)
+                    viewModel.SettingsServerSelected = null
                 }
             }
             R.id.settings_add_server_back -> {
@@ -789,6 +791,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                         viewModel.SettingsAddress.value?:"localhost",
                         Integer.parseInt(viewModel.SettingsPort.value?:"8080")
                     )
+                    serverAdapter?.setServers(DBManager.getServers())
                     val settingsServerList = viewModel.SettingsDialog?.findViewById<RecyclerView>(R.id.settings_server_list)
                     val settingsAddServerContainer = viewModel.SettingsDialog?.findViewById<ScrollView>(R.id.settings_add_server_container)
                     settingsServerList?.visibility = View.VISIBLE

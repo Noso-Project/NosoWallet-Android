@@ -39,9 +39,9 @@ class mpNetwork {
                 viewModel.ConnectionError.postValue(true) // Report Connection Error
                 viewModel.SYNC_DELAY = viewModel.SYNC_DELAY+1000   // Inrcease Wait for the next attempt
                 Log.e("mpNetwork","Connection error, check the internet")
-            }catch (e:Exception){ // Something else....
+            }catch (e:java.lang.Exception){ // Something else....
                 viewModel.ConnectionError.postValue(true)
-                Log.e("mpNetwork","Unhandled Exception: "+e.printStackTrace().toString())
+                Log.e("mpNetwork","Unhandled Exception: "+e.message)
             }
             return NodeInfo()
         }
