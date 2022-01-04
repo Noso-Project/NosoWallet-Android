@@ -15,7 +15,6 @@ import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,8 +29,6 @@ import com.s7evensoftware.nosowallet.databinding.DialogSetupBinding
 import io.realm.Realm
 import kotlinx.coroutines.*
 import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, ServerAdapter.OnServerSelected, AddressAdapter.OnCopyDone {
@@ -131,7 +128,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
 
     private fun SaveBlockBranchInfo(lastBlock:Long, lastBrach:String){
-        Log.e("Main","Saving Block and Branch Info")
+        Log.e("Main","Saving Block($lastBlock) and Branch($lastBrach) Info")
         val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
         with (sharedPref.edit()) {
             putLong(getString(R.string.sharedpref_netstate_lastblock), lastBlock)
@@ -141,10 +138,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
 
     private fun RestoreBlockBranchInfo(){
-        Log.e("Main","Restoring Block and Branch Info")
         val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
         viewModel.LastBlock.value = sharedPref.getLong(getString(R.string.sharedpref_netstate_lastblock), 0)
         viewModel.LastSummary.value = sharedPref.getString(getString(R.string.sharedpref_netstate_lastbranch), "0")
+        Log.e("Main","Restoring Block(${viewModel.LastBlock.value}) and Branch(${viewModel.LastSummary.value}) Info")
     }
 
     private fun CreateDefaultSeedNodes() {
@@ -194,7 +191,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     viewModel.WalletSynced.postValue(false)
                     Log.e("Sync","Consensus failed, unable to reach any node")
                 }
-
                 delay(viewModel.SYNC_DELAY)
             }
         }
