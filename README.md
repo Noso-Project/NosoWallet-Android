@@ -24,3 +24,6 @@ The way to add the library to the project is by adding the implementation line i
 ![image](https://user-images.githubusercontent.com/53009062/147697515-8ce4be92-7dcf-4d24-9732-f31beb8fde43.png)
 
 
+## Donations
+
+NosoCoin: S7evenSoftware
