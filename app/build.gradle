@@ -12,9 +12,8 @@ android {
         applicationId "com.s7evensoftware.nosowallet"
         minSdk 23
         targetSdk 30
-        versionCode 7
-        versionName "1.0.9"
-
+        versionCode 8
+        versionName "1.0.10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,7 +27,6 @@ android {
     buildFeatures {
         viewBinding = true
     }
-
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

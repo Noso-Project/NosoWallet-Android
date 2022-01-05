@@ -76,6 +76,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             }
         }
     }
+    var pasteQRToDestination = registerForActivityResult(ScanContract()){ result ->
+        result.contents?.let { content ->
+            viewModel.SendFunds_TO = content
+            binding.mainSendFundsDestination.setText(content)
+            binding.mainSendFundsDestination.setSelection(content.length-1)
+        }
+    }
     var exportWalletTask = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         val result = mpParser.ExportWallet(it.resultCode, it.data, viewModel.AdddressList.value!!)
         if(result != -1 ) Toast.makeText(this, result, Toast.LENGTH_SHORT).show() // -1 = export cancelled
@@ -253,6 +260,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         binding.mainSendFundsCancel.setOnClickListener(this)
         binding.mainSendFundsSend.setOnClickListener(this)
         binding.mainSendFundsSendConfirm.setOnClickListener(this)
+        binding.mainSendFundsQr.setOnClickListener(this)
 
         //Fill seed nodes list
         serverAdapter = ServerAdapter(this)
@@ -282,15 +290,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 var replaceFirstZero = true
                 var savedBeforePaste: CharSequence? = null
 
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
+                override fun beforeTextChanged(s: CharSequence?,start: Int,count: Int,after: Int) {
                     savedBeforePaste = s // Save the actual value in case is needed for paste case
                 }
-
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     try {
                         if(!ignoreNext){
@@ -656,6 +658,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 binding.mainNetstatContainer.visibility = View.VISIBLE
                 binding.mainSendFundsContainer.visibility = View.GONE
             }
+            R.id.main_send_funds_qr -> {
+                val options = ScanOptions()
+                options.setPrompt(getString(R.string.import_wallet_from_qr_prompt))
+                options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                options.setOrientationLocked(true)
+                pasteQRToDestination.launch(options)
+            }
             R.id.main_send_funds_send -> { // If valid data then shows the confirmation button
                 if(viewModel.SendFunds_FROM.isNotBlank()){
                     if(viewModel.SendFunds_TO.isNotBlank()){
@@ -884,7 +893,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     Snackbar.make(v, R.string.settings_new_server_error, Snackbar.LENGTH_LONG).show()
                 }
             }
-
         }
     }
 
@@ -909,11 +917,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
 
     override fun onQRGenerationCall(address: String) {
-        val size = 512
-        val bits = QRCodeWriter().encode(address, BarcodeFormat.QR_CODE, size, size)
-        val QRbitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565).also {
-            for ( x in 0 until size) {
-                for ( y in 0 until size){
+        val bits = QRCodeWriter().encode(address, BarcodeFormat.QR_CODE, QR_BITMAP_SIZE, QR_BITMAP_SIZE)
+        val QRbitmap = Bitmap.createBitmap(QR_BITMAP_SIZE, QR_BITMAP_SIZE, Bitmap.Config.RGB_565).also {
+            for ( x in 0 until QR_BITMAP_SIZE) {
+                for ( y in 0 until QR_BITMAP_SIZE){
                     it.setPixel(x,y, if(bits[x,y]) Color.BLACK else Color.WHITE)
                 }
             }

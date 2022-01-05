@@ -15,6 +15,8 @@
     <dimen name="wallet_row_address">15sp</dimen>
     <dimen name="wallet_row_number_text">12sp</dimen>
 
+    <dimen name="wallet_qrviewer_bmargin">10dp</dimen>
+
     <dimen name="main_netstat_block_hpadding">10dp</dimen>
     <dimen name="main_netstat_block_vpadding">10dp</dimen>
     <dimen name="main_netstat_date_text_size">15sp</dimen>
@@ -23,8 +25,8 @@
     <dimen name="main_sendfunds_text_title">20sp</dimen>
     <dimen name="main_sendfunds_text_labels">12sp</dimen>
     <dimen name="main_sendfunds_button_text">12sp</dimen>
-    <dimen name="main_sendfunds_label_width">90dp</dimen>
-    <dimen name="main_sendfunds_label_left_margin">10dp</dimen>
+    <dimen name="main_sendfunds_label_width">70dp</dimen>
+    <dimen name="main_sendfunds_label_left_margin">5dp</dimen>
     <dimen name="main_sendfunds_input_vpadding">6dp</dimen>
     <dimen name="main_sendfunds_input_hpadding">10dp</dimen>
 

@@ -4,6 +4,7 @@ const val NODE_TIMEOUT        = 1500
 const val DELTA_TRIGGER       = true // ff false then nodes with Delta > 0 will be excluded from node selection
 const val DEFAULT_SYNC_DELAY  = 10000L
 const val MISSING_FUNDS       = "MISSING_FUNDS_ALERT"
+const val QR_BITMAP_SIZE      = 512
 
 const val NOSPath             = "NOSODATA" // directory
 const val OptionsFileName     = "options.psk" //psk

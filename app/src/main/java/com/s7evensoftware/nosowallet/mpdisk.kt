@@ -276,18 +276,22 @@ class mpDisk {
                         +File.separator
                         +LogsFilename)
 
-            if(!fileLog.exists()){
-                fileLog.parentFile.mkdirs()
-                fileLog.createNewFile()
-            }else{
-                if(fileLog.length() >= 1048576){
-                    Log.e("mpDisk","Clearing Logfile - OK")
-                    fileLog.delete()
-                    fileLog.createNewFile()
-                }
-            }
-
             try{
+                if(!fileLog.exists()){
+                    fileLog.parentFile.mkdirs()
+                    fileLog.createNewFile()
+                }else{
+                    if(fileLog.length() >= 1048576){
+                        if(fileLog.delete()){
+                            Log.e("mpDisk","Log file cleared - OK")
+                            fileLog.createNewFile()
+                        }else{
+                            Log.e("mpDisk","Error clearing Log file - ERR")
+                        }
+
+                    }
+                }
+
                 val buffWrt = BufferedWriter(FileWriter(fileLog, true))
                 val currentTime = System.currentTimeMillis()
                 val formattedLine = mpFunctions.getDateFromUNIX(currentTime)+" "+

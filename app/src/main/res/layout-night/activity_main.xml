@@ -321,6 +321,15 @@
                     android:background="@drawable/background_corner_rounded_actionable"
                     android:src="@drawable/ic_baseline_content_paste_24"
                     app:tint="@color/black" />
+                <ImageButton
+                    android:id="@+id/main_send_funds_qr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    android:padding="3dp"
+                    android:background="@drawable/background_corner_rounded_actionable"
+                    android:src="@drawable/ic_qricon_24"
+                    app:tint="@color/black"/>
                 <EditText
                     android:id="@+id/main_send_funds_destination"
                     android:layout_width="match_parent"
