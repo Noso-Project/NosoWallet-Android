@@ -6,7 +6,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/Noso-Project/NosoWallet-Android?label=latest%20release)](https://github.com/Noso-Project/NosoWallet-Android/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/Noso-Project/NosoWallet-Android/total)](https://github.com/Noso-Project/NosoWallet-Android/releases)
 
-NosoWallet for android, based on: https://github.com/Noso-Project/NosoWallet
+NosoWallet for android, based on: https://github.com/Noso-Project/NosoLite
 
 ## Running NOSOmobile
 
