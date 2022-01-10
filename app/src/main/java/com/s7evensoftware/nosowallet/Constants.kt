@@ -31,8 +31,11 @@ const val CoinSimbol = "NOSO"              // Coin 3 chars
 const val CoinName = "Noso"                // Coin name
 const val CoinChar = "N"                   // Char for addresses
 
-const val Comisiontrfr      = 10000             // Amount/Comisiontrfr = 0.01% of the amount
-const val MinimunFee        = 10L                  // Minimun fee for transfer
+const val InitialReward     = 5000000000   // Initial reward
+const val ComisionCustom    = 200000       // 0.05 % of the Initial reward
+const val CustomizationFee  = InitialReward/ComisionCustom
+const val Comisiontrfr      = 10000        // Amount/Comisiontrfr = 0.01% of the amount
+const val MinimunFee        = 10L          // Minimun fee for transfer
 const val Protocol          = 1
 const val ProgramVersion    = "1.0"
 

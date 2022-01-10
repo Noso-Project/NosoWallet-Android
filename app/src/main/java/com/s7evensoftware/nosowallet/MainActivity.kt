@@ -70,6 +70,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 mpParser.ImportQRWallet(content, viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
             ){
                 Toast.makeText(this, "Imported 1 new wallet", Toast.LENGTH_SHORT).show()
+                Log.e("Main","Import wallet triggering")
+                addressAdapter?.setAddressList(viewModel.AdddressList.value)
+                viewModel.UpdateBalanceTrigger.value = viewModel.UpdateBalanceTrigger.value?.inc()
             }else{
                 Toast.makeText(this, "Invalid wallet or already exists", Toast.LENGTH_SHORT).show()
             }

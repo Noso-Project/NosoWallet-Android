@@ -22,6 +22,43 @@ class mpParser {
             importWalletTask.launch(intent)
         }
 
+        fun CustomizeAddress(target:WalletObject, customName:String, lastBlock:Long):Int{
+            var TrfrHash:String;var OrderHash:String
+            var CurrTime:Long
+            var cont:Int
+
+            if(target.Custom?.isEmpty() == true){
+                return R.string.customize_error_1
+            }
+
+            if(customName.length < 5 || customName.length > 40){
+                return R.string.customize_error_2
+            }
+
+            if(IsValidAddress(customName)){
+                return R.string.customize_error_3
+            }
+
+            if(target.Balance < CustomizationFee){
+                return R.string.customize_error_4
+            }
+
+            val tempWallet = target.Hash?.let { DBManager.getWallet(it) }
+
+            if(tempWallet?.Custom?.isEmpty() != true){
+                return R.string.customize_error_1
+            }
+
+            if(DBManager.isAliasUsed(customName)){
+                return R.string.customize_error_5
+            }
+
+            CurrTime = System.currentTimeMillis()/1000
+            TrfrHash = mpCripto.getTransferHash("$CurrTime${target.Hash}$customName$lastBlock")
+            OrderHash = mpFunctions.getOrderHash("1$CurrTime$TrfrHash")
+            return 0
+        }
+
         fun SpecialBase64Decode(input:String):ByteArray {
             val indexList = ArrayList<Int>()
 

@@ -13,9 +13,14 @@ class mpFunctions {
         fun UpdateWalletFromSummary(addressList: ArrayList<WalletObject>){
             for(wallet in addressList){
                 wallet.Hash?.let {
+                    wallet.Custom = GetCustomFromSummary(it)
                     wallet.Balance = GetAddressBalanceFromSummary(it)
                 }
             }
+        }
+
+        fun GetCustomFromSummary(address:String):String {
+            return DBManager.getCustom(address)
         }
 
         fun GetAddressBalanceFromSummary(address:String):Long {

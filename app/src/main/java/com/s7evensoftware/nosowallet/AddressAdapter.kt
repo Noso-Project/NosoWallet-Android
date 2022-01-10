@@ -67,7 +67,11 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
             rowbinding = WalletAddressRowBinding.bind(itemView)
             itemView.setOnCreateContextMenuListener(this)
 
-            rowbinding.walletAddressRowAddress.text = wallet.Hash
+            if(wallet.Custom?.isBlank() == true || wallet.Custom?.length?:0 < 5){
+                rowbinding.walletAddressRowAddress.text = wallet.Hash
+            }else{
+                rowbinding.walletAddressRowAddress.text = wallet.Custom
+            }
             rowbinding.walletAddressRowIncoming.text = mpCoin.Long2Currency(pendingData.Incoming)
             rowbinding.walletAddressRowOutgoing.text = mpCoin.Long2Currency(pendingData.Outgoing)
             rowbinding.walletAddressRowBalance.text = mpCoin.Long2Currency(wallet.Balance)

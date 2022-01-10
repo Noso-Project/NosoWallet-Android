@@ -63,6 +63,36 @@ object DBManager {
         return 0L
     }
 
+    fun getCustom(address: String):String {
+        val realmDB = Realm.getInstance(config)
+        realmDB.where(SumaryData::class.java).equalTo("Hash",address).findFirst()?.let {
+            val result = it.Custom
+            realmDB.close()
+            return result
+        }
+        return ""
+    }
+
+    fun getWallet(address:String):SumaryData? {
+        val realmDB = Realm.getInstance(config)
+        realmDB.where(SumaryData::class.java).equalTo("Hash",address).findFirst()?.let {
+            return it
+        }
+        return null
+    }
+
+    fun isAliasUsed(custom_name:String):Boolean {
+        val realmDB = Realm.getInstance(config)
+        realmDB.where(SumaryData::class.java).findAll()?.let {
+            for(sd in it){
+                if(sd.Custom == custom_name){
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     fun addSummaryFromList(addressSummary: ArrayList<SumaryData>) {
         val realmDB = Realm.getInstance(config)
         realmDB.executeTransaction {

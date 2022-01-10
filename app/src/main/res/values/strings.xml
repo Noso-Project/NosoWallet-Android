@@ -84,4 +84,11 @@
     </string>
     <string name="delete_dialog_error1">You cannot delete the only address in the wallet</string>
 
+    <string name="customize_error_1">Address has already a custom name</string>
+    <string name="customize_error_2">Invalid custom name, required length should be between 5 to 40 chars</string>
+    <string name="customize_error_3">Invalid custom name, cannot be a valid address</string>
+    <string name="customize_error_4">Not enough funds to customize</string>
+    <string name="customize_error_5">Custom name already is already in used, choose something different</string>
+
+
 </resources>

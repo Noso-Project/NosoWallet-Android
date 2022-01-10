@@ -138,6 +138,14 @@ class mpCripto {
             }
         }
 
+        fun getTransferHash(order:String):String {
+            var result = HashSha256String(order)
+            result = BMHexto58(result, BigInteger("58"))
+            var b58sum = BMB58resumen(result)
+            var clave = BMDecto58(b58sum.toString())
+            return "tR$result$clave"
+        }
+
         fun GetFee(amount:Long):Long {
             val result = amount/ Comisiontrfr
             if(result < MinimunFee){
