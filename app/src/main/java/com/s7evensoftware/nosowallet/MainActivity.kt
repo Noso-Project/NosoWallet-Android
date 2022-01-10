@@ -724,25 +724,28 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                     viewModel
                                 )
 
-                                if(res == "ok"){
-                                    val out = mpFunctions.WalletAddressIndex(outgoing, viewModel.AdddressList.value!!)
-                                    val inc = mpFunctions.WalletAddressIndex(incoming, viewModel.AdddressList.value!!)
-                                    if(out != -1){
-                                        viewModel.PendingList.value?.let {
-                                            it[out].Outgoing += balance+mpCoin.GetFee(balance)
+                                if(res != ""){
+                                    if(res == MISSING_FUNDS){
+                                        viewModel.TriggerSuccessError.postValue(2) // Address funds not enough error
+                                        order_pending = false
+                                    }else{
+                                        Log.e("Main","Order success, OrderID: $res")
+                                        val out = mpFunctions.WalletAddressIndex(outgoing, viewModel.AdddressList.value!!)
+                                        val inc = mpFunctions.WalletAddressIndex(incoming, viewModel.AdddressList.value!!)
+                                        if(out != -1){
+                                            viewModel.PendingList.value?.let {
+                                                it[out].Outgoing += balance+mpCoin.GetFee(balance)
+                                            }
                                         }
-                                    }
-                                    if(inc != -1){
-                                        viewModel.PendingList.value?.let {
-                                            it[inc].Incoming += balance
+                                        if(inc != -1){
+                                            viewModel.PendingList.value?.let {
+                                                it[inc].Incoming += balance
+                                            }
                                         }
+                                        viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
+                                        viewModel.TriggerSuccessError.postValue(3) // Success
+                                        order_pending = false
                                     }
-                                    viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
-                                    viewModel.TriggerSuccessError.postValue(3) // Success
-                                    order_pending = false
-                                }else if(res == MISSING_FUNDS){
-                                    viewModel.TriggerSuccessError.postValue(2) // Address funds not enough error
-                                    order_pending = false
                                 }else{
                                     viewModel.TriggerSuccessError.postValue(1) // Connection Error
                                     fail_count++
