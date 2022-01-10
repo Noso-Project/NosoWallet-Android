@@ -32,6 +32,16 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    signingConfigs {
+        debug {
+            storeFile file('dev_keystore.jks')
+            keyAlias 'alias'
+            storePassword 'rd64Z6dfhH'
+            keyPassword 'rd64Z6dfhH'
+        }
+    }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
