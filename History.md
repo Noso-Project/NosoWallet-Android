@@ -1,4 +1,8 @@
 ## Version 1.0.11
+- Added option to delete addresses with a context menu by long pressing an address
+- Fixed the send order method to match the node response (this was causing a request to be sent multiple times)
+
+## Version 1.0.10
 - General code clean up, removed unused libraries and repos from gradle project
 - Fixed server deletion that prevented the first node to be deleted without selecting other first
 - Now the log is cleared after 1MB size is reached
