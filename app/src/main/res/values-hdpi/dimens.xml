@@ -31,4 +31,7 @@
     <dimen name="main_sendfunds_input_hpadding">5dp</dimen>
 
     <dimen name="main_sendfunds_input_text_size">8sp</dimen>
+
+    <dimen name="dialog_delete_textsize">12sp</dimen>
+    <dimen name="dialog_delete_padding">20dp</dimen>
 </resources>

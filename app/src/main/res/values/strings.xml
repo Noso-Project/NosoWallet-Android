@@ -71,5 +71,16 @@
 
     <string name="qr_dialog_title">Address QR code</string>
 
+    <string name="menu_action_delete">Delete</string>
+    <string name="menu_action_customize">Customize</string>
+
+    <string name="delete_dialog_title">Delete address</string>
+    <string name="delete_dialog_target">Target</string>
+    <string name="delete_dialog_delete">Delete</string>
+    <string name="delete_dialog_cancel">Cancel</string>
+    <string name="delete_dialog_disclaimer">
+        This will delete the address, if you don\'t have a backup
+        there is no way to recover it.
+    </string>
 
 </resources>

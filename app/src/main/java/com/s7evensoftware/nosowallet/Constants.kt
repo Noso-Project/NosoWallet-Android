@@ -16,6 +16,7 @@ const val BotDataFilename     = "botdata.psk" // psk
 const val NodeDataFilename    = "nodes.psk" // psk
 const val NTPDataFilename     = "ntpservers.psk" // psk
 const val WalletFilename      = "wallet.pkw" // pkw
+const val GhostFilename       = "erased.ssyl" // ssyl, stands for Steven saved your life
 const val WalletBackUpFile    = "wallet.pkw.bak" // pkw
 const val UpdatesDirectory    = "UPDATES/" // directory
 const val LogsDirectory       = "LOGS" // directory
@@ -34,5 +35,10 @@ const val Comisiontrfr      = 10000             // Amount/Comisiontrfr = 0.01% o
 const val MinimunFee        = 10L                  // Minimun fee for transfer
 const val Protocol          = 1
 const val ProgramVersion    = "1.0"
+
+
+//Menu actions
+const val DELETE_ADDRESS    = "MENU_DELETE_ADDRESS"
+const val CUSTOMIZE_ADDRESS    = "MENU_CUSTOMIZE_ADDRESS"
 
 

@@ -1,8 +1,10 @@
 package com.s7evensoftware.nosowallet
 
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.s7evensoftware.nosowallet.databinding.WalletAddressRowBinding
 
@@ -47,9 +49,24 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
         notifyItemInserted(AddressList!!.indexOf(newWallet))
     }
 
-    inner class Address(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    fun deleteWalletAt(position: Int){
+        AddressList?.removeAt(position)
+        PendingList?.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun getWallet(position: Int):WalletObject? {
+        return AddressList?.get(position)
+    }
+
+    inner class Address(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnCreateContextMenuListener {
+
+        var rowbinding = WalletAddressRowBinding.bind(itemView)
+
         fun setAddress(wallet: WalletObject, pendingData: PendingData){
-            var rowbinding = WalletAddressRowBinding.bind(itemView)
+            rowbinding = WalletAddressRowBinding.bind(itemView)
+            itemView.setOnCreateContextMenuListener(this)
+
             rowbinding.walletAddressRowAddress.text = wallet.Hash
             rowbinding.walletAddressRowIncoming.text = mpCoin.Long2Currency(pendingData.Incoming)
             rowbinding.walletAddressRowOutgoing.text = mpCoin.Long2Currency(pendingData.Outgoing)
@@ -77,9 +94,24 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
                 }
             }
         }
+
+        override fun onCreateContextMenu(
+            menu: ContextMenu?,
+            v: View?,
+            menuInfo: ContextMenu.ContextMenuInfo?
+        ) {
+            AddressList?.let {
+                callback?.setMenuTarget(adapterPosition)
+            }
+
+            menu?.add(0, v!!.id, 0, R.string.menu_action_delete)
+            menu?.add(0, v!!.id, 1, R.string.menu_action_customize)
+            //menu?.add(0, v!!.id, 2, "")
+        }
     }
 
     interface OnCopyDone {
+        fun setMenuTarget(position:Int)
         fun onAddressCopied(address:String)
         fun onSourceForSendFunds(address: String)
         fun onQRGenerationCall(address: String)

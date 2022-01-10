@@ -1,10 +1,7 @@
 package com.s7evensoftware.nosowallet
 
 import android.Manifest
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -12,6 +9,8 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -89,6 +88,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
     private var serverAdapter:ServerAdapter? = null
     private var addressAdapter:AddressAdapter? = null
+    private var menuAddressTarget:Int = -1
 
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext
@@ -902,6 +902,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         serverAdapter?.notifyDataSetChanged()
     }
 
+    override fun setMenuTarget(wallet_pos: Int) {
+        menuAddressTarget = wallet_pos
+    }
+
     override fun onAddressCopied(address: String) {
         val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val addressClip = ClipData.newPlainText("Noso Address",address)
@@ -914,6 +918,38 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     override fun onSourceForSendFunds(address: String) {
         viewModel.SendFunds_FROM = address
         binding.mainSendFundsFrom.setText(address)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when(item.title){
+            getString(R.string.menu_action_delete) -> {
+                val wallet = addressAdapter?.getWallet(menuAddressTarget)
+                val content = LayoutInflater.from(this).inflate(R.layout.dialog_delete_address, null)
+                content.findViewById<TextView>(R.id.dialog_delete_target).text = wallet?.Hash
+
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.delete_dialog_title)
+                    .setView(content)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.delete_dialog_delete) { _, _ ->
+                        viewModel.AdddressList.value?.let {
+                            Log.e("Main", "Deleting address: ${wallet?.Hash}")
+                            mpDisk.SaveErased(wallet!!)
+                            addressAdapter?.deleteWalletAt(menuAddressTarget)
+                            mpDisk.SaveWallet(it)
+                        }
+                    }
+                    .setNegativeButton(R.string.delete_dialog_cancel) { _, _ ->
+                        // Nothing to do
+                    }
+                    .create()
+                    .show()
+            }
+            getString(R.string.menu_action_customize) -> {
+                // Not implemented
+            }
+        }
+        return true
     }
 
     override fun onQRGenerationCall(address: String) {

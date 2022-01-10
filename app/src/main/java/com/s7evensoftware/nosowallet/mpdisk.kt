@@ -150,6 +150,29 @@ class mpDisk {
             }
         }
 
+        fun SaveErased(wallet: WalletObject) {
+            val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
+            val FileWallet = File(NOSOroot.path, GhostFilename)
+            val outputByteArray = ByteArrayOutputStream()
+            val dataoutputStream = DataOutputStream(outputByteArray)
+            val tempList = ArrayList<WalletObject>()
+            tempList.add(wallet)
+            writeWalletFile(dataoutputStream, tempList)
+
+            try{
+                //Write ghost.pkw file
+                val fileOutputStream = FileOutputStream(FileWallet)
+                outputByteArray.writeTo(fileOutputStream)
+                outputByteArray.flush();outputByteArray.close()
+                fileOutputStream.flush();fileOutputStream.close()
+                Log.e("mpDisk","Ghost file written - OK")
+            }catch (e:Exception){
+                dataoutputStream.close()
+                outputByteArray.close()
+                Log.e("mpDisk","Unable to write ghost file wallet file - ERR")
+            }
+        }
+
         fun ExportWallet(FileWallet: Uri?, listaDirecciones:ArrayList<WalletObject>): Int {
             val outputByteArray = ByteArrayOutputStream()
             val dataoutputStream = DataOutputStream(outputByteArray)
