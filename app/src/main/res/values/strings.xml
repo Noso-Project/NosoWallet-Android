@@ -82,5 +82,6 @@
         This will delete the address, if you don\'t have a backup
         there is no way to recover it.
     </string>
+    <string name="delete_dialog_error1">You cannot delete the only address in the wallet</string>
 
 </resources>

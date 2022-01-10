@@ -823,7 +823,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             R.id.main_wallet_export -> {
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
-                    setType("application/pkw")
+                    type = "application/pkw"
                     putExtra(Intent.EXTRA_TITLE, "androidWallet.pkw")
                 }
                 exportWalletTask.launch(intent)
@@ -936,10 +936,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     .setCancelable(true)
                     .setPositiveButton(R.string.delete_dialog_delete) { _, _ ->
                         viewModel.AdddressList.value?.let {
-                            Log.e("Main", "Deleting address: ${wallet?.Hash}")
-                            mpDisk.SaveErased(wallet!!)
-                            addressAdapter?.deleteWalletAt(menuAddressTarget)
-                            mpDisk.SaveWallet(it)
+                            if(it.size > 1){
+                                Log.e("Main", "Deleting address: ${wallet?.Hash}")
+                                mpDisk.SaveErased(wallet!!)
+                                addressAdapter?.deleteWalletAt(menuAddressTarget)
+                                mpDisk.SaveWallet(it)
+                            }else{
+                                Log.e("Main", "Error, the only address cannot be deleted")
+                                Toast.makeText(this, R.string.delete_dialog_error1, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                     .setNegativeButton(R.string.delete_dialog_cancel) { _, _ ->
