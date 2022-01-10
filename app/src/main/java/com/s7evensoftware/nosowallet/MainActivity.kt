@@ -957,7 +957,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     .show()
             }
             getString(R.string.menu_action_customize) -> {
-                // Not implemented
+                Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show()
             }
         }
         return true
