@@ -31,16 +31,16 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: assembleRelease
+        arguments: assembleDebug
 
     - name: List Output Release
-      run: ls -al app/build/outputs/apk/release
+      run: ls -al app/build/outputs/apk/debug
 
     - name: Upload the Release binary
       uses: actions/upload-artifact@v2
       with:
         name: NosoMobile-Release
-        path: app/build/outputs/apk/release/app-release-unsigned.apk
+        path: app/build/outputs/apk/debug/app-debug.apk
 
   package-release:
     if: contains(github.ref, '/tags/')
@@ -66,7 +66,7 @@ jobs:
     - name: Create release files
       run: |
         cd NosoMobile-Release
-        mv app-release-unsigned.apk NosoMobile-${{ steps.vars.outputs.tag }}.apk
+        mv app-debug.apk NosoMobile-${{ steps.vars.outputs.tag }}.apk
         zip -r NosoMobile-${{ steps.vars.outputs.tag }}.zip NosoMobile-${{ steps.vars.outputs.tag }}.apk
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
