@@ -20,6 +20,8 @@ class MainViewModel: ViewModel() {
     var currentQR:Bitmap? = null
     var isQROpen = false
 
+    var isOrderHistoryOpen = false
+
     var AdddressList = MutableLiveData(ArrayList<WalletObject>())
     var PendingList = MutableLiveData(ArrayList<PendingData>())
     var UpdateBalanceTrigger = MutableLiveData(0)

@@ -23,7 +23,8 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
                     <TextView
@@ -37,13 +38,15 @@
                         android:id="@+id/history_order_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:maxLines="3"
                         android:textColor="@color/black"
                         android:textSize="@dimen/wallet_row_address"
-                        android:text="ORDER asjdflasdf 234234 11 1000"
+                        android:text="ORx#x#X"
                         />
                 </LinearLayout>
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="right|center_vertical">
                     <ImageButton

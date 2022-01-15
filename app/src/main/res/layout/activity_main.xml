@@ -177,7 +177,31 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
-            android:background="@drawable/background_corner_rounded_white" />
+            android:background="@drawable/background_corner_rounded_white"/>
+
+        <!-- Option back to list implementation
+        <LinearLayout
+            android:id="@+id/main_address_list_return"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal|center_vertical"
+            android:paddingVertical="2dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:background="@drawable/background_corner_rounded_white">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Return to address list"
+                />
+        </LinearLayout> -->
     </LinearLayout>
 
     <LinearLayout

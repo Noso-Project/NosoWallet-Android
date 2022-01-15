@@ -93,6 +93,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     private var addressAdapter:AddressAdapter? = null
     private var orderAdapter:OrderAdapter? = null
     private var menuAddressTarget:Int = -1
+    private var menuOrderTarget:String = ""
 
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext
@@ -106,8 +107,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
         //Insert Seed Nodes if empty
         CreateDefaultSeedNodes()
-
-        val a = 6/0
 
         //Start view model for whole app
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -123,12 +122,24 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         setContentView(view)
         RestoreSendFundsView()
         RestoreDialogs()
+        RestoreList()
 
         // Display Content
         CalculateGrandBalance()
         SummarySync()
         TimeTask()
         Log.e("Main","Your DPI is: "+resources.displayMetrics.density)
+    }
+
+    private fun RestoreList() {
+        Log.e("Main","restoring order list view: ${viewModel.isOrderHistoryOpen}")
+        if(viewModel.isOrderHistoryOpen){
+            orderAdapter = OrderAdapter(this)
+            orderAdapter?.setOrderList(DBManager.getOrders())
+            binding.mainAddressList.adapter = orderAdapter
+            orderAdapter?.notifyDataSetChanged()
+            binding.mainAddressList.smoothScrollToPosition(orderAdapter!!.itemCount - 1)
+        }
     }
 
     private fun RestoreDialogs(){
@@ -652,6 +663,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     if(clipboard.primaryClipDescription?.getMimeType(0) == "text/plain"){
                         val clip = clipboard.primaryClip?.getItemAt(0)
                         binding.mainSendFundsDestination.setText(clip?.text.toString())
+                        binding.mainSendFundsDestination.setSelection(binding.mainSendFundsDestination.text.length-1)
                     }
                 }
             }
@@ -750,6 +762,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                                         viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
                                         viewModel.TriggerSuccessError.postValue(3) // Success
                                         order_pending = false
+
+                                        val newOrder = OrderObject()
+                                        newOrder.OrderID = res
+                                        newOrder.Destination = incoming
+                                        newOrder.Amount = balance
+                                        DBManager.insertOrder(newOrder)
                                     }
                                 }else{
                                     viewModel.TriggerSuccessError.postValue(1) // Connection Error
@@ -962,16 +980,41 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show()
             }
             getString(R.string.menu_action_history) -> {
+                Log.e("Main","Showing Order History")
                 if(orderAdapter == null){
                     orderAdapter = OrderAdapter(this)
-                }else{
+                }
+                orderAdapter!!.setOrderList(DBManager.getOrders())
+                if(orderAdapter!!.itemCount > 0){
+                    viewModel.isOrderHistoryOpen = true
                     binding.mainAddressList.adapter = orderAdapter
-                    orderAdapter!!.setOrderList(DBManager.getOrders())
+                    orderAdapter?.notifyDataSetChanged()
+                    binding.mainAddressList.smoothScrollToPosition(orderAdapter!!.itemCount - 1)
+                }else{
+                    Toast.makeText(this, R.string.history_order_empty_alert, Toast.LENGTH_SHORT).show()
                 }
             }
-
+            getString(R.string.menu_action_copy) -> {
+                onOrderCopied(menuOrderTarget)
+            }
+            getString(R.string.menu_action_return) -> {
+                Log.e("Main","Returning Addres List")
+                binding.mainAddressList.adapter = addressAdapter
+                addressAdapter?.notifyDataSetChanged()
+                viewModel.isOrderHistoryOpen = false
+            }
         }
         return true
+    }
+
+    override fun onBackPressed() {
+        if(viewModel.isOrderHistoryOpen){
+            binding.mainAddressList.adapter = addressAdapter
+            addressAdapter?.notifyDataSetChanged()
+            viewModel.isOrderHistoryOpen = false
+        }else{
+            super.onBackPressed()
+        }
     }
 
     override fun onQRGenerationCall(address: String) {
@@ -986,11 +1029,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
         if(viewModel.QRDialog == null){
             viewModel.QRDialog = AlertDialog.Builder(this)
-                .setTitle(R.string.qr_dialog_title)
+                .setTitle(R.string.qr_address_dialog_title)
                 .setView(prepareQRView(layoutInflater.inflate(R.layout.dialog_address_qrcode, null), address, QRbitmap))
                 .setCancelable(true)
                 .setOnCancelListener {
-                    viewModel.isSettingsOpen = false
+                    viewModel.isQROpen = false
                 }
                 .create()
         }else{
@@ -1003,15 +1046,46 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         viewModel.isQROpen = true
     }
 
-    override fun onOrderCopied(address: String) {
-        TODO("Not yet implemented")
+    override fun onOrderCopied(orderid: String) {
+        val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val addressClip = ClipData.newPlainText("Noso Orderid",orderid)
+        clipManager.setPrimaryClip(addressClip)
+
+        //Show Message "Copied"
+        Toast.makeText(this, R.string.general_copytoclip, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onOrderQRGenerationCall(address: String) {
-        TODO("Not yet implemented")
+    override fun onOrderQRGenerationCall(orderid: String) {
+        val bits = QRCodeWriter().encode(orderid, BarcodeFormat.QR_CODE, QR_BITMAP_SIZE, QR_BITMAP_SIZE)
+        val QRbitmap = Bitmap.createBitmap(QR_BITMAP_SIZE, QR_BITMAP_SIZE, Bitmap.Config.RGB_565).also {
+            for ( x in 0 until QR_BITMAP_SIZE) {
+                for ( y in 0 until QR_BITMAP_SIZE){
+                    it.setPixel(x,y, if(bits[x,y]) Color.BLACK else Color.WHITE)
+                }
+            }
+        }
+
+        if(viewModel.QRDialog == null){
+            viewModel.QRDialog = AlertDialog.Builder(this)
+                .setTitle(R.string.qr_orderid_dialog_title)
+                .setView(prepareQRView(layoutInflater.inflate(R.layout.dialog_address_qrcode, null), orderid, QRbitmap))
+                .setCancelable(true)
+                .setOnCancelListener {
+                    viewModel.isQROpen = false
+                }
+                .create()
+        }else{
+            viewModel.QRDialog!!.setTitle(R.string.qr_orderid_dialog_title)
+            val wallet_addrss = viewModel.QRDialog!!.findViewById<TextView>(R.id.dialog_address_current)
+            val qr_viewer = viewModel.QRDialog!!.findViewById<ImageView>(R.id.dialog_address_qrcode_viewer)
+            wallet_addrss?.text = orderid
+            qr_viewer?.setImageBitmap(QRbitmap)
+        }
+        viewModel.QRDialog?.show()
+        viewModel.isQROpen = true
     }
 
-    override fun setOrderTarget(position: Int) {
-        TODO("Not yet implemented")
+    override fun setOrderTarget(orderid: String) {
+        menuOrderTarget = orderid
     }
 }

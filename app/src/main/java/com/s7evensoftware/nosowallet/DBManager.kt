@@ -67,9 +67,20 @@ object DBManager {
         realmDB.close()
     }
 
-    fun getOrders(): RealmResults<OrderObject>? {
+    fun getOrders(): ArrayList<OrderObject> {
         val realmDB = Realm.getInstance(config)
-        return realmDB.where(OrderObject::class.java).findAll()
+        val list = realmDB.where(OrderObject::class.java).findAll()
+
+        val result = ArrayList<OrderObject>()
+        list.forEach { order ->
+            val o = OrderObject()
+            o.OrderID = order.OrderID
+            o.Destination = order.Destination
+            o.Amount = order.Amount
+            result.add(o)
+        }
+        realmDB.close()
+        return result
     }
 
 

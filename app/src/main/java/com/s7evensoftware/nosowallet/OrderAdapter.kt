@@ -10,20 +10,19 @@ import io.realm.RealmResults
 
 class OrderAdapter(callback:OrderAdapterListener): RecyclerView.Adapter<OrderAdapter.Order>() {
 
-    private var OrderList:RealmResults<OrderObject>? = null
+    private var OrderList:ArrayList<OrderObject>? = null
     private var callback:OrderAdapterListener? = null
 
     init {
         this.callback = callback
     }
 
-    fun setOrderList(value: RealmResults<OrderObject>?) {
+    fun setOrderList(value: ArrayList<OrderObject>) {
         OrderList = value
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Order {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.wallet_address_row, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.order_record_row, parent, false)
         return Order(view)
     }
 
@@ -59,10 +58,9 @@ class OrderAdapter(callback:OrderAdapterListener): RecyclerView.Adapter<OrderAda
 
     inner class Order(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnCreateContextMenuListener {
 
-        var rowbinding = OrderRecordRowBinding.bind(itemView)
 
         fun setOrder(order: OrderObject){
-            rowbinding = OrderRecordRowBinding.bind(itemView)
+            val rowbinding = OrderRecordRowBinding.bind(itemView)
             itemView.setOnCreateContextMenuListener(this)
 
             rowbinding.historyOrderId.text = order.OrderID
@@ -70,7 +68,7 @@ class OrderAdapter(callback:OrderAdapterListener): RecyclerView.Adapter<OrderAda
             rowbinding.historyOrderAmount.text = mpCoin.Long2Currency(order.Amount)
 
             rowbinding.historyOrderCopy.tag = order.OrderID
-            rowbinding.historyOrderCopy.tag = order.OrderID
+            rowbinding.historyOrderQr.tag = order.OrderID
 
             rowbinding.historyOrderCopy.setOnClickListener(this)
             rowbinding.historyOrderQr.setOnClickListener(this)
@@ -78,10 +76,10 @@ class OrderAdapter(callback:OrderAdapterListener): RecyclerView.Adapter<OrderAda
 
         override fun onClick(v: View?) {
             when(v?.id){
-                R.id.wallet_address_row_copy -> {
+                R.id.history_order_copy -> {
                     callback?.onOrderCopied(v.tag as String)
                 }
-                R.id.wallet_address_row_qr -> {
+                R.id.history_order_qr -> {
                     callback?.onOrderQRGenerationCall(v.tag as String)
                 }
             }
@@ -93,19 +91,19 @@ class OrderAdapter(callback:OrderAdapterListener): RecyclerView.Adapter<OrderAda
             menuInfo: ContextMenu.ContextMenuInfo?
         ) {
             OrderList?.let {
-                callback?.setOrderTarget(adapterPosition)
+                getOrder(adapterPosition)?.let { order ->
+                    callback?.setOrderTarget(order.OrderID!!)
+                }
             }
 
-            menu?.add(0, v!!.id, 0, R.string.menu_action_delete)
-            menu?.add(0, v!!.id, 1, R.string.menu_action_customize)
-            menu?.add(0, v!!.id, 2, R.string.menu_action_history)
-            //menu?.add(0, v!!.id, 2, "")
+            menu?.add(0, v!!.id, 0, R.string.menu_action_copy)
+            menu?.add(0, v!!.id, 1, R.string.menu_action_return)
         }
     }
 
     interface OrderAdapterListener {
-        fun onOrderCopied(address:String)
-        fun onOrderQRGenerationCall(address: String)
-        fun setOrderTarget(position: Int)
+        fun onOrderCopied(orderid:String)
+        fun onOrderQRGenerationCall(orderid: String)
+        fun setOrderTarget(orderid:String)
     }
 }
