@@ -304,7 +304,7 @@ class mpDisk {
                     fileLog.parentFile.mkdirs()
                     fileLog.createNewFile()
                 }else{
-                    if(fileLog.length() >= 1048576){
+                    if(fileLog.length() >= 51200){
                         if(fileLog.delete()){
                             Log.e("mpDisk","Log file cleared - OK")
                             fileLog.createNewFile()
