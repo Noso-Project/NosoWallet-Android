@@ -622,7 +622,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         if(!directoryexist(NOSPath)){
             mpDisk.CreateOptionsFile()
         }
-        mpDisk.VerifyFiles(viewModel.AdddressList.value!!, viewModel.PendingList.value!!)
+        mpDisk.VerifyFiles(viewModel.AdddressList.value!!, viewModel.PendingList.value!!, viewModel.GhostList.value!!)
         addressAdapter?.notifyDataSetChanged()
     }
 
@@ -961,7 +961,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                         viewModel.AdddressList.value?.let {
                             if(it.size > 1){
                                 Log.e("Main", "Deleting address: ${wallet?.Hash}")
-                                mpDisk.SaveErased(wallet!!)
+                                viewModel.GhostList.value?.add(wallet!!)
+                                mpDisk.SaveErased(viewModel.GhostList.value!!)
                                 addressAdapter?.deleteWalletAt(menuAddressTarget)
                                 mpDisk.SaveWallet(it)
                             }else{

@@ -15,7 +15,7 @@ class mpDisk {
             this.context = context
         }
 
-        fun VerifyFiles(addressList: ArrayList<WalletObject>, pendingList:ArrayList<PendingData> ){
+        fun VerifyFiles(addressList: ArrayList<WalletObject>, pendingList:ArrayList<PendingData>, ghostList: ArrayList<WalletObject>){
             if(!directoryexist(UpdatesDirectory)){
                 CreateDir(UpdatesDirectory)
             }
@@ -32,6 +32,10 @@ class mpDisk {
                 if(addressList.size < 1){
                     LoadWallet(WalletFilename, addressList, pendingList)
                 }
+            }
+
+            if(fileexist(GhostFilename)){
+                LoadWallet(GhostFilename, ghostList, ArrayList())
             }
 
             if(fileexist(SumaryFilePath)){
@@ -150,14 +154,12 @@ class mpDisk {
             }
         }
 
-        fun SaveErased(wallet: WalletObject) {
+        fun SaveErased(ghostList: ArrayList<WalletObject>) {
             val NOSOroot = File(context.getExternalFilesDir(null)!!.path+File.separator+NOSPath)
             val FileWallet = File(NOSOroot.path, GhostFilename)
             val outputByteArray = ByteArrayOutputStream()
             val dataoutputStream = DataOutputStream(outputByteArray)
-            val tempList = ArrayList<WalletObject>()
-            tempList.add(wallet)
-            writeWalletFile(dataoutputStream, tempList)
+            writeWalletFile(dataoutputStream, ghostList)
 
             try{
                 //Write ghost.pkw file

@@ -23,6 +23,7 @@ class MainViewModel: ViewModel() {
     var isOrderHistoryOpen = false
 
     var AdddressList = MutableLiveData(ArrayList<WalletObject>())
+    var GhostList = MutableLiveData(ArrayList<WalletObject>())
     var PendingList = MutableLiveData(ArrayList<PendingData>())
     var UpdateBalanceTrigger = MutableLiveData(0)
     var AvailableBalance = MutableLiveData(0L)
