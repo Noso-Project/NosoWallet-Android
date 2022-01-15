@@ -29,13 +29,14 @@ object DBManager {
     fun insertDefaultNodes(){
         val realmDB = Realm.getInstance(config)
 
-        if(realmDB.where(ServerObject::class.java).count().toInt() == 0){
+        if(realmDB.where(ServerObject::class.java).count().toInt() != 7){
             val node1 = ServerObject()
             val node2 = ServerObject()
             val node3 = ServerObject()
             val node4 = ServerObject()
             val node5 = ServerObject()
             val node6 = ServerObject()
+            val node7 = ServerObject()
 
             node1.Address = "192.210.226.118"
             node2.Address = "45.146.252.103"
@@ -43,14 +44,18 @@ object DBManager {
             node4.Address = "107.172.5.8"
             node5.Address = "185.239.239.184"
             node6.Address = "109.230.238.240"
+            node7.Address = "23.94.21.83"
 
             realmDB.executeTransaction {
+                // Clear List
+                realmDB.delete(ServerObject::class.java)
                 it.insert(node1)
                 it.insert(node2)
                 it.insert(node3)
                 it.insert(node4)
                 it.insert(node5)
                 it.insert(node6)
+                it.insert(node7)
             }
             Log.e("DBManager","Creating Seed Nodes - OK")
         }else{

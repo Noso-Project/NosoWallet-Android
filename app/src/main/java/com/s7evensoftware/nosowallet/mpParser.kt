@@ -176,7 +176,8 @@ class mpParser {
         fun parseInternalWallet(
             fileRef: File,
             addressList: ArrayList<WalletObject>,
-            pendingList: ArrayList<PendingData>
+            pendingList: ArrayList<PendingData>,
+            isGhost: Boolean
         ):Boolean{
             val fileReference = FileInputStream(fileRef)
             var bytes = ByteArray(fileRef.length().toInt())
@@ -189,7 +190,7 @@ class mpParser {
                 fileReference.close()
                 return false
             }
-            return parseWallet(bytes, addressList, pendingList) > 0
+            return parseWallet(bytes, addressList, pendingList, isGhost) > 0
         }
 
         fun parseExternalWallet(context: Context, uriRef: Uri, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
@@ -205,10 +206,10 @@ class mpParser {
                 fileReference?.close()
                 return -1
             }
-            return parseWallet(bytes, addressList, pendingList)
+            return parseWallet(bytes, addressList, pendingList, false)
         }
 
-        fun parseWallet(upbytes:ByteArray, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>):Int{
+        fun parseWallet(upbytes:ByteArray, addressList: ArrayList<WalletObject>, pendingList: ArrayList<PendingData>, isGhost:Boolean):Int{
             var nuevos = 0
             var current:ByteArray? = upbytes.copyOfRange(0, 625)
             var bytes = upbytes.copyOfRange(626, upbytes.size)
@@ -250,7 +251,11 @@ class mpParser {
                     current = null
                 }
             }
-            mpDisk.SaveWallet(addressList)
+            if(isGhost){
+                mpDisk.SaveErased(addressList)
+            }else{
+                mpDisk.SaveWallet(addressList)
+            }
             return nuevos
         }
 

@@ -830,6 +830,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             }
             R.id.dialog_import_wallet_file -> {
                 viewModel.ImportDialog?.dismiss()
+                viewModel.isImportOpen = false
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     setType("*/*")
                 }
@@ -837,6 +838,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             }
             R.id.dialog_import_wallet_qr -> {
                 viewModel.ImportDialog?.dismiss()
+                viewModel.isImportOpen = false
                 val options = ScanOptions()
                 options.setPrompt(getString(R.string.import_wallet_from_qr_prompt))
                 options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)

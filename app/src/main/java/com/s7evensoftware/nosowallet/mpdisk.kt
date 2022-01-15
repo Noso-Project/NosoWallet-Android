@@ -25,17 +25,18 @@ class mpDisk {
             }
 
             if(!fileexist(WalletFilename)){
-                Log.e("mpDisk","Wallet Creation: "+ WalletFilename)
+                Log.e("mpDisk", "Wallet Creation: $WalletFilename")
                 CreateWallet(addressList, pendingList)
             }else{
-                Log.e("mpDisk","Loading Wallet: "+WalletFilename)
+                Log.e("mpDisk", "Loading Wallet: $WalletFilename")
                 if(addressList.size < 1){
-                    LoadWallet(WalletFilename, addressList, pendingList)
+                    LoadWallet(WalletFilename, addressList, pendingList, false)
                 }
             }
 
             if(fileexist(GhostFilename)){
-                LoadWallet(GhostFilename, ghostList, ArrayList())
+                Log.e("mpDisk", "Loading Ghost Wallet: $GhostFilename")
+                LoadWallet(GhostFilename, ghostList, ArrayList(), true)
             }
 
             if(fileexist(SumaryFilePath)){
@@ -222,7 +223,8 @@ class mpDisk {
         fun LoadWallet(
             wallet: String,
             addressList: ArrayList<WalletObject>,
-            pendingList: ArrayList<PendingData>
+            pendingList: ArrayList<PendingData>,
+            isGhost:Boolean
         ){
             if(fileexist(wallet)){
                 mpParser.parseInternalWallet(
@@ -232,7 +234,8 @@ class mpDisk {
                             +File.separator
                             +wallet),
                     addressList,
-                    pendingList
+                    pendingList,
+                    isGhost
                 )
             }
         }
