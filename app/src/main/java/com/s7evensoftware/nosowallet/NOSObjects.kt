@@ -89,6 +89,12 @@ class WalletObject : Serializable {
     var LastOP:Long = 0
 }
 
+open class OrderObject: RealmObject() {
+    @PrimaryKey var OrderID: String? = null
+    var Destination:String? = null
+    var Amount:Long = 0L
+}
+
 class KeyPair : Serializable {
     var PublicKey:String? = null
     var PrivateKey:String? = null

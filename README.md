@@ -26,4 +26,4 @@ The way to add the library to the project is by adding the implementation line i
 
 ## Donations
 
-NosoCoin: S7evenSoftware
+NosoCoin: NOSOmobile-donations

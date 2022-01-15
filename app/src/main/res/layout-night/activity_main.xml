@@ -20,9 +20,17 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
+        <ImageView
+            android:layout_width="@dimen/main_noso_logo"
+            android:layout_height="@dimen/main_noso_logo"
+            android:adjustViewBounds="true"
+            android:src="@drawable/noso_coin"
+            />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-2dp"
             android:orientation="vertical">
             <TextView
                 android:layout_width="wrap_content"

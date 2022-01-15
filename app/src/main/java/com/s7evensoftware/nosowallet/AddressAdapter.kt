@@ -8,11 +8,11 @@ import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.s7evensoftware.nosowallet.databinding.WalletAddressRowBinding
 
-class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.Address>() {
+class AddressAdapter(callback:AddressAdapterListener): RecyclerView.Adapter<AddressAdapter.Address>() {
 
     private var AddressList:ArrayList<WalletObject>? = null
     private var PendingList:ArrayList<PendingData>? = null
-    private var callback:OnCopyDone? = null
+    private var callback:AddressAdapterListener? = null
 
     init {
         this.callback = callback
@@ -110,11 +110,12 @@ class AddressAdapter(callback:OnCopyDone): RecyclerView.Adapter<AddressAdapter.A
 
             menu?.add(0, v!!.id, 0, R.string.menu_action_delete)
             menu?.add(0, v!!.id, 1, R.string.menu_action_customize)
+            menu?.add(0, v!!.id, 2, R.string.menu_action_history)
             //menu?.add(0, v!!.id, 2, "")
         }
     }
 
-    interface OnCopyDone {
+    interface AddressAdapterListener {
         fun setMenuTarget(position:Int)
         fun onAddressCopied(address:String)
         fun onSourceForSendFunds(address: String)

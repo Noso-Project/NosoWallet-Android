@@ -36,7 +36,7 @@ import kotlinx.coroutines.*
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, ServerAdapter.OnServerSelected, AddressAdapter.OnCopyDone {
+class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, ServerAdapter.OnServerSelected, AddressAdapter.AddressAdapterListener, OrderAdapter.OrderAdapterListener {
 
     lateinit var binding:ActivityMainBinding
     lateinit var viewModel:MainViewModel
@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
     private var serverAdapter:ServerAdapter? = null
     private var addressAdapter:AddressAdapter? = null
+    private var orderAdapter:OrderAdapter? = null
     private var menuAddressTarget:Int = -1
 
     private var job: Job = Job()
@@ -103,9 +104,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         RequestPermissions()
         mpDisk.setContext(this)
 
-        //Start built in DB
-        Realm.init(this)
+        //Insert Seed Nodes if empty
         CreateDefaultSeedNodes()
+
+        val a = 6/0
 
         //Start view model for whole app
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -126,7 +128,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         CalculateGrandBalance()
         SummarySync()
         TimeTask()
-        Log.e("Main","Your DPI is: "+getResources().getDisplayMetrics().density)
+        Log.e("Main","Your DPI is: "+resources.displayMetrics.density)
     }
 
     private fun RestoreDialogs(){
@@ -959,6 +961,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             getString(R.string.menu_action_customize) -> {
                 Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show()
             }
+            getString(R.string.menu_action_history) -> {
+                if(orderAdapter == null){
+                    orderAdapter = OrderAdapter(this)
+                }else{
+                    binding.mainAddressList.adapter = orderAdapter
+                    orderAdapter!!.setOrderList(DBManager.getOrders())
+                }
+            }
+
         }
         return true
     }
@@ -990,5 +1001,17 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         }
         viewModel.QRDialog?.show()
         viewModel.isQROpen = true
+    }
+
+    override fun onOrderCopied(address: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onOrderQRGenerationCall(address: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setOrderTarget(position: Int) {
+        TODO("Not yet implemented")
     }
 }

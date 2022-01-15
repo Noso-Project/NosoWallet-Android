@@ -1,12 +1,25 @@
 package com.s7evensoftware.nosowallet
 
+import io.realm.FieldAttribute
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmResults
+import io.realm.annotations.PrimaryKey
 
 object DBManager {
     private val realmName = "NosoDB"
     private val config = RealmConfiguration.Builder()
+        .schemaVersion(1)
+        .migration { realm, oldVersion, newVersion ->
+            val schema = realm.schema
+            if(oldVersion == 0L){
+                val newModel = schema.create("OrderObject")
+                newModel.addField("OrderID", String::class.java, FieldAttribute.PRIMARY_KEY)
+                newModel.addField("Destination", String::class.java)
+                newModel.addField("Amount", Long::class.java)
+            }
+            Log.e("DBManager","Updating DB from version: $oldVersion")
+        }
         .allowQueriesOnUiThread(true)
         .allowWritesOnUiThread(true)
         .name(realmName).build()
@@ -45,6 +58,20 @@ object DBManager {
         }
         realmDB.close()
     }
+
+    fun insertOrder(newOrder:OrderObject) {
+        val realmDB = Realm.getInstance(config)
+        realmDB.executeTransaction {
+            it.insert(newOrder)
+        }
+        realmDB.close()
+    }
+
+    fun getOrders(): RealmResults<OrderObject>? {
+        val realmDB = Realm.getInstance(config)
+        return realmDB.where(OrderObject::class.java).findAll()
+    }
+
 
     fun getSummarySize():Int {
         val realmDB = Realm.getInstance(config)
