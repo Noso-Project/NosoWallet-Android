@@ -29,7 +29,7 @@ object DBManager {
     fun insertDefaultNodes(){
         val realmDB = Realm.getInstance(config)
 
-        if(realmDB.where(ServerObject::class.java).count().toInt() != 7){
+        if(realmDB.where(ServerObject::class.java).count().toInt() < 7){
             val node1 = ServerObject()
             val node2 = ServerObject()
             val node3 = ServerObject()
