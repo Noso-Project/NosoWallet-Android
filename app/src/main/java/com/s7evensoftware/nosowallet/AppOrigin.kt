@@ -2,7 +2,6 @@ package com.s7evensoftware.nosowallet
 
 import android.app.Application
 import io.realm.Realm
-import kotlin.system.exitProcess
 
 class AppOrigin: Application() {
 

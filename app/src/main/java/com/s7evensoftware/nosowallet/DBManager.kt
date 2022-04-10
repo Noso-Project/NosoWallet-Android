@@ -26,8 +26,31 @@ object DBManager {
 
     init {}
 
+    fun clearNonWorkingNodes(){
+        val realmDB = Realm.getInstance(config)
+        val found = realmDB.where(ServerObject::class.java)
+            .equalTo("Address", "107.172.193.176")
+            .or()
+            .equalTo("Address", "107.175.194.151")
+            .or()
+            .equalTo("Address", "192.3.73.184")
+            .or()
+            .equalTo("Address", "185.239.239.184")
+            .findAll()
+
+        realmDB.executeTransaction {
+            found.forEach {
+                it.deleteFromRealm()
+            }
+        }
+        realmDB.close()
+    }
+
     fun insertDefaultNodes(){
         val realmDB = Realm.getInstance(config)
+
+        // Erase expired or no-longer working nodes
+        clearNonWorkingNodes()
 
         if(realmDB.where(ServerObject::class.java).count().toInt() < 7){
             val node1 = ServerObject()
@@ -38,11 +61,11 @@ object DBManager {
             val node6 = ServerObject()
             val node7 = ServerObject()
 
-            node1.Address = "192.210.226.118"
+            node1.Address = "107.172.5.8"
             node2.Address = "45.146.252.103"
             node3.Address = "194.156.88.117"
-            node4.Address = "107.172.5.8"
-            node5.Address = "185.239.239.184"
+            node4.Address = "172.245.52.208"
+            node5.Address = "192.210.226.118"
             node6.Address = "109.230.238.240"
             node7.Address = "23.94.21.83"
 
