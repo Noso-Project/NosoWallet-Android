@@ -1,9 +1,4 @@
-## Version 1.0.14
-- Removed no-longer working seednodes
-- 107.172.5.8
-- 172.245.52.208
-- 192.210.226.118
-- Added new seednodes addresses
-- 107.172.193.176
-- 107.175.194.151
-- 192.3.73.184
+## Version 1.0.15
+- Fixed an issue affecting some devices due to the size of the noso logo png (it was bigger than needed).
+- Updated seed nodes.
+- Fixed an issue with the fee calculation (didn't affect the transactions but now is better)
