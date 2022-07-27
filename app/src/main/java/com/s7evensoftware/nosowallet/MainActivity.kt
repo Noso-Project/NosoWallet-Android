@@ -34,6 +34,8 @@ import com.s7evensoftware.nosowallet.databinding.DialogSetupBinding
 import io.realm.Realm
 import kotlinx.coroutines.*
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, ServerAdapter.OnServerSelected, AddressAdapter.AddressAdapterListener, OrderAdapter.OrderAdapterListener {
@@ -157,15 +159,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
 
     private fun RestoreSendFundsView() {
-        viewModel.isSendFundsOpen.observe(this, {
-            if(it){
+        viewModel.isSendFundsOpen.observe(this) {
+            if (it) {
                 binding.mainNetstatContainer.visibility = View.GONE
                 binding.mainSendFundsContainer.visibility = View.VISIBLE
-            }else{
+            } else {
                 binding.mainNetstatContainer.visibility = View.VISIBLE
                 binding.mainSendFundsContainer.visibility = View.GONE
             }
-        })
+        }
     }
 
     override fun onDestroy() {
@@ -498,44 +500,56 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         binding.mainAddressList.adapter = addressAdapter
 
         //Order Success/Fail Observer
-        viewModel.TriggerSuccessError.observe(this, {
-            if(it > 0){
-                when(it){
+        viewModel.TriggerSuccessError.observe(this) {
+            if (it > 0) {
+                when (it) {
                     1 -> {
-                        Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error_conn, Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(
+                            binding.mainSendFundsSend,
+                            R.string.general_sendfunds_error_conn,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                     }
                     2 -> {
-                        Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_amount_err, Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(
+                            binding.mainSendFundsSend,
+                            R.string.general_sendfunds_amount_err,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                     }
                     3 -> {
-                        Toast.makeText(applicationContext, R.string.general_sendfunds_success, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            applicationContext,
+                            R.string.general_sendfunds_success,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 viewModel.TriggerSuccessError.value = 0
             }
-        })
+        }
 
         //Sync Observer
-        viewModel.WalletSynced.observe(this, {
-            if(it && !viewModel.ConnectionError.value!!){
+        viewModel.WalletSynced.observe(this) {
+            if (it && !viewModel.ConnectionError.value!!) {
                 binding.mainNetstatBlockContainer.background.setTint(getColor(R.color.colorGreenSync))
-            }else{
+            } else {
                 binding.mainNetstatBlockContainer.background.setTint(getColor(R.color.colorRedUnsync))
             }
-        })
+        }
 
         //Block Observer
-        viewModel.LastBlock.observe(this, {
-            if(it > 0L){
+        viewModel.LastBlock.observe(this) {
+            if (it > 0L) {
                 binding.mainNetstatBlockNumber.text = it.toString()
             }
-        })
+        }
 
         //Time Observer
-        viewModel.RealTimeValue.observe(this, {
+        viewModel.RealTimeValue.observe(this) {
             binding.mainNetstatDate.text = mpFunctions.getDateFromUNIX(it)
             binding.mainNetstatTime.text = mpFunctions.getTimeFromUNIX(it)
-        })
+        }
     }
 
     private fun prepareQRView(view:View, address:String, qr:Bitmap):View{
@@ -627,17 +641,17 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
     }
 
     private fun CalculateGrandBalance(){
-        viewModel.UpdateBalanceTrigger.observe(this, {
+        viewModel.UpdateBalanceTrigger.observe(this) {
             UpdateWalletFromSummary()  // Individual Balance Update
-            var total:Long = 0
+            var total: Long = 0
             viewModel.AdddressList.value?.let {
-                if(it.size > 0){
-                    for(wallet in it){
+                if (it.size > 0) {
+                    for (wallet in it) {
                         total += wallet.Balance
                     }
 
                     viewModel.PendingList.value?.let {
-                        for(pending in it){
+                        for (pending in it) {
                             total -= pending.Outgoing
                         }
                     }
@@ -646,7 +660,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             viewModel.AvailableBalance.value = total
             binding.mainGrandBalance.text = mpCoin.Long2Currency(total)
             addressAdapter?.notifyDataSetChanged()
-        })
+        }
     }
 
     // Checks for Directory in app root files folder

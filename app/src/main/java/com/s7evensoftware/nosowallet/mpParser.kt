@@ -79,6 +79,7 @@ class mpParser {
             while (strAux.length >= 8){
                 val currentGroup = strAux.substring(0, 8)
                 val intVal = Integer.parseInt(currentGroup, 2)
+                Log.e("Parser","Int value -> $intVal")
                 tempByteArray.add(intVal.toByte())
                 strAux = strAux.substring(8)
             }

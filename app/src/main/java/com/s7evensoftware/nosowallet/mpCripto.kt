@@ -112,7 +112,7 @@ class mpCripto {
                                 viewModel.PendingList.value!!
                             )
                         )
-                        Fee += ArrayTrfrs.last().AmountFee
+                        Fee -= ArrayTrfrs.last().AmountFee
                         Amount -= ArrayTrfrs.last().AmountTrf
                         OrderHashString += ArrayTrfrs.last().TrfrID
                     }

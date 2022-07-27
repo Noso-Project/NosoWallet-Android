@@ -31,11 +31,23 @@ object DBManager {
         val found = realmDB.where(ServerObject::class.java)
             .equalTo("Address", "107.172.193.176")
             .or()
+            .equalTo("Address", "107.172.5.8")
+            .or()
             .equalTo("Address", "107.175.194.151")
             .or()
             .equalTo("Address", "192.3.73.184")
             .or()
             .equalTo("Address", "185.239.239.184")
+            .or()
+            .equalTo("Address", "45.146.252.103")
+            .or()
+            .equalTo("Address", "194.156.88.117")
+            .or()
+            .equalTo("Address", "172.245.52.208")
+            .or()
+            .equalTo("Address", "192.210.226.118")
+            .or()
+            .equalTo("Address", "23.94.21.83")
             .findAll()
 
         realmDB.executeTransaction {
@@ -60,14 +72,18 @@ object DBManager {
             val node5 = ServerObject()
             val node6 = ServerObject()
             val node7 = ServerObject()
+            val node8 = ServerObject()
+            val node9 = ServerObject()
 
-            node1.Address = "107.172.5.8"
-            node2.Address = "45.146.252.103"
-            node3.Address = "194.156.88.117"
-            node4.Address = "172.245.52.208"
-            node5.Address = "192.210.226.118"
-            node6.Address = "109.230.238.240"
-            node7.Address = "23.94.21.83"
+            node1.Address = "109.230.238.240"
+            node2.Address = "198.144.190.194"
+            node3.Address = "149.57.226.244"
+            node4.Address = "107.172.193.176"
+            node5.Address = "66.151.117.247"
+            node6.Address = "149.57.229.81"
+            node7.Address = "107.175.24.151"
+            node8.Address = "159.196.1.198"
+            node9.Address = "101.100.138.125"
 
             realmDB.executeTransaction {
                 // Clear List
