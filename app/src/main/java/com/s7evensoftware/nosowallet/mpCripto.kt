@@ -4,6 +4,9 @@ import org.bouncycastle.crypto.digests.RIPEMD160Digest
 import org.bouncycastle.util.encoders.Hex
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.experimental.xor
 
 class mpCripto {
     companion object {
@@ -46,6 +49,36 @@ class mpCripto {
             MyData.Score = 0
             MyData.LastOP = 0
             return MyData
+        }
+
+        fun XorEncode(key:String, source: String):String{
+            var result = ""
+
+            for(i in source.indices){
+                val c:Byte = if(key.isNotEmpty()){
+                    key[0+(i % key.length)].code.toByte().xor(source[i].code.toByte())
+                }else{
+                    source[i].code.toByte()
+                }
+                val twoDigitsFix = if(Integer.toHexString(c.toInt()).length == 1){ "0${Integer.toHexString(c.toInt())}"}else{ Integer.toHexString(c.toInt()) }
+                result += twoDigitsFix.lowercase()
+            }
+
+            return result
+        }
+
+        fun XorDecode(key:String, source: String):String{
+            var result = ""
+
+            for(i in 0 until source.length/2){
+                var c:Byte = source.substring(i*2,i*2+2).toInt(16).toByte()
+                if(key.isNotEmpty()){
+                    c = key[0+(i % key.length)].code.toByte().xor(c)
+                }
+                result += c.toInt().toChar()
+            }
+
+            return result
         }
 
         fun GetAddressFromPublicKey(PubKey:String):String {

@@ -100,4 +100,13 @@
     <string name="history_order_destination">Destination</string>
     <string name="history_order_amount">Amount</string>
 
+    <string name="dialog_lock_title">Lock System</string>
+    <string name="menu_action_lock">Lock</string>
+    <string name="menu_action_unlock">Unlock</string>
+    <string name="dialog_lock_enter_password">Enter Password</string>
+    <string name="dialog_lock_confirm_password">Confirm Password</string>
+    <string name="dialog_unlock_failed">Failed to unlock, wrong password?</string>
+    <string name="dialog_lock_failed_psswd_match">Failed to lock, password mismatch</string>
+    <string name="dialog_lock_failed_psswd_empty">Password can\'t be empty</string>
+
 </resources>

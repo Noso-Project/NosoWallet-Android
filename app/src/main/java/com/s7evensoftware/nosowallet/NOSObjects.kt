@@ -50,6 +50,8 @@ class PendingData {
 open class ServerObject:RealmObject() {
     @PrimaryKey var Address:String = "localhost"
     var Port:Int = 8080
+    var NosoAddress:String = ""
+    var Count:Int = 0
     var isDefault:Boolean = false
 }
 
@@ -87,6 +89,7 @@ class WalletObject : Serializable {
     var Pending:Long = 0
     var Score:Long = 0
     var LastOP:Long = 0
+    var isLocked:Boolean = false
 }
 
 open class OrderObject: RealmObject() {

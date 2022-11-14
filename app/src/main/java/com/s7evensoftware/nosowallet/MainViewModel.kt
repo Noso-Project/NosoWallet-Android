@@ -11,10 +11,17 @@ class MainViewModel: ViewModel() {
     var isImportOpen = false
 
     var SettingsDialog:AlertDialog? = null
+    var LockDialog:AlertDialog? = null
+    var isUnlockMode:Boolean = false
+    var lockPassword:String = ""
+    var lockConfirmPassword:String = ""
     var SettingsAddress = MutableLiveData("")
     var SettingsPort = MutableLiveData("")
     var SettingsServerSelected:ServerObject? = null
     var isSettingsOpen = false
+    var isLockOpen = false
+
+    var isOrderPending = false
 
     var QRDialog:AlertDialog? = null
     var currentQR:Bitmap? = null
@@ -39,6 +46,8 @@ class MainViewModel: ViewModel() {
 
     var RealTimeValue = MutableLiveData(System.currentTimeMillis())
 
+    var MNList:List<ServerObject> = listOf()
+
     var allowSendAll = false
     var isSendFundsOpen = MutableLiveData(false)
     var SendFunds_TO = ""
@@ -48,4 +57,23 @@ class MainViewModel: ViewModel() {
     var LastNodeSelected:NodeInfo? = null
     var TriggerSuccessError = MutableLiveData(0)
 
+    init {
+
+    }
+
+    fun getWallet(address:String):WalletObject? {
+        AdddressList.value?.find { wallet -> wallet.Hash == address }?.let {
+            return it
+        }
+
+        return null
+    }
+
+    fun isLocked(sendfundsFrom: String): Boolean {
+        AdddressList.value?.find { wallet -> wallet.Hash == sendfundsFrom }?.let {
+            return it.isLocked
+        }
+
+        return false
+    }
 }

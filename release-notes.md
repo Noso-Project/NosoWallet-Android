@@ -1,4 +1,3 @@
-## Version 1.0.15
-- Fixed an issue affecting some devices due to the size of the noso logo png (it was bigger than needed).
-- Updated seed nodes.
-- Fixed an issue with the fee calculation (didn't affect the transactions but now is better)
+## Version 1.0.16
+- Implemented Dynamic Nodes List retrieval for Concensus (manual edition can still be done from the settings but values will be overrided each time the app is opened).
+- Implemented Encryption System (compatible with NosoLite lock system), you can now Lock specific addresses and unlock key will be asksed when sending funds from a locked address (tiny lock icon will show up next to licked Addresses).

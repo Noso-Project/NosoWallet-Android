@@ -16,7 +16,7 @@ class AppOrigin: Application() {
         // UncaughtHandler
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             Log.e("NOOSOmobile","Unhandled error: ${e.message}")
-            defaultHandler.uncaughtException(t, e)
+            defaultHandler?.uncaughtException(t, e)
         }
     }
 }

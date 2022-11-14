@@ -1,6 +1,7 @@
 package com.s7evensoftware.nosowallet
 
 import androidx.lifecycle.MutableLiveData
+import io.realm.RealmResults
 import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,6 +26,10 @@ class mpFunctions {
 
         fun GetAddressBalanceFromSummary(address:String):Long {
             return DBManager.getAddressBalance(address)
+        }
+
+        fun updateNodeList(){
+
         }
 
         fun Concensus(NODEarray:ArrayList<NodeInfo>, viewModel:MainViewModel):ConcensusResult? {
@@ -73,7 +78,7 @@ class mpFunctions {
             }
 
             //Select a random server for the upcoming requests
-            selectedNode = getRandomServer(NODEarray, CBlock, CBranch, CPending)
+            selectedNode = getRandomNode(NODEarray, CBlock, CBranch, CPending)
             viewModel.LastNodeSelected = selectedNode
 
             if(CBlock > viewModel.LastBlock.value?:0 || DBManager.getSummarySize() == 0){
@@ -113,7 +118,7 @@ class mpFunctions {
             return result
         }
 
-        private fun getRandomServer(NODEarray: ArrayList<NodeInfo>, block:Long, brach:String, pendings:Long): NodeInfo {
+        private fun getRandomNode(NODEarray: ArrayList<NodeInfo>, block:Long, brach:String, pendings:Long): NodeInfo {
             val candidateServer = ArrayList<NodeInfo>()
             for(server in NODEarray){
                 if(
@@ -132,6 +137,44 @@ class mpFunctions {
                 }
             }
             return NodeInfo()
+        }
+
+        fun getRandomServer(ServerList: RealmResults<ServerObject>?): ServerObject {
+            ServerList?.let {
+                if(ServerList.size > 0){
+                    ThreadLocalRandom.current().nextInt(ServerList.size).let {
+                        return ServerList[it]!!
+                    }
+                }
+            }
+
+            val node1 = ServerObject()
+            val node2 = ServerObject()
+            val node3 = ServerObject()
+            val node4 = ServerObject()
+            val node5 = ServerObject()
+            val node6 = ServerObject()
+            val node7 = ServerObject()
+            val node8 = ServerObject()
+            val node9 = ServerObject()
+
+            node1.Address = "192.3.85.196"
+            node2.Address = "192.3.254.186"
+            node3.Address = "47.87.181.190"
+            node4.Address = "47.87.178.205"
+            node5.Address = "81.22.38.101"
+            node6.Address = "66.151.117.247"
+            node7.Address = "47.87.180.219"
+            node8.Address = "47.87.137.96"
+            node9.Address = "101.100.138.125"
+
+            val seedList = listOf(
+                node1,node2,node3,node4,node5,node6,node7,node8,node9
+            )
+
+            ThreadLocalRandom.current().nextInt(seedList.size).let {
+                return seedList[it]
+            }
         }
 
         fun SendFundsFromAddress(
@@ -420,6 +463,37 @@ class mpFunctions {
             return "00:00:00"
         }
 
+        fun parseMNString(response: String?): List<ServerObject> {
+            val resultMNList = mutableListOf<ServerObject>()
+            response?.let {
+                val tokens = StringTokenizer(it)
+                    tokens.nextToken() // Ignore Block Number
 
+                while(tokens.hasMoreTokens()){
+                    var rawNodeInfo = tokens.nextToken()
+                        rawNodeInfo = rawNodeInfo.replace(":", " ")
+                        rawNodeInfo = rawNodeInfo.replace(";", " ")
+
+                    val tokenNodeInfo = StringTokenizer(rawNodeInfo)
+                    val nodeValues = ArrayList<String>()
+                    while(tokenNodeInfo.hasMoreTokens()){
+                        nodeValues.add(tokenNodeInfo.nextToken())
+                    }
+
+                    val nodeInfo = ServerObject()
+                    nodeInfo.Address = nodeValues[0]
+                    nodeInfo.Port = nodeValues[1].toInt()
+                    nodeInfo.NosoAddress = nodeValues[2]
+                    nodeInfo.Count = nodeValues[3].toInt()
+
+                    if(resultMNList.isEmpty()){
+                        resultMNList.add(nodeInfo)
+                    }else{
+                        resultMNList.add(nodeInfo)
+                    }
+                }
+            }
+            return resultMNList
+        }
     }
 }

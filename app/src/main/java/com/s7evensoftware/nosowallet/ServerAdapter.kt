@@ -28,13 +28,16 @@ class ServerAdapter(callback:OnServerSelected): RecyclerView.Adapter<ServerAdapt
         }
     }
 
+    fun setServers(servers: List<ServerObject>) {
+        ServerLocalCopy = ArrayList(servers)
+    }
+
     fun deleteServer(server:ServerObject){
-        indexOf(server)
-            ?.let {
-                ServerLocalCopy?.removeAt(it)
-                DBManager.deleteServer(server.Address)
-                notifyItemRemoved(it)
-            }
+        indexOf(server).let {
+            ServerLocalCopy?.removeAt(it)
+            DBManager.deleteServer(server.Address)
+            notifyItemRemoved(it)
+        }
     }
 
     fun getServers(): ArrayList<ServerObject>? {

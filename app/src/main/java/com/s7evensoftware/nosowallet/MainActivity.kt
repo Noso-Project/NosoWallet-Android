@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,11 +31,11 @@ import com.journeyapps.barcodescanner.ScanOptions
 import com.s7evensoftware.nosowallet.databinding.ActivityMainBinding
 import com.s7evensoftware.nosowallet.databinding.DialogAddressQrcodeBinding
 import com.s7evensoftware.nosowallet.databinding.DialogImportWalletBinding
+import com.s7evensoftware.nosowallet.databinding.DialogLockingBinding
 import com.s7evensoftware.nosowallet.databinding.DialogSetupBinding
-import io.realm.Realm
 import kotlinx.coroutines.*
+import org.bouncycastle.util.encoders.DecoderException
 import java.io.File
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
@@ -108,7 +109,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         mpDisk.setContext(this)
 
         //Insert Seed Nodes if empty
-        CreateDefaultSeedNodes()
+        //CreateDefaultSeedNodes()
 
         //Start view model for whole app
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -128,9 +129,23 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
 
         // Display Content
         CalculateGrandBalance()
+        syncMNodes()
         SummarySync()
         TimeTask()
+
         Log.e("Main","Your DPI is: "+resources.displayMetrics.density)
+    }
+
+    private fun syncMNodes(){
+        launch {
+            var list = listOf<ServerObject>()
+            while(list.isEmpty()){
+                val randomServer = mpFunctions.getRandomServer(DBManager.getServers()?.freeze())
+                list = mpNetwork.getMasterNodeList(randomServer.Address, randomServer.Port, viewModel)
+            }
+            DBManager.updateNodes(list)
+            serverAdapter?.setServers(list)
+        }
     }
 
     private fun RestoreList() {
@@ -669,6 +684,85 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         return file.exists()
     }
 
+    private fun processOrderConfirmation(encryptedKey:String? = null){
+        launch{
+            var fail_count = 0
+            var order_pending = true
+            val outgoing = viewModel.SendFunds_FROM
+            val incoming = viewModel.SendFunds_TO
+            val balance = viewModel.SendFunds_Amount
+            val ref = viewModel.SendFunds_Ref.replace(" ","_")
+
+            while(order_pending && fail_count < 5){
+                val res = mpCripto.SendTo(
+                    outgoing,
+                    incoming,
+                    balance,
+                    ref,
+                    viewModel
+                )
+
+                if(res != ""){
+                    if(res == MISSING_FUNDS){
+                        viewModel.TriggerSuccessError.postValue(2) // Address funds not enough error
+                        order_pending = false
+                    }else{
+                        Log.e("Main","Order success, OrderID: $res")
+                        val out = mpFunctions.WalletAddressIndex(outgoing, viewModel.AdddressList.value!!)
+                        val inc = mpFunctions.WalletAddressIndex(incoming, viewModel.AdddressList.value!!)
+                        if(out != -1){
+                            viewModel.PendingList.value?.let {
+                                it[out].Outgoing += balance+mpCoin.GetFee(balance)
+                            }
+                        }
+                        if(inc != -1){
+                            viewModel.PendingList.value?.let {
+                                it[inc].Incoming += balance
+                            }
+                        }
+                        viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
+                        viewModel.TriggerSuccessError.postValue(3) // Success
+                        order_pending = false
+
+                        val newOrder = OrderObject()
+                        newOrder.OrderID = res
+                        newOrder.Destination = incoming
+                        newOrder.Amount = balance
+                        DBManager.insertOrder(newOrder)
+
+                        if(viewModel.isOrderPending && encryptedKey != null){
+                            viewModel.getWallet(viewModel.SendFunds_FROM)?.let {
+                                it.PrivateKey = encryptedKey
+                                it.isLocked = true
+                            }
+                            viewModel.isOrderPending = false
+                        }
+                    }
+                }else{
+                    viewModel.TriggerSuccessError.postValue(1) // Connection Error
+                    fail_count++
+                    delay(DEFAULT_SYNC_DELAY)
+                }
+            }
+        }
+        binding.mainSendFundsFrom.setText("")
+        binding.mainSendFundsReference.setText("")
+        binding.mainSendFundsAmount.setText("0.00000000")
+        binding.mainSendFundsDestination.setText("")
+
+        binding.mainSendFundsDestination.isEnabled = true
+        binding.mainSendFundsAmount.isEnabled = true
+        binding.mainSendFundsReference.isEnabled = true
+        binding.mainSendFundsUseallCheck.isChecked = false
+
+        binding.mainSendFundsClose.visibility = View.VISIBLE
+        binding.mainSendFundsSend.visibility = View.VISIBLE
+        binding.mainSendFundsCancel.visibility = View.GONE
+        binding.mainSendFundsSendConfirm.visibility = View.GONE
+
+        viewModel.isSendFundsOpen.value = false
+    }
+
     override fun onClick(v: View) {
         when(v.id){
             R.id.main_send_funds_paste -> {
@@ -738,74 +832,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
             R.id.main_send_funds_send_confirm -> {
                 viewModel.WalletSynced.value?.let {
                     if(it){
-                        launch{
-                            var fail_count = 0
-                            var order_pending = true
-                            val outgoing = viewModel.SendFunds_FROM
-                            val incoming = viewModel.SendFunds_TO
-                            val balance = viewModel.SendFunds_Amount
-                            val ref = viewModel.SendFunds_Ref.replace(" ","_")
-
-                            while(order_pending && fail_count < 5){
-                                val res = mpCripto.SendTo(
-                                    outgoing,
-                                    incoming,
-                                    balance,
-                                    ref,
-                                    viewModel
-                                )
-
-                                if(res != ""){
-                                    if(res == MISSING_FUNDS){
-                                        viewModel.TriggerSuccessError.postValue(2) // Address funds not enough error
-                                        order_pending = false
-                                    }else{
-                                        Log.e("Main","Order success, OrderID: $res")
-                                        val out = mpFunctions.WalletAddressIndex(outgoing, viewModel.AdddressList.value!!)
-                                        val inc = mpFunctions.WalletAddressIndex(incoming, viewModel.AdddressList.value!!)
-                                        if(out != -1){
-                                            viewModel.PendingList.value?.let {
-                                                it[out].Outgoing += balance+mpCoin.GetFee(balance)
-                                            }
-                                        }
-                                        if(inc != -1){
-                                            viewModel.PendingList.value?.let {
-                                                it[inc].Incoming += balance
-                                            }
-                                        }
-                                        viewModel.UpdateBalanceTrigger.postValue(viewModel.UpdateBalanceTrigger.value?:0+1)
-                                        viewModel.TriggerSuccessError.postValue(3) // Success
-                                        order_pending = false
-
-                                        val newOrder = OrderObject()
-                                        newOrder.OrderID = res
-                                        newOrder.Destination = incoming
-                                        newOrder.Amount = balance
-                                        DBManager.insertOrder(newOrder)
-                                    }
-                                }else{
-                                    viewModel.TriggerSuccessError.postValue(1) // Connection Error
-                                    fail_count++
-                                    delay(DEFAULT_SYNC_DELAY)
-                                }
-                            }
+                        if(viewModel.isLocked(viewModel.SendFunds_FROM)){
+                            viewModel.isOrderPending = true
+                            viewModel.isUnlockMode = true
+                            lockResponse(true)
+                        }else{
+                            processOrderConfirmation()
                         }
-                        binding.mainSendFundsFrom.setText("")
-                        binding.mainSendFundsReference.setText("")
-                        binding.mainSendFundsAmount.setText("0.00000000")
-                        binding.mainSendFundsDestination.setText("")
-
-                        binding.mainSendFundsDestination.isEnabled = true
-                        binding.mainSendFundsAmount.isEnabled = true
-                        binding.mainSendFundsReference.isEnabled = true
-                        binding.mainSendFundsUseallCheck.isChecked = false
-
-                        binding.mainSendFundsClose.visibility = View.VISIBLE
-                        binding.mainSendFundsSend.visibility = View.VISIBLE
-                        binding.mainSendFundsCancel.visibility = View.GONE
-                        binding.mainSendFundsSendConfirm.visibility = View.GONE
-
-                        viewModel.isSendFundsOpen.value = false
                     }else{
                         Snackbar.make(binding.mainSendFundsSend, R.string.general_sendfunds_error_sync, Snackbar.LENGTH_SHORT).show()
                     }
@@ -935,6 +968,78 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                     Snackbar.make(v, R.string.settings_new_server_error, Snackbar.LENGTH_LONG).show()
                 }
             }
+
+            //Locking
+            R.id.dialog_lock_accept -> {
+                if(viewModel.isUnlockMode){
+                    viewModel.LockDialog?.dismiss()
+
+                    val targetWallet = if(addressAdapter?.contextTarget != null){ addressAdapter?.contextTarget }else{ viewModel.getWallet(viewModel.SendFunds_FROM) }
+
+                    targetWallet?.let { wallet ->
+                        if(wallet.isLocked){
+                            val hashedPass = mpCripto.HashSha256String(viewModel.lockConfirmPassword)
+
+                            try{
+                                val savedEncrypted = wallet.PrivateKey
+                                val decryptedKey = mpCripto.XorDecode(hashedPass, (wallet.PrivateKey?:"*0").substring(1))
+                                val testSignature = mpCripto.getStringSigned("VERIFICATION",decryptedKey)
+                                val verification = mpCripto.VerifySignedString("VERIFICATION", testSignature, wallet.PublicKey?:"")
+
+                                addressAdapter?.contextTarget = null
+
+                                if(verification){
+                                    if(viewModel.isOrderPending){
+                                        wallet.PrivateKey = decryptedKey
+                                        wallet.isLocked = false
+                                        processOrderConfirmation(savedEncrypted)
+                                    }else{
+                                        wallet.PrivateKey = decryptedKey
+                                        wallet.isLocked = false
+                                        viewModel.AdddressList.value?.let {
+                                            mpDisk.SaveWallet(it)
+                                        }
+                                        addressAdapter?.updateWallet(wallet)
+                                    }
+                                }else{
+                                    Toast.makeText(this, R.string.dialog_unlock_failed, Toast.LENGTH_LONG).show()
+                                    viewModel.isOrderPending = false
+                                }
+                            }catch(e: DecoderException){
+                                viewModel.isOrderPending = false
+                                Toast.makeText(this, R.string.dialog_unlock_failed, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }else{
+                    addressAdapter?.contextTarget?.let { wallet ->
+                        if(!wallet.isLocked){
+                            if(viewModel.lockPassword.isNotEmpty()){
+                                if(viewModel.lockPassword == viewModel.lockConfirmPassword){
+                                    val hashedPass = mpCripto.HashSha256String(viewModel.lockConfirmPassword)
+                                    val encryptedKey = "*"+mpCripto.XorEncode(hashedPass, wallet.PrivateKey?:"")
+
+                                    wallet.PrivateKey = encryptedKey
+                                    wallet.isLocked = true
+                                    viewModel.AdddressList.value?.let {
+                                        mpDisk.SaveWallet(it)
+                                        addressAdapter?.updateWallet(wallet)
+                                    }
+                                    viewModel.LockDialog?.dismiss()
+                                    addressAdapter?.contextTarget = null
+                                }else{
+                                    Toast.makeText(this, R.string.dialog_lock_failed_psswd_match, Toast.LENGTH_SHORT).show()
+                                }
+                            }else{
+                                Toast.makeText(this, R.string.dialog_lock_failed_psswd_empty, Toast.LENGTH_SHORT).show()
+                            }
+                        }else{
+                            viewModel.LockDialog?.dismiss()
+                            addressAdapter?.contextTarget = null
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -953,7 +1058,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
         val addressClip = ClipData.newPlainText("Noso Address",address)
         clipManager.setPrimaryClip(addressClip)
 
-        //Show Message "Copied"
+        //Show Message "Copied"vsco
         Toast.makeText(this, R.string.general_copytoclip, Toast.LENGTH_SHORT).show()
     }
 
@@ -1020,8 +1125,82 @@ class MainActivity : AppCompatActivity(), CoroutineScope, View.OnClickListener, 
                 addressAdapter?.notifyDataSetChanged()
                 viewModel.isOrderHistoryOpen = false
             }
+            getString(R.string.menu_action_lock) -> {
+//                val pass = mpCripto.HashSha256String("keyuser95")
+//                val encrypted = mpCripto.XorEncode(pass, viewModel.AdddressList.value!![0].PrivateKey!!)
+//                mpCripto.XorDecode(pass, encrypted)
+                lockResponse()
+            }
+            getString(R.string.menu_action_unlock) -> {
+                lockResponse(true)
+            }
         }
         return true
+    }
+
+    fun prepareLockDialog(isUnlock: Boolean, view: View):View {
+        val binding = DialogLockingBinding.bind(view)
+
+        binding.dialogLockPassword.setText("")
+        binding.dialogLockConfirmPassword.setText("")
+
+        binding.dialogLockPassword.doOnTextChanged { text, start, before, count ->
+            viewModel.lockPassword = text.toString()
+        }
+        binding.dialogLockConfirmPassword.doOnTextChanged { text, start, before, count ->
+            viewModel.lockConfirmPassword = text.toString()
+        }
+
+        if(isUnlock){
+            viewModel.isUnlockMode = isUnlock
+
+            binding.dialogLabelConfirmPassword.visibility = View.GONE
+            binding.dialogLockPassword.visibility = View.GONE
+
+            binding.dialogLockAccept.text = getString(R.string.menu_action_unlock)
+            binding.dialogLockAccept.setOnClickListener(this)
+        }else{
+            viewModel.isUnlockMode = isUnlock
+
+            binding.dialogLockPassword.visibility = View.VISIBLE
+            binding.dialogLabelConfirmPassword.visibility = View.VISIBLE
+            binding.dialogLockPassword.requestFocus()
+
+            binding.dialogLockAccept.text = getString(R.string.menu_action_lock)
+            binding.dialogLockAccept.setOnClickListener(this)
+
+            binding.dialogLockCancel.setOnClickListener {
+                viewModel.isUnlockMode = false
+                viewModel.LockDialog?.dismiss()
+            }
+        }
+
+        return view
+    }
+
+    fun lockResponse(isUnlock:Boolean = false) {
+        if(viewModel.LockDialog == null){
+
+            //Customize
+            val view = prepareLockDialog(isUnlock, layoutInflater.inflate(R.layout.dialog_locking, null))
+
+            viewModel.LockDialog = AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(true)
+                .setOnCancelListener {
+                    viewModel.isLockOpen = false
+                    viewModel.isUnlockMode = false
+                }
+                .create()
+
+
+        }else{
+            val view = prepareLockDialog(isUnlock, viewModel.LockDialog!!.findViewById(R.id.dialog_lock_parent)!!)
+            viewModel.LockDialog?.setView(view)
+        }
+
+        viewModel.LockDialog?.show()
+        viewModel.isLockOpen = true
     }
 
     override fun onBackPressed() {

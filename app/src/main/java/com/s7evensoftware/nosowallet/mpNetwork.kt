@@ -15,9 +15,46 @@ import java.util.zip.ZipFile
 class mpNetwork {
     companion object {
 
+        fun getMasterNodeList(address:String, port:Int, viewModel: MainViewModel):List<ServerObject>{
+            val serverAddress = InetSocketAddress(address, port)
+            Log.e("mpNetwork","Requesting MN List to $address")
+            try{
+                val clientSocket = Socket()
+                clientSocket.connect(serverAddress, NODE_TIMEOUT)
+                val clientChannel = PrintWriter(BufferedWriter(OutputStreamWriter(clientSocket.getOutputStream())), true)
+                val inputStreamReader = InputStreamReader(clientSocket.getInputStream())
+                val bufferReader = BufferedReader(inputStreamReader)
+
+                clientChannel.println("NSLMNS")
+                val response = bufferReader.readLine()
+                clientSocket.close()
+
+                val fullMNList = mpFunctions.parseMNString(response)
+                val validatorsAmount:Int = (fullMNList.size/10) + 3
+                val fullMNListOrdered = fullMNList.sortedByDescending { server -> server.Count }
+                val validators = fullMNListOrdered.subList(0, if(validatorsAmount >= fullMNListOrdered.size){ fullMNListOrdered.size }else{ validatorsAmount})
+                viewModel.MNList = validators
+
+                viewModel.SYNC_DELAY = DEFAULT_SYNC_DELAY // Restore Sync Delay
+                viewModel.ConnectionError.postValue(false) // Reports Connection Success
+
+                return validators
+            }catch (t:SocketTimeoutException){
+                Log.e("mpNetwork","MN List Request to $address -> Timed Out")
+            }catch (c:ConnectException){ // No internet ?
+                viewModel.ConnectionError.postValue(true) // Report Connection Error
+                viewModel.SYNC_DELAY = viewModel.SYNC_DELAY+1000   // Inrcease Wait for the next attempt
+                Log.e("mpNetwork","Connection error, MN down or check your the internet")
+            }catch (e:java.lang.Exception){ // Something else....
+                viewModel.ConnectionError.postValue(true)
+                Log.e("mpNetwork","Unhandled Exception: "+e.message)
+            }
+            return listOf()
+        }
+
         fun getNodeStatus(address:String, port:Int, viewModel: MainViewModel):NodeInfo{
             val serverAddress = InetSocketAddress(address, port)
-            Log.e("mpNetwork","Requesting Node Status to $address")
+            //Log.e("mpNetwork","Requesting Node Status to $address")
             try{
                 val clientSocket = Socket()
                 clientSocket.connect(serverAddress, NODE_TIMEOUT)
@@ -34,11 +71,11 @@ class mpNetwork {
 
                 return mpFunctions.stringToNodeInfo(response, address, port)
             }catch (t:SocketTimeoutException){
-                Log.e("mpNetwork","Request to $address -> Timed Out")
+                Log.e("mpNetwork","Node Status Request to $address -> Timed Out")
             }catch (c:ConnectException){ // No internet ?
                 viewModel.ConnectionError.postValue(true) // Report Connection Error
                 viewModel.SYNC_DELAY = viewModel.SYNC_DELAY+1000   // Inrcease Wait for the next attempt
-                Log.e("mpNetwork","Connection error, check the internet")
+                Log.e("mpNetwork","Connection to $address:$port -> error, Node is down or check the internet")
             }catch (e:java.lang.Exception){ // Something else....
                 viewModel.ConnectionError.postValue(true)
                 Log.e("mpNetwork","Unhandled Exception: "+e.message)
@@ -109,7 +146,7 @@ class mpNetwork {
                 Log.e("Welcome-Err","Request failed to $address$ -> Timed Out")
             }catch (c:ConnectException) { // No internet ?
                 viewModel.ConnectionError.postValue(true) // Report Connection Error
-                Log.e("mpNetwork", "Connection error, check the internet")
+                Log.e("mpNetwork", "Connection error, Node is down or check the internet")
             }catch (e:Exception){ // Something else....
                 viewModel.ConnectionError.postValue(true)
                 Log.e("mpNetwork","Unhandled Exception: "+e.message)

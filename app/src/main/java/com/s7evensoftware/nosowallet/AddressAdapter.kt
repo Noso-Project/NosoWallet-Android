@@ -13,6 +13,7 @@ class AddressAdapter(callback:AddressAdapterListener): RecyclerView.Adapter<Addr
     private var AddressList:ArrayList<WalletObject>? = null
     private var PendingList:ArrayList<PendingData>? = null
     private var callback:AddressAdapterListener? = null
+    var contextTarget:WalletObject? = null
 
     init {
         this.callback = callback
@@ -59,6 +60,13 @@ class AddressAdapter(callback:AddressAdapterListener): RecyclerView.Adapter<Addr
         return AddressList?.get(position)
     }
 
+    fun updateWallet(wallet: WalletObject) {
+        AddressList?.let {
+            val index = it.indexOf(wallet)
+            notifyItemChanged(index)
+        }
+    }
+
     inner class Address(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnCreateContextMenuListener {
 
         var rowbinding = WalletAddressRowBinding.bind(itemView)
@@ -66,6 +74,12 @@ class AddressAdapter(callback:AddressAdapterListener): RecyclerView.Adapter<Addr
         fun setAddress(wallet: WalletObject, pendingData: PendingData){
             rowbinding = WalletAddressRowBinding.bind(itemView)
             itemView.setOnCreateContextMenuListener(this)
+
+            if(wallet.isLocked){
+                rowbinding.isLockedIcon.visibility = View.VISIBLE
+            }else{
+                rowbinding.isLockedIcon.visibility = View.GONE
+            }
 
             if(wallet.Custom?.isBlank() == true || wallet.Custom?.length?:0 < 5){
                 rowbinding.walletAddressRowAddress.text = wallet.Hash
@@ -108,9 +122,12 @@ class AddressAdapter(callback:AddressAdapterListener): RecyclerView.Adapter<Addr
                 callback?.setMenuTarget(adapterPosition)
             }
 
+            contextTarget = AddressList?.find { w -> w.Hash == v?.tag }
+
             menu?.add(0, v!!.id, 0, R.string.menu_action_delete)
             menu?.add(0, v!!.id, 1, R.string.menu_action_customize)
             menu?.add(0, v!!.id, 2, R.string.menu_action_history)
+            menu?.add(0, v!!.id, 3, if( contextTarget != null && contextTarget!!.isLocked){ R.string.menu_action_unlock }else{ R.string.menu_action_lock })
             //menu?.add(0, v!!.id, 2, "")
         }
     }

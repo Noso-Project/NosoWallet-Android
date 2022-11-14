@@ -5,19 +5,28 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmResults
 import io.realm.annotations.PrimaryKey
+import io.realm.kotlin.delete
 
 object DBManager {
     private val realmName = "NosoDB"
     private val config = RealmConfiguration.Builder()
-        .schemaVersion(1)
+        .schemaVersion(2)
         .migration { realm, oldVersion, newVersion ->
             val schema = realm.schema
-            if(oldVersion == 0L){
+
+            if(oldVersion >= 0L){
                 val newModel = schema.create("OrderObject")
                 newModel.addField("OrderID", String::class.java, FieldAttribute.PRIMARY_KEY)
                 newModel.addField("Destination", String::class.java)
                 newModel.addField("Amount", Long::class.java)
             }
+
+            if(oldVersion >= 1L){
+                val currentModel = schema.get("ServerObject")
+                currentModel?.addField("NosoAddress", String::class.java, FieldAttribute.REQUIRED)
+                currentModel?.addField("Count", Int::class.java, FieldAttribute.REQUIRED)
+            }
+
             Log.e("DBManager","Updating DB from version: $oldVersion")
         }
         .allowQueriesOnUiThread(true)
@@ -25,6 +34,20 @@ object DBManager {
         .name(realmName).build()
 
     init {}
+
+    fun updateNodes(dynamicList:List<ServerObject>){
+        val realmDB = Realm.getInstance(config)
+
+        realmDB.executeTransaction {
+            // Clear Existing Nodes
+            realmDB.delete(ServerObject::class.java)
+            // Insert Validators
+            for (node in dynamicList) {
+                it.insert(node)
+            }
+        }
+        realmDB.close()
+    }
 
     fun clearNonWorkingNodes(){
         val realmDB = Realm.getInstance(config)
@@ -53,6 +76,8 @@ object DBManager {
         realmDB.executeTransaction {
             found.forEach {
                 it.deleteFromRealm()
+
+
             }
         }
         realmDB.close()

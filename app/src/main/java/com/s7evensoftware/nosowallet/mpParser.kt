@@ -79,7 +79,7 @@ class mpParser {
             while (strAux.length >= 8){
                 val currentGroup = strAux.substring(0, 8)
                 val intVal = Integer.parseInt(currentGroup, 2)
-                Log.e("Parser","Int value -> $intVal")
+                //Log.e("Parser","Int value -> $intVal")
                 tempByteArray.add(intVal.toByte())
                 strAux = strAux.substring(8)
             }
@@ -228,6 +228,7 @@ class mpParser {
                     newWallet.Custom = Custom
                     newWallet.PublicKey = PublicKey
                     newWallet.PrivateKey = PrivateKey
+                    newWallet.isLocked = newWallet.PrivateKey!![0] == '*'
 
                     if(!WalletExists(newWallet,addressList)){
                         addressList.add(newWallet)
@@ -235,7 +236,7 @@ class mpParser {
                         nuevos++
 
                         Log.e("mpParser","## Wallet Info: ")
-                        Log.e("mpParser","# Address: $Address")
+                        Log.e("mpParser","# Address: $Address [${if(newWallet.isLocked){"Locked"}else{"Unlocked"}}]")
                     }else{
                         Log.e("mpParser","Ignoring wallet, already exists: "+newWallet.Hash)
                     }
