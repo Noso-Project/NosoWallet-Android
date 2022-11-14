@@ -14,14 +14,14 @@ object DBManager {
         .migration { realm, oldVersion, newVersion ->
             val schema = realm.schema
 
-            if(oldVersion >= 0L){
+            if(oldVersion <= 0L){
                 val newModel = schema.create("OrderObject")
                 newModel.addField("OrderID", String::class.java, FieldAttribute.PRIMARY_KEY)
                 newModel.addField("Destination", String::class.java)
                 newModel.addField("Amount", Long::class.java)
             }
 
-            if(oldVersion >= 1L){
+            if(oldVersion <= 1L){
                 val currentModel = schema.get("ServerObject")
                 currentModel?.addField("NosoAddress", String::class.java, FieldAttribute.REQUIRED)
                 currentModel?.addField("Count", Int::class.java, FieldAttribute.REQUIRED)

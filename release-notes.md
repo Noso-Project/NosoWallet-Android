@@ -1,3 +1,2 @@
-## Version 1.0.16
-- Implemented Dynamic Nodes List retrieval for Concensus (manual edition can still be done from the settings but values will be overrided each time the app is opened).
-- Implemented Encryption System (compatible with NosoLite lock system), you can now Lock specific addresses and unlock key will be asksed when sending funds from a locked address (tiny lock icon will show up next to licked Addresses).
+## Version 1.0.17
+- Fixed an error of the previous release that was causing the app to crash after launched (it was due to a data migration issue from old DB schema to new, required to make the encryption work).
