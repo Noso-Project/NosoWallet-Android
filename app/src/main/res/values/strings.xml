@@ -13,7 +13,7 @@
     <string name="general_export_cancelled"></string>
     <string name="general_export_error">Error exporting wallet</string>
 
-    <string name="general_import_error_1">Invalid file, no wallets found</string>
+    <string name="general_import_error_1">Invalid file extension or no wallets found</string>
     <string name="general_import_error_2">Invalid file extension found</string>
     <string name="general_import_error_3">Import cancelled</string>
     <string name="general_import_start">Imported </string>
@@ -108,5 +108,7 @@
     <string name="dialog_unlock_failed">Failed to unlock, wrong password?</string>
     <string name="dialog_lock_failed_psswd_match">Failed to lock, password mismatch</string>
     <string name="dialog_lock_failed_psswd_empty">Password can\'t be empty</string>
+    <string name="title_activity_dummy_composable">DummyComposable</string>
+    <string name="general_send_funds_to_placeholder">Select an address from the list</string>
 
 </resources>
