@@ -5,11 +5,14 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
@@ -34,53 +37,40 @@ fun OrderRow(
     order: OrderObject,
     onAction: (NosoAction, Any) -> Unit
 ) {
-    Box {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color.White)
-                .padding(2.dp)
-                .clickable {  },
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.width(IntrinsicSize.Max)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(id = R.string.history_order_label),
-                        fontSize = 10.sp
-                    )
-                }
-                Text(text = order.OrderID, fontSize = 15.sp)
-                Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
-                    WalletBalance(label = stringResource(id = R.string.wallet_outgoing_balance), value = order.Amount.toNoso(), Color.Red)
-                }
-            }
-            Row(modifier = Modifier.padding(5.dp)) {
-                IconButton(
-                    onClick = {
-                        clipManager.setText(AnnotatedString(order.OrderID))
-                        Toast.makeText(context, R.string.general_copytoclip, Toast.LENGTH_SHORT).show()
-                    },
-                    modifier = Modifier
-                        .width(26.dp)
-                        .height(26.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_content_copy_24),
-                        contentDescription = null
-                    )
-                }
-            }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color.White)
+            .padding(2.dp)
+            .clickable { },
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(modifier = Modifier.weight(0.45f)) {
+            Text(text = stringResource(id = R.string.history_order_label), fontSize = 10.sp)
+            Text(text = order.OrderID, fontSize = 12.sp, lineHeight = 12.sp)
         }
-    }
-}
+        Spacer(modifier = Modifier.width(10.dp))
+        Column(modifier = Modifier.weight(0.45f)) {
+            Text(text = stringResource(id = R.string.wallet_outgoing_balance), fontSize = 10.sp)
+            Text(text = order.Amount.toNoso(), fontSize = 12.sp, color = Color.Red)
+        }
 
-@Composable
-fun WalletBalance(label:String, value:String, color: Color = Color.Black) {
-    Column(horizontalAlignment = Alignment.Start) {
-        Text(text = label, fontSize = 12.sp)
-        Text(text = value, fontSize = 12.sp, color = color)
+        IconButton(
+            onClick = {
+                clipManager.setText(AnnotatedString(order.OrderID))
+                Toast.makeText(context, R.string.general_copytoclip, Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier
+                .width(24.dp)
+                .height(24.dp)
+                .weight(0.1f)
+                .align(alignment = CenterVertically)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_content_copy_24),
+                contentDescription = null
+            )
+        }
     }
 }
 
@@ -90,7 +80,7 @@ fun previewOrderRow(){
     NosoWalletTheme {
         OrderRow(
             order = OrderObject().apply {
-                this.OrderID = "asdlfjkasdjfalsdjfañsdjfñasjdfñasjdñf"
+                this.OrderID = "asdlfjkasdjfalsdjfañsdjfñasjdfñasjdñfasdfasdfasdfasdfasdfasdfasdfasdf"
                 this.Amount = 1000L
                 this.Destination = "S7evenSoftware"
             }

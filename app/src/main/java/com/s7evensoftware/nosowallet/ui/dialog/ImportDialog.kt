@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,20 +17,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import com.s7evensoftware.nosowallet.R
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 
 @Composable
 fun ImportDialog(
-    context: Context = LocalContext.current,
     onAction: (NosoAction, Any) -> Unit
 ) {
     val importWalletQrTask = rememberLauncherForActivityResult(ScanContract()){ result ->
@@ -58,19 +63,29 @@ fun ImportDialog(
             color = Color.Black
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Row {
-            IconButton(onClick = { importWalletQrTask.launch(ScanOptions()) }) {
-                Icon(imageVector = Icons.Default.Place, contentDescription = null)
+        Row(
+            modifier = Modifier.align(CenterHorizontally),
+            verticalAlignment = Bottom
+        ) {
+            Column(
+                horizontalAlignment = CenterHorizontally,
+                modifier = Modifier.clickable { importWalletQrTask.launch(ScanOptions()) }
+            ) {
+                Icon(painter = painterResource(id = R.drawable.ic_qricon_24), contentDescription = null)
+                Text(text = "QR Code")
             }
-            IconButton(
-                onClick = {
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(
+                horizontalAlignment = CenterHorizontally,
+                modifier = Modifier.clickable {
                     val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                         type = "*/*"
                     }
                     importWalletFileTask.launch(intent)
                 }
             ) {
-                Icon(imageVector = Icons.Default.Place, contentDescription = null)
+                Icon(painter = painterResource(id = R.drawable.ic_fileicon_24), contentDescription = null)
+                Text(text = "File .Pkw")
             }
         }
     }

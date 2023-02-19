@@ -314,9 +314,9 @@ class mpDisk {
             }
         }
 
-        fun appendLog(origen:String, content:String){
+        fun appendLog(origen:String, content:String, localContext: Context = context){
             val fileLog = File(
-                context.getExternalFilesDir(null)!!.path
+                localContext.getExternalFilesDir(null)!!.path
                         +File.separator
                         + NOSPath
                         +File.separator
@@ -330,14 +330,13 @@ class mpDisk {
                     fileLog.parentFile.mkdirs()
                     fileLog.createNewFile()
                 }else{
-                    if(fileLog.length() >= 51200){
+                    if(false /*fileLog.length() >= 51200*/){
                         if(fileLog.delete()){
                             Log.e("mpDisk", "Log file cleared - OK")
                             fileLog.createNewFile()
                         }else{
                             Log.e("mpDisk", "Error clearing Log file - ERR")
                         }
-
                     }
                 }
 
@@ -356,9 +355,9 @@ class mpDisk {
         }
 
         /* Check if file exists in NOSODATA directory */
-        fun fileexist(fileName: String): Boolean {
+        fun fileexist(fileName: String, localContext: Context = context): Boolean {
             val file = File(
-                context.getExternalFilesDir(null)!!.path
+                localContext.getExternalFilesDir(null)!!.path
                         +File.separator
                         + NOSPath
                         +File.separator
@@ -367,9 +366,9 @@ class mpDisk {
         }
 
         /* Check if dir exists in NOSODATA directory */
-        fun directoryexist(pathName: String): Boolean {
+        fun directoryexist(pathName: String, localContext: Context = context): Boolean {
             val file = File(
-                context.getExternalFilesDir(null)!!.path
+                localContext.getExternalFilesDir(null)!!.path
                 +File.separator
                 + NOSPath
                 +File.separator

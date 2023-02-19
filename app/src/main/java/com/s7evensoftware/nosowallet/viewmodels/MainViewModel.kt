@@ -1,6 +1,7 @@
 package com.s7evensoftware.nosowallet.viewmodels
 
 
+import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,7 @@ import com.s7evensoftware.nosowallet.model.DEFAULT_SYNC_DELAY
 import com.s7evensoftware.nosowallet.model.MISSING_FUNDS
 import com.s7evensoftware.nosowallet.model.NOSPath
 import com.s7evensoftware.nosowallet.nosocore.*
+import com.s7evensoftware.nosowallet.popservice.PoPService
 import com.s7evensoftware.nosowallet.ui.footer.SendState
 import com.s7evensoftware.nosowallet.ui.footer.SyncState
 import com.s7evensoftware.nosowallet.ui.main.ListState
@@ -40,7 +42,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
     //newVars
     var grandBalance by mutableStateOf(0L)
     var sendFundsState by mutableStateOf(SendState.Closed)
-    var popServiceEnabled by mutableStateOf(false)
+    var isPoPEnabled by mutableStateOf(false)
     var lockPassword by mutableStateOf("")
     var lockConfirmPassword by mutableStateOf("")
 
@@ -86,7 +88,25 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
         restoreBlockBranchInfo()
         viewModelScope.launch { performInit() }
         viewModelScope.launch { timeTask() }
+        viewModelScope.launch { isPopRunning() }
         viewModelScope.launch { createSeedNodes();syncMNodes();summarySync() }
+    }
+
+    private fun isPopRunning(){
+        val activityManager = app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val runningServices = activityManager.getRunningServices(Int.MAX_VALUE)
+
+        val serviceClassName = PoPService::class.java.name
+        var isServiceRunning = false
+
+        for (service in runningServices) {
+            if (serviceClassName == service.service.className) {
+                isServiceRunning = true
+                break
+            }
+        }
+
+        isPoPEnabled = isServiceRunning
     }
 
     private suspend fun createSeedNodes(){

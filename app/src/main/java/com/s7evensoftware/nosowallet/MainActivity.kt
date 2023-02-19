@@ -3,6 +3,7 @@ package com.s7evensoftware.nosowallet
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // set context for read/write tasks
-        RequestPermissions()
+        requestPermissions()
         mpDisk.setContext(this)
 
         setContent {
@@ -68,7 +69,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                Main(){ action, value ->
+                Main(
+                    backPressedDispatcher = onBackPressedDispatcher
+                ){ action, value ->
                     dialogType.value = action
                     showDialog.value = value as Boolean
                 }
@@ -76,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun RequestPermissions() {
+    private fun requestPermissions() {
         if (checkSelfPermission(applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED && checkSelfPermission(
                 applicationContext,

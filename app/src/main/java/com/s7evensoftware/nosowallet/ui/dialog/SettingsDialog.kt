@@ -1,7 +1,8 @@
 package com.s7evensoftware.nosowallet.ui.dialog
 
+import android.app.PendingIntent
 import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,7 +19,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,11 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.s7evensoftware.nosowallet.ServerObject
-import com.s7evensoftware.nosowallet.ui.customcomposable.Button
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 import com.s7evensoftware.nosowallet.ui.nodes.NodeRow
 import com.s7evensoftware.nosowallet.ui.theme.NosoWalletTheme
 import com.s7evensoftware.nosowallet.ui.theme.walletColor
+import com.s7evensoftware.nosowallet.util.Log
+
+const val NOSO_POP_JOB_ID = 7020090
 
 @Composable
 fun SettingsDialog(
@@ -45,6 +46,7 @@ fun SettingsDialog(
     onAction: (NosoAction, Any) -> Unit
 ) {
     var selectedServer by remember { mutableStateOf(ServerObject()) }
+
     Column(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(10.dp))
@@ -64,10 +66,12 @@ fun SettingsDialog(
             verticalAlignment = Alignment.CenterVertically,
             //modifier = Modifier.padding(horizontal = 10.dp)
         ){
-            Text(text = "Enable PoP Service")
+            Text(
+                text = "Enable PoP Service",
+            )
             Spacer(modifier = Modifier.weight(1f))
             Switch(
-                enabled = false,
+                enabled = true,
                 checked = popServiceEnabled,
                 onCheckedChange = { onAction(NosoAction.SwitchPoP, !popServiceEnabled) }
             )

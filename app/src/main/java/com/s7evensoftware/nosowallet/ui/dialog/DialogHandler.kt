@@ -2,16 +2,18 @@ package com.s7evensoftware.nosowallet.ui.dialog
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
-import com.s7evensoftware.nosowallet.ui.main.NosoAction
-import com.s7evensoftware.nosowallet.viewmodels.MainViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.s7evensoftware.nosowallet.R
 import com.s7evensoftware.nosowallet.ServerObject
+import com.s7evensoftware.nosowallet.popservice.PoPService
+import com.s7evensoftware.nosowallet.ui.main.NosoAction
+import com.s7evensoftware.nosowallet.viewmodels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -35,7 +37,7 @@ fun DialogHandler(
                     NosoAction.SettingsDialog -> {
                         SettingsDialog(
                             serverList = viewModel.serverList,
-                            popServiceEnabled = viewModel.popServiceEnabled
+                            popServiceEnabled = viewModel.isPoPEnabled
                         ){ action, value ->
                             performAction(action = action, value = value, context = context, viewModel = viewModel, coroutineScope = coroutineScope, toggleDialog = toggleDialog)
                         }
@@ -180,7 +182,18 @@ fun performAction(action: NosoAction, value: Any, context: Context, viewModel: M
             }
         }
         NosoAction.DeleteNode -> { viewModel.removeServer(value as ServerObject) }
-        NosoAction.SwitchPoP -> { viewModel.popServiceEnabled = value as Boolean }
+        NosoAction.SwitchPoP -> {
+            if(value as Boolean){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(Intent(context, PoPService::class.java))
+                }else{
+                    context.startService(Intent(context, PoPService::class.java))
+                }
+            }else{
+                context.stopService(Intent(context, PoPService::class.java))
+            }
+            viewModel.isPoPEnabled = value as Boolean
+        }
         else -> {}
     }
 }

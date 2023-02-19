@@ -1,7 +1,7 @@
-## Version 2.0.0
-- I migrated the whole project to use Jetpack Compose, the interface changes and overall updates will be easier now.
-- Enhanced Lock/Unlock system, now with a 8 char restriction.
-- Added support for sending noso from one or more locked addresses.
-- Overall stability updates.
-- Custom Alis support improved (it used to be partially broken).
-- Changed the build yaml to produce the release version instead of debug version for releases (release version has better performance).
+## Version 2.0.1
+- I fixed a problem with the back button action (was causing the stack to overflow).
+- Added the back button logic to return form History view or close the Send Funds block.
+- Implemented the methods needed for the PoP Service that will run in the background to earn noso from the mobile wallet (the logic is still missing so is not enabled yet).
+- Implemented validation of Addresses or Custom Alias for funds sending (now it won't let you continue if is invalid).
+- Fixed the "Send From All" logic, now it won't allow you to enable this option if there are funds enough in the selected wallet or if there are not funds at all in the other addresses.
+- Changed the design of the buttons on the import dialog (I left the test buttons and forgot to changed them before release).
