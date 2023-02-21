@@ -12,11 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.s7evensoftware.nosowallet.*
-import com.s7evensoftware.nosowallet.model.DBManager
-import com.s7evensoftware.nosowallet.model.DEFAULT_SYNC_DELAY
-import com.s7evensoftware.nosowallet.model.MISSING_FUNDS
-import com.s7evensoftware.nosowallet.model.NOSPath
+import com.s7evensoftware.nosowallet.R
+import com.s7evensoftware.nosowallet.model.*
 import com.s7evensoftware.nosowallet.nosocore.*
 import com.s7evensoftware.nosowallet.popservice.PoPService
 import com.s7evensoftware.nosowallet.ui.footer.SendState
@@ -43,6 +40,8 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
     var grandBalance by mutableStateOf(0L)
     var sendFundsState by mutableStateOf(SendState.Closed)
     var isPoPEnabled by mutableStateOf(false)
+    var popAddress by mutableStateOf("")
+    var popPassword by mutableStateOf("mypassword")
     var lockPassword by mutableStateOf("")
     var lockConfirmPassword by mutableStateOf("")
 
@@ -60,6 +59,9 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
     val addressForFunds = mutableListOf<WalletObject>()
     val addressForFundsLocked = mutableListOf<WalletObject>()
     var unlockIndex by mutableStateOf(0)
+
+    private val _poolList = mutableStateListOf<HashMap<Int, String>>()
+    var poolList:List<HashMap<Int, String>> = _poolList
 
     private val _addressList = mutableStateListOf<WalletObject>()
     var addressList:List<WalletObject> = _addressList
@@ -86,7 +88,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
 
     init {
         restoreBlockBranchInfo()
-        viewModelScope.launch { performInit() }
+        viewModelScope.launch { performInit();restorePopSettings() }
         viewModelScope.launch { timeTask() }
         viewModelScope.launch { isPopRunning() }
         viewModelScope.launch { createSeedNodes();syncMNodes();summarySync() }
@@ -160,20 +162,48 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
         return file.exists()
     }
 
+    fun savePoPSettings(address:String, password: String){
+        Log.e("Main","Saving PoP Current Settings")
+        saveToSharedPref(R.string.sharedpref_pop_address, address)
+        saveToSharedPref(R.string.sharedpref_pop_password, password)
+    }
+
+    private fun restorePopSettings(){
+        Log.e("Main","Restoring PoP Service Settings")
+        popAddress = restoreFromSharedPref(R.string.sharedpref_pop_address, "") as String
+        popPassword = restoreFromSharedPref(R.string.sharedpref_pop_password, "mypassword") as String
+    }
+
     private fun restoreBlockBranchInfo(){
-        val sharedPref = app.getSharedPreferences("NOSOPREF",Context.MODE_PRIVATE) ?: return
-        lastBlock.value = sharedPref.getLong(app.getString(R.string.sharedpref_netstate_lastblock), 0)
-        lastSummary.value = sharedPref.getString(app.getString(R.string.sharedpref_netstate_lastbranch), "0")?:"0"
         Log.e("Main","Restoring Block(${lastBlock.value}) and Branch(${lastSummary.value}) Info")
+        lastBlock.value = restoreFromSharedPref(R.string.sharedpref_netstate_lastblock, 0L) as Long
+        lastSummary.value = restoreFromSharedPref(R.string.sharedpref_netstate_lastbranch, "0") as String
     }
 
     private fun saveBlockBranchInfo(lastBlock:Long, lastBrach:String){
         Log.e("Main","Saving Block($lastBlock) and Branch($lastBrach) Info")
+        saveToSharedPref(R.string.sharedpref_netstate_lastblock, lastBlock)
+        saveToSharedPref(R.string.sharedpref_netstate_lastbranch, lastBrach)
+    }
+
+    private fun saveToSharedPref(name:Int, value:Any){
         val sharedPref = app.getSharedPreferences("NOSOPREF",Context.MODE_PRIVATE) ?: return
         with (sharedPref.edit()) {
-            putLong(app.getString(R.string.sharedpref_netstate_lastblock), lastBlock)
-            putString(app.getString(R.string.sharedpref_netstate_lastbranch), lastBrach)
+            when(value){
+                is Long -> { putLong(app.getString(name), value) }
+                is String -> { putString(app.getString(name), value) }
+                else -> {  }
+            }
             apply()
+        }
+    }
+
+    private fun restoreFromSharedPref(name:Int, default:Any): Any? {
+        val sharedPref = app.getSharedPreferences("NOSOPREF",Context.MODE_PRIVATE)
+        return when(default){
+            is Long -> { sharedPref.getLong(app.getString(name), default) }
+            is String -> { sharedPref.getString(app.getString(name), default) }
+            else -> { null }
         }
     }
 
@@ -221,6 +251,20 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
                         }
                     }
                 }
+            }
+
+            // Sync Pool List
+            while(poolList.isEmpty()){
+                val syncNode = mpFunctions.getRandomServer(nodeArray)
+                val nosoCFG = mpNetwork.getNosoCFG(
+                    targetAddress = syncNode.Address,
+                    targetPort = syncNode.Port,
+                    syncDelay = syncDelay,
+                    syncStatus = syncStatus
+                )
+
+                _poolList.clear()
+                _poolList.addAll(mpFunctions.getPoolListFromCFG(nosoCFG))
             }
 
             if(nodeArray.size > 0){
@@ -277,7 +321,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
         }
     }
 
-    suspend fun processOrder(source:WalletObject, sourceList: MutableList<WalletObject>):String{
+    suspend fun processOrder(source: WalletObject, sourceList: MutableList<WalletObject>):String{
         var failCount = 0
         val outgoing = source.Hash?:""
         val incoming = fundsDestination
@@ -348,7 +392,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
         Log.e("MVM", "Lock Address ${sourceWallet.Hash} - Ok")
     }
 
-    fun unlockWallet(password:String, wallet:WalletObject = sourceWallet, temp:Boolean = false):Boolean{
+    fun unlockWallet(password:String, wallet: WalletObject = sourceWallet, temp:Boolean = false):Boolean{
         try {
             val hashedPass = mpCripto.HashSha256String(password)
             val decryptedKey = mpCripto.XorDecode(hashedPass, (wallet.PrivateKey?:"*0").substring(1))
@@ -412,7 +456,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
         mpDisk.SaveWallet(_addressList)
     }
 
-    fun addServer(node:ServerObject){
+    fun addServer(node: ServerObject){
         _serverList.add(node)
         viewModelScope.launch {
             DBManager.insertNewServer(
@@ -423,7 +467,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
         }
     }
 
-    fun removeServer(node:ServerObject){
+    fun removeServer(node: ServerObject){
         _serverList.remove(node)
         viewModelScope.launch {
             DBManager.deleteServer(node.Address, realmDB)

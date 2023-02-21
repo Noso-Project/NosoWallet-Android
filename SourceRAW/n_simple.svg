@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 135.46666 135.46666"
+   version="1.1"
+   id="svg830"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04, custom)"
+   sodipodi:docname="noso-icon_simple.svg"
+   inkscape:export-filename="C:\Users\MJ\Downloads\noso-icon_simple.png"
+   inkscape:export-xdpi="97.360931"
+   inkscape:export-ydpi="97.360931"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview11"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.93359375"
+     inkscape:cx="256.53556"
+     inkscape:cy="256.53556"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs827">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1067">
+      <stop
+         style="stop-color:#f9af1e;stop-opacity:1"
+         offset="0"
+         id="stop1063" />
+      <stop
+         style="stop-color:#f9dd37;stop-opacity:1"
+         offset="1"
+         id="stop1065" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1067"
+       id="linearGradient1069"
+       x1="114.02308"
+       y1="112.46973"
+       x2="20.511576"
+       y2="21.761644"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="noso-icon"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="display:inline;fill:url(#linearGradient1069);fill-opacity:1;stroke-width:0.264583"
+       id="path935"
+       cx="67.73333"
+       cy="67.73333"
+       r="66.786537"
+       inkscape:label="coin-bg" />
+    <path
+       style="display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.220761px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 95.543053,28.308507 82.268486,92.332535 C 76.123019,92.035801 73.001781,91.741038 69.509389,85.605441 L 60.910775,66.696252 51.888603,107.15882 C 43.244486,107.84957 39.028367,103.58236 40.082626,96.132059 L 50.178339,49.668337 c 3.052264,-9.352685 5.862278,-10.922806 13.656728,-10.563725 l 10.82042,25.097449 6.231952,-28.31524 c 2.505172,-7.714278 6.900252,-7.858822 14.655614,-7.578314"
+       id="path2640"
+       sodipodi:nodetypes="ccccccccccc"
+       inkscape:label="logo" />
+  </g>
+</svg>

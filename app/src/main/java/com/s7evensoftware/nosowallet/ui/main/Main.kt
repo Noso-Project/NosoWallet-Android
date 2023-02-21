@@ -1,13 +1,10 @@
 package com.s7evensoftware.nosowallet.ui.main
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -15,33 +12,29 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import com.s7evensoftware.nosowallet.*
 import com.s7evensoftware.nosowallet.R
+import com.s7evensoftware.nosowallet.model.WalletObject
 import com.s7evensoftware.nosowallet.nosocore.mpCripto
 import com.s7evensoftware.nosowallet.nosocore.mpFunctions
 import com.s7evensoftware.nosowallet.nosocore.mpParser
-import com.s7evensoftware.nosowallet.viewmodels.MainViewModel
 import com.s7evensoftware.nosowallet.ui.addresslist.AddressList
-import com.s7evensoftware.nosowallet.ui.dialog.NOSO_POP_JOB_ID
 import com.s7evensoftware.nosowallet.ui.footer.Footer
 import com.s7evensoftware.nosowallet.ui.footer.SendState
 import com.s7evensoftware.nosowallet.ui.header.Header
 import com.s7evensoftware.nosowallet.ui.menu.Menu
 import com.s7evensoftware.nosowallet.ui.orderlist.OrderHistory
-import com.s7evensoftware.nosowallet.ui.theme.NosoWalletTheme
-import com.s7evensoftware.nosowallet.util.Log
 import com.s7evensoftware.nosowallet.util.toNoso
+import com.s7evensoftware.nosowallet.viewmodels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -85,7 +78,11 @@ enum class NosoAction {
     TempUnlockWallet,
     ProcessingOrder,
     DeleteDialog,
-    QRDialog
+    QRDialog,
+    SetPopAddress,
+    PopSetupDialog,
+    PopSettingsDialog,
+    SetPopPassword
 }
 
 @Composable
@@ -217,7 +214,8 @@ fun performAction(action: NosoAction, value: Any, context: Context, onAction: (N
             viewModel.createNewAddress()
             Toast.makeText(context, R.string.general_create_success, Toast.LENGTH_SHORT).show()
         }
-        NosoAction.SetCurrentWallet -> { viewModel.sourceWallet = value as WalletObject }
+        NosoAction.SetCurrentWallet -> { viewModel.sourceWallet = value as WalletObject
+        }
         NosoAction.SetFundsSource -> {
             if(viewModel.sendFundsState != SendState.Confirm){
                 viewModel.sourceWallet = value as WalletObject

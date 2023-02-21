@@ -1,8 +1,5 @@
 package com.s7evensoftware.nosowallet.model
 
-import com.s7evensoftware.nosowallet.OrderObject
-import com.s7evensoftware.nosowallet.ServerObject
-import com.s7evensoftware.nosowallet.SumaryData
 import com.s7evensoftware.nosowallet.util.Log
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
@@ -10,6 +7,12 @@ import io.realm.kotlin.query.RealmResults
 
 class DBManager {
     companion object {
+
+        val seedsList = listOf(
+            "47.87.181.190", "47.87.178.205", "66.151.117.247", "47.87.180.219",
+            "47.87.137.96", "192.3.85.196", "192.3.254.186", "198.46.218.125",
+            "20.199.50.27", "63.227.69.162", "81.22.38.101"
+        )
 
         suspend fun updateNodes(dynamicList:List<ServerObject>, realmDB:Realm){
             realmDB.write {
@@ -20,13 +23,16 @@ class DBManager {
             }
         }
 
-        suspend fun clearNonWorkingNodes(realmDB: Realm){
+        private suspend fun clearNonWorkingNodes(realmDB: Realm){
             val deprecatedNodesList = listOf(
                 "107.172.193.176", "107.172.5.8",
                 "107.175.194.151", "192.3.73.184",
                 "185.239.239.184", "45.146.252.103",
                 "194.156.88.117", "172.245.52.208",
-                "192.210.226.118", "23.94.21.83"
+                "192.210.226.118", "23.94.21.83",
+                "109.230.238.240", "198.144.190.194",
+                "149.57.226.244", "149.57.229.81",
+                "159.196.1.198", "101.100.138.125"
             )
 
             realmDB.write {
@@ -40,26 +46,19 @@ class DBManager {
 
         suspend fun insertDefaultNodes(realmDB: Realm){
             // Erase expired or no-longer working nodes
+
             clearNonWorkingNodes(realmDB)
             if(realmDB.query<ServerObject>().find().count() < 7){
-                val node1 = ServerObject().apply { Address = "109.230.238.240" }
-                val node2 = ServerObject().apply { Address = "198.144.190.194" }
-                val node3 = ServerObject().apply { Address = "149.57.226.244" }
-                val node4 = ServerObject().apply { Address = "107.172.193.176" }
-                val node5 = ServerObject().apply { Address = "66.151.117.247" }
-                val node6 = ServerObject().apply { Address = "149.57.229.81" }
-                val node7 = ServerObject().apply { Address = "107.175.24.151" }
-                val node8 = ServerObject().apply { Address = "159.196.1.198" }
-                val node9 = ServerObject().apply { Address = "101.100.138.125" }
+                val newNodeList = seedsList.map { nodeAddress ->
+                    ServerObject().apply {
+                        Address = nodeAddress
+                    }
+                }
 
                 realmDB.write {
-                    copyToRealm(node1)
-                    copyToRealm(node2)
-                    copyToRealm(node3)
-                    copyToRealm(node4)
-                    copyToRealm(node5)
-                    copyToRealm(node6)
-                    copyToRealm(node7)
+                    newNodeList.forEach {
+                        copyToRealm(it)
+                    }
                 }
                 Log.e("DBManager","Creating Seed Nodes - OK")
             }else{

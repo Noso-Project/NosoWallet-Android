@@ -1,8 +1,5 @@
 package com.s7evensoftware.nosowallet.ui.dialog
 
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,9 +10,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,26 +20,22 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.s7evensoftware.nosowallet.ServerObject
+import com.s7evensoftware.nosowallet.model.ServerObject
+import com.s7evensoftware.nosowallet.ui.customcomposable.Switch
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 import com.s7evensoftware.nosowallet.ui.nodes.NodeRow
-import com.s7evensoftware.nosowallet.ui.theme.NosoWalletTheme
 import com.s7evensoftware.nosowallet.ui.theme.walletColor
-import com.s7evensoftware.nosowallet.util.Log
-
-const val NOSO_POP_JOB_ID = 7020090
 
 @Composable
 fun SettingsDialog(
     serverList:List<ServerObject>,
     popServiceEnabled:Boolean,
-    context: Context = LocalContext.current,
+    isPoolReady:Boolean,
+    //context: Context = LocalContext.current,
     onAction: (NosoAction, Any) -> Unit
 ) {
     var selectedServer by remember { mutableStateOf(ServerObject()) }
@@ -63,17 +56,31 @@ fun SettingsDialog(
         )
         Spacer(modifier = Modifier.height(5.dp))
         Row (
-            verticalAlignment = Alignment.CenterVertically,
-            //modifier = Modifier.padding(horizontal = 10.dp)
+            verticalAlignment = Alignment.CenterVertically
         ){
+            IconButton(
+                onClick = {
+                    onAction(NosoAction.PopSettingsDialog, true)
+                },
+                modifier = Modifier.offset(x = (-15).dp)
+            ) {
+                Icon(imageVector = Icons.Default.Info, contentDescription = null)
+            }
             Text(
-                text = "Enable PoP Service",
+                text = "PoP Service",
+                modifier = Modifier.offset(x = (-20).dp)
             )
             Spacer(modifier = Modifier.weight(1f))
             Switch(
-                enabled = true,
+                enabled = false && isPoolReady,
                 checked = popServiceEnabled,
-                onCheckedChange = { onAction(NosoAction.SwitchPoP, !popServiceEnabled) }
+                onCheckedChange = {
+                    if(popServiceEnabled){
+                        onAction(NosoAction.SwitchPoP, false)
+                    }else{
+                        onAction(NosoAction.PopSetupDialog, true)
+                    }
+                }
             )
         }
         Spacer(modifier = Modifier.height(5.dp))
@@ -135,12 +142,12 @@ fun SettingsDialog(
     }
 }
 
-@Composable
-@Preview
-fun previewSettings(){
-    NosoWalletTheme {
-        SettingsDialog(serverList = listOf(), popServiceEnabled = true){ a,b ->
-
-        }
-    }
-}
+//@Composable
+//@Preview
+//fun previewSettings(){
+//    NosoWalletTheme {
+//        SettingsDialog(serverList = listOf(), popServiceEnabled = true){ a,b ->
+//
+//        }
+//    }
+//}

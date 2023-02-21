@@ -2,7 +2,6 @@ package com.s7evensoftware.nosowallet.nosocore
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.s7evensoftware.nosowallet.*
 import com.s7evensoftware.nosowallet.model.*
 import com.s7evensoftware.nosowallet.ui.footer.SyncState
 import com.s7evensoftware.nosowallet.util.Log
@@ -12,7 +11,6 @@ import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
-import kotlin.collections.ArrayList
 
 class mpFunctions {
     companion object {
@@ -166,19 +164,29 @@ class mpFunctions {
                 }
             }
 
-            val node1 = ServerObject().apply { Address = "109.230.238.240" }
-            val node2 = ServerObject().apply { Address = "198.144.190.194" }
-            val node3 = ServerObject().apply { Address = "149.57.226.244" }
-            val node4 = ServerObject().apply { Address = "107.172.193.176" }
-            val node5 = ServerObject().apply { Address = "66.151.117.247" }
-            val node6 = ServerObject().apply { Address = "149.57.229.81" }
-            val node7 = ServerObject().apply { Address = "107.175.24.151" }
-            val node8 = ServerObject().apply { Address = "159.196.1.198" }
-            val node9 = ServerObject().apply { Address = "101.100.138.125" }
+            val seedList = DBManager.seedsList.map { nodeAddress ->
+                ServerObject().apply {
+                    Address = nodeAddress
+                }
+            }
 
-            val seedList = listOf(
-                node1,node2,node3,node4,node5,node6,node7,node8,node9
-            )
+            ThreadLocalRandom.current().nextInt(seedList.size).let {
+                return seedList[it]
+            }
+        }
+
+        fun getRandomServer(ServerList: ArrayList<NodeInfo>): NodeInfo {
+            if(ServerList.size > 0){
+                ThreadLocalRandom.current().nextInt(ServerList.size).let {
+                    return ServerList[it]
+                }
+            }
+
+            val seedList = DBManager.seedsList.map { nodeAddress ->
+                NodeInfo().apply {
+                    Address = nodeAddress
+                }
+            }
 
             ThreadLocalRandom.current().nextInt(seedList.size).let {
                 return seedList[it]
@@ -333,6 +341,33 @@ class mpFunctions {
             addressList.clear()
             addressList.addAll(updatedWallet)
             lastPendingCount.value = CPending // Update Pendings Count
+        }
+
+        fun getPoolListFromCFG(
+            input: String
+        ): List<HashMap<Int, String>> {
+            if(input.isEmpty()) return listOf()
+
+            val poolList = mutableListOf<HashMap<Int, String>>()
+            val blockTokens = StringTokenizer(input)
+            val values = ArrayList<String>()
+
+            while(blockTokens.hasMoreTokens()){
+                values.add(blockTokens.nextToken())
+            }
+
+            val poolTokens = StringTokenizer(values[4], ":")
+            while (poolTokens.hasMoreTokens()){
+                val poolData = StringTokenizer(poolTokens.nextToken(), ";")
+                if(poolData.hasMoreTokens()){
+                    val pool = HashMap<Int, String>()
+                    pool[0] = poolData.nextToken() // Pool Address
+                    pool[1] = poolData.nextToken() // Pool Port
+                    poolList.add(pool)
+                }
+            }
+
+            return poolList
         }
 
         fun AddressSummaryIndex(address: String, addressSummary: ArrayList<SumaryData>):Int {

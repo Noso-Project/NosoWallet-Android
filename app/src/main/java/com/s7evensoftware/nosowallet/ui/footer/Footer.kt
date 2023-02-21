@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.s7evensoftware.nosowallet.R
-import com.s7evensoftware.nosowallet.WalletObject
+import com.s7evensoftware.nosowallet.model.WalletObject
 import com.s7evensoftware.nosowallet.nosocore.mpFunctions
 import com.s7evensoftware.nosowallet.ui.customcomposable.Button
 import com.s7evensoftware.nosowallet.ui.main.NosoAction

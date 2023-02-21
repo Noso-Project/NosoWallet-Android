@@ -3,6 +3,8 @@
 
     <string name="sharedpref_netstate_lastblock">LASTBLOCKLONG_SAVE_KEY</string>
     <string name="sharedpref_netstate_lastbranch">LASTBRANCH_SAVE_KEY</string>
+    <string name="sharedpref_pop_address">POP_SERVICE_ADDRESS</string>
+    <string name="sharedpref_pop_password">POP_SERVICE_PASSWORD</string>
 
     <string name="general_done">Done</string>
     <string name="general_add">Add</string>

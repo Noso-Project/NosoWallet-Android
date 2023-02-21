@@ -20,7 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.s7evensoftware.nosowallet.ServerObject
+import com.s7evensoftware.nosowallet.model.ServerObject
 import com.s7evensoftware.nosowallet.ui.customcomposable.Button
 import com.s7evensoftware.nosowallet.ui.customcomposable.OutlinedTextField
 import com.s7evensoftware.nosowallet.ui.main.NosoAction

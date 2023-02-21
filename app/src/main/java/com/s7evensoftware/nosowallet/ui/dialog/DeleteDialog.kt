@@ -15,13 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.s7evensoftware.nosowallet.WalletObject
+import com.s7evensoftware.nosowallet.model.WalletObject
 import com.s7evensoftware.nosowallet.ui.customcomposable.Button
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 
 @Composable
 fun DeleteDialog(
-    targetWallet:WalletObject,
+    targetWallet: WalletObject,
     onAction: (NosoAction, Any) -> Unit
 ) {
     Column(

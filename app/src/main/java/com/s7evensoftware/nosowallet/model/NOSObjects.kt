@@ -1,11 +1,8 @@
-package com.s7evensoftware.nosowallet
+package com.s7evensoftware.nosowallet.model
 
-import android.icu.number.ScientificNotation
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.io.Serializable
-import java.security.PrivateKey
-import java.security.PublicKey
 
 class ConcensusResult {
     var LastBlock:Long = 0
@@ -13,7 +10,6 @@ class ConcensusResult {
     var Address:String = ""
     var Port:Int = 8080
 }
-
 
 class ConcensusData {
     var Value:String = ""
@@ -32,9 +28,25 @@ class NodeInfo {
     var UTCTime:Long = 0
 }
 
-class PendingData {
-    var Incoming:Long = 0
-    var Outgoing:Long = 0
+class PoolData {
+    var Address:String = ""
+    var Port:Int = 8080
+    var MinerID:String = ""
+    var NosoAddress:String = ""
+    var Connected:Boolean = false
+    var Invalid: Boolean = false
+    var CurrentBlock:Long = 0
+    var TargetHash:String = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+    var TargetDiff:String = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+    var PoolBalance:Long = 0L
+    var PoolTilPayment:Int = 30
+    var PoolPayStr:String = ""
+}
+
+class PoolPayData{
+    var Block = 0L
+    var Amount = 0L
+    var OrderID = ""
 }
 
 class SumaryData: RealmObject {
@@ -110,7 +122,7 @@ class WalletObject : Serializable {
         locked:Boolean = isLocked,
         incoming:Long = Incoming,
         outgoing:Long = Outgoing
-    ):WalletObject {
+    ): WalletObject {
         return WalletObject().apply {
             Hash = hash
             Custom = custom

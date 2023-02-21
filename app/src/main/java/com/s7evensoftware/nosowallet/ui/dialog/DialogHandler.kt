@@ -10,7 +10,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.s7evensoftware.nosowallet.R
-import com.s7evensoftware.nosowallet.ServerObject
+import com.s7evensoftware.nosowallet.model.ServerObject
+import com.s7evensoftware.nosowallet.popservice.NOSO_INTENT_POP_ADDRESS
+import com.s7evensoftware.nosowallet.popservice.NOSO_INTENT_POP_PASSWORD
+import com.s7evensoftware.nosowallet.popservice.NOSO_INTENT_POP_POOLS
 import com.s7evensoftware.nosowallet.popservice.PoPService
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 import com.s7evensoftware.nosowallet.viewmodels.MainViewModel
@@ -37,7 +40,19 @@ fun DialogHandler(
                     NosoAction.SettingsDialog -> {
                         SettingsDialog(
                             serverList = viewModel.serverList,
-                            popServiceEnabled = viewModel.isPoPEnabled
+                            popServiceEnabled = viewModel.isPoPEnabled,
+                            isPoolReady = viewModel.poolList.isNotEmpty()
+                        ){ action, value ->
+                            performAction(action = action, value = value, context = context, viewModel = viewModel, coroutineScope = coroutineScope, toggleDialog = toggleDialog)
+                        }
+                    }
+                    NosoAction.PopSetupDialog,
+                    NosoAction.PopSettingsDialog -> {
+                        PoPDialog(
+                            addressList = viewModel.addressList,
+                            popAddress = viewModel.popAddress,
+                            popPassword = viewModel.popPassword,
+                            readOnly = type == NosoAction.PopSettingsDialog
                         ){ action, value ->
                             performAction(action = action, value = value, context = context, viewModel = viewModel, coroutineScope = coroutineScope, toggleDialog = toggleDialog)
                         }
@@ -102,7 +117,9 @@ fun performAction(action: NosoAction, value: Any, context: Context, viewModel: M
         NosoAction.UnlockTempDialog,
         NosoAction.LockDialog,
         NosoAction.DeleteDialog,
-        NosoAction.QRDialog-> { toggleDialog(action, value as Boolean) }
+        NosoAction.QRDialog,
+        NosoAction.PopSetupDialog,
+        NosoAction.PopSettingsDialog -> { toggleDialog(action, value as Boolean) }
 
         NosoAction.AddNode -> {
             viewModel.addServer(value as ServerObject)
@@ -184,16 +201,27 @@ fun performAction(action: NosoAction, value: Any, context: Context, viewModel: M
         NosoAction.DeleteNode -> { viewModel.removeServer(value as ServerObject) }
         NosoAction.SwitchPoP -> {
             if(value as Boolean){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(Intent(context, PoPService::class.java))
-                }else{
-                    context.startService(Intent(context, PoPService::class.java))
+                viewModel.savePoPSettings(viewModel.popAddress, viewModel.popPassword)
+                val popIntent = Intent(context, PoPService::class.java).apply {
+                    putExtra(NOSO_INTENT_POP_ADDRESS,viewModel.popAddress)
+                    putExtra(NOSO_INTENT_POP_PASSWORD,viewModel.popPassword)
+                    putExtra(NOSO_INTENT_POP_POOLS, ArrayList(viewModel.poolList))
                 }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(popIntent)
+                }else{
+                    context.startService(popIntent)
+                }
+
+                viewModel.isPoPEnabled = true
             }else{
                 context.stopService(Intent(context, PoPService::class.java))
+                viewModel.isPoPEnabled = false
             }
-            viewModel.isPoPEnabled = value as Boolean
         }
+        NosoAction.SetPopAddress -> { viewModel.popAddress = value as String }
+        NosoAction.SetPopPassword -> { viewModel.popPassword = value as String }
         else -> {}
     }
 }

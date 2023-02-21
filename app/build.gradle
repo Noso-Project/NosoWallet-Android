@@ -27,8 +27,8 @@ android {
         applicationId "com.s7evensoftware.nosowallet"
         minSdk 23
         targetSdk 33
-        versionCode 18
-        versionName "2.0.1"
+        versionCode 19
+        versionName "2.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true

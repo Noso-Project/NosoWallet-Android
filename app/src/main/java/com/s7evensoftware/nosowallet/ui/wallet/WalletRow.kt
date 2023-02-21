@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,18 +22,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.s7evensoftware.nosowallet.R
-import com.s7evensoftware.nosowallet.WalletObject
+import com.s7evensoftware.nosowallet.model.WalletObject
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
-import com.s7evensoftware.nosowallet.ui.theme.NosoWalletTheme
-import com.s7evensoftware.nosowallet.ui.theme.walletColor
 import com.s7evensoftware.nosowallet.ui.theme.walletPressed
 import com.s7evensoftware.nosowallet.util.toNoso
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable

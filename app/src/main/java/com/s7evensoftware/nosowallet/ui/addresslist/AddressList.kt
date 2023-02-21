@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.s7evensoftware.nosowallet.WalletObject
+import com.s7evensoftware.nosowallet.model.WalletObject
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 import com.s7evensoftware.nosowallet.ui.wallet.WalletRow
 

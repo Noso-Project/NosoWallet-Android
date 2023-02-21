@@ -1,7 +1,7 @@
 package com.s7evensoftware.nosowallet.nosocore
 
-import com.s7evensoftware.nosowallet.KeyPair
-import com.s7evensoftware.nosowallet.KeyType
+import com.s7evensoftware.nosowallet.model.KeyPair
+import com.s7evensoftware.nosowallet.model.KeyType
 import org.bouncycastle.asn1.x9.X9ECParameters
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import org.bouncycastle.crypto.AsymmetricCipherKeyPairGenerator
