@@ -307,8 +307,9 @@ class mpNetwork {
                     val clientChannel = PrintWriter(BufferedWriter(OutputStreamWriter(clientSocket.getOutputStream())), true)
                     val inputStreamReader = InputStreamReader(clientSocket.getInputStream())
                     val bufferReader = BufferedReader(inputStreamReader)
+                    val encryptedPassword = mpCripto.getMD5of("$minerPassword$minerAddress$address")
 
-                    clientChannel.println("SOURCE $minerAddress $MINER_IDENTIFIER${BuildConfig.VERSION_NAME} $minerPassword")
+                    clientChannel.println("SOURCE $minerAddress $MINER_IDENTIFIER${BuildConfig.VERSION_NAME} $encryptedPassword")
                     response = bufferReader.readLine()
                     clientSocket.close()
                 }
@@ -345,21 +346,21 @@ class mpNetwork {
 
                     return poolData
                 }else{
-                    Log.e("Network", "[$address] Error: ${poolInfo[0]}")
+                    Log.e("mpNetwork", "[$address] Error: ${poolInfo[0]}")
                     return PoolData().apply { Invalid = true }
                 }
             }catch (t: SocketTimeoutException){
                 Log.e("mpNetwork","Connection to $address:$port TimedOut, retrying...")
-                return PoolData()
+                return PoolData().apply { Invalid = true }
             }catch (c: ConnectException){ // No internet ?
                 Log.e("mpNetwork","Connection error, check the internet, retrying...")
-                return PoolData()
+                return PoolData().apply { Invalid = true }
             }catch (r: IOException){ // No internet ?
-                Log.e("mpNetwork","Reading error, malformed input? : ${r.message}")
-                return PoolData()
+                Log.e("mpNetwork","Reading error, internet issue / malformed input? : ${r.message}")
+                return PoolData().apply { Invalid = true }
             }catch (e:Exception){ // Something else....
                 Log.e("mpNetwork","Unhandled Exception: ${e.message}")
-                return PoolData()
+                return PoolData().apply { Invalid = true }
             }
         }
 

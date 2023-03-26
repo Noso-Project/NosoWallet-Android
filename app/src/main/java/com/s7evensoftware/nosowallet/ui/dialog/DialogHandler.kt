@@ -1,5 +1,7 @@
 package com.s7evensoftware.nosowallet.ui.dialog
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -11,10 +13,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.s7evensoftware.nosowallet.R
 import com.s7evensoftware.nosowallet.model.ServerObject
-import com.s7evensoftware.nosowallet.popservice.NOSO_INTENT_POP_ADDRESS
-import com.s7evensoftware.nosowallet.popservice.NOSO_INTENT_POP_PASSWORD
-import com.s7evensoftware.nosowallet.popservice.NOSO_INTENT_POP_POOLS
-import com.s7evensoftware.nosowallet.popservice.PoPService
+import com.s7evensoftware.nosowallet.popservice.*
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 import com.s7evensoftware.nosowallet.viewmodels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -204,7 +203,7 @@ fun performAction(action: NosoAction, value: Any, context: Context, viewModel: M
                 viewModel.savePoPSettings(viewModel.popAddress, viewModel.popPassword)
                 val popIntent = Intent(context, PoPService::class.java).apply {
                     putExtra(NOSO_INTENT_POP_ADDRESS,viewModel.popAddress)
-                    putExtra(NOSO_INTENT_POP_PASSWORD,viewModel.popPassword)
+                    putExtra(NOSO_INTENT_POP_PASSWORD, viewModel.popPassword)
                     putExtra(NOSO_INTENT_POP_POOLS, ArrayList(viewModel.poolList))
                 }
 
@@ -217,6 +216,15 @@ fun performAction(action: NosoAction, value: Any, context: Context, viewModel: M
                 viewModel.isPoPEnabled = true
             }else{
                 context.stopService(Intent(context, PoPService::class.java))
+
+                val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE
+                val intent = Intent(context, PoPBroadcast::class.java).apply {
+                    this.action = NOSO_POP_RECURRENT_ACTION
+                }
+                val pendingIntent = PendingIntent.getBroadcast(context, NOSO_POP_RECURRENT_TASK_CODE, intent, flags)
+                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                alarmManager.cancel(pendingIntent)
+
                 viewModel.isPoPEnabled = false
             }
         }

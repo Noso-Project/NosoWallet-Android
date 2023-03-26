@@ -36,7 +36,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(textColor = Color.Black),
+    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(textColor = Color.Black, errorBorderColor = Color.Red),
     softwareKeyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
 ) {
     androidx.compose.material3.OutlinedTextField(

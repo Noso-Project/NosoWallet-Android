@@ -89,7 +89,8 @@ fun PoPDialog(
             readOnly = readOnly,
             value = popPassword, onValueChange = { onAction(NosoAction.SetPopPassword, it) },
             label = { Text(text = "Password:") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+            isError = popPassword.length <= 8
         )
         Spacer(modifier = Modifier.height(5.dp))
         Row(modifier = Modifier.align(End)) {

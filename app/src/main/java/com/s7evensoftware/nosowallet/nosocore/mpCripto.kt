@@ -12,7 +12,6 @@ import org.bouncycastle.util.encoders.Hex
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.experimental.xor
 
 class mpCripto {
@@ -272,6 +271,28 @@ class mpCripto {
             //Log.e("mpCripto","MD160 result raw: "+String(result))
             //Log.e("mpCripto","MD160 result hex: "+String(Hex.encode(result)))
             return String(Hex.encode(result))
+        }
+
+        fun getMD5of(string:String):String {
+            val encoded = encodeMD5String(string)
+            return toHex(encoded)
+        }
+
+        private fun encodeMD5String(source: String):ByteArray {
+            val digest = MessageDigest.getInstance("MD5")
+            return digest.digest(source.toByteArray())
+        }
+
+        private fun toHex(encoded:ByteArray):String {
+            val hexCoded = StringBuilder()
+            for (element in encoded) {
+                val hex = Integer.toHexString(0xff and element.toInt())
+                if (hex.length == 1) {
+                    hexCoded.append('0')
+                }
+                hexCoded.append(hex)
+            }
+            return hexCoded.toString()
         }
 
         /* Legacy Kotlin based

@@ -35,7 +35,6 @@ fun SettingsDialog(
     serverList:List<ServerObject>,
     popServiceEnabled:Boolean,
     isPoolReady:Boolean,
-    //context: Context = LocalContext.current,
     onAction: (NosoAction, Any) -> Unit
 ) {
     var selectedServer by remember { mutableStateOf(ServerObject()) }
@@ -72,7 +71,7 @@ fun SettingsDialog(
             )
             Spacer(modifier = Modifier.weight(1f))
             Switch(
-                enabled = false && isPoolReady,
+                enabled = isPoolReady || popServiceEnabled,
                 checked = popServiceEnabled,
                 onCheckedChange = {
                     if(popServiceEnabled){

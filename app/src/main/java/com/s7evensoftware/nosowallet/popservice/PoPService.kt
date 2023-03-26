@@ -16,6 +16,7 @@ import com.s7evensoftware.nosowallet.nosocore.mpNetwork
 import com.s7evensoftware.nosowallet.ui.theme.nosoColor
 import com.s7evensoftware.nosowallet.util.Log
 import kotlinx.coroutines.*
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
 const val NOSO_POP_RECURRENT_ACTION = "com.s7evensoftware.nosowallet.PPB_NOSO_ACTION"
@@ -76,7 +77,6 @@ class PoPService: Service() {
             putExtra(NOSO_INTENT_POP_BLOCK, currentBlock)
             action = NOSO_POP_RECURRENT_ACTION
         }
-
         val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         val pendingIntent = PendingIntent.getBroadcast(this, NOSO_POP_RECURRENT_TASK_CODE, intent, flags)
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -100,6 +100,7 @@ class PoPService: Service() {
 
         startForeground(NOSO_POP_NOTIFICATION_ID, notification)
     }
+
     private fun createNotificationChannel(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(NOSO_NOTIFICATION_CHANNEL_ID,
@@ -132,15 +133,18 @@ class PoPBroadcast: BroadcastReceiver() {
         }
     }
 
-    private fun randomInterval():Long{
-        val startLimit = 10
-        val finishLimit = 585
+    private fun randomInterval(popAccepted:Int):Long{
+        if(popAccepted > 0){
+            val startLimit = 10
+            val finishLimit = 585
 
-        ThreadLocalRandom.current().nextInt(finishLimit-startLimit).let {
-            val blockAge = (System.currentTimeMillis()%600000) / 1000
-            val timeTilNextParticipation = 600-blockAge+(startLimit + it.toLong())
-            Log.e("PPS","Time until next participation $timeTilNextParticipation seg.")
-            return timeTilNextParticipation*1000
+            ThreadLocalRandom.current().nextInt(finishLimit-startLimit).let {
+                val blockAge = (System.currentTimeMillis()%600000) / 1000
+                val timeTilNextParticipation = 600-blockAge+(startLimit + it.toLong())
+                return timeTilNextParticipation*1000
+            }
+        }else{
+            return 120000L
         }
     }
 
@@ -177,32 +181,42 @@ class PoPBroadcast: BroadcastReceiver() {
 
                 if(!poolData.Invalid){
                     popAccepted += 1
-                }
 
-                if(poolData.CurrentBlock > updatedBlock){
-                    updatedBlock = poolData.CurrentBlock
+                    if(poolData.CurrentBlock > updatedBlock){
+                        updatedBlock = poolData.CurrentBlock
+                    }
                 }
             }
+
+            val popInterval = randomInterval(popAccepted = popAccepted)
+            val calendar = Calendar.getInstance();calendar.timeInMillis = System.currentTimeMillis() + popInterval
+            val hoursUntilNextPop = calendar.get(Calendar.HOUR_OF_DAY)
+            val minutesUntilNextPop = calendar.get(Calendar.MINUTE)
+            val longTimeFormat = String.format("%02d:%02d", hoursUntilNextPop, minutesUntilNextPop)
 
             getRawNotification(context).let {
-                it.setContentText("[${updatedBlock}] PoP Accepted $popAccepted/${poolList.size}")
+                if(popAccepted > 0){
+                    it.setContentText("[${updatedBlock}] PoP Accepted $popAccepted/${poolList.size}\t\nNext participation at $longTimeFormat")
+                }else{
+                    it.setContentText("Participation failed, retrying...")
+                }
                 notificationManager.notify(NOSO_POP_NOTIFICATION_ID, it.build())
             }
-        }
 
-        val popInterval = randomInterval()
-        val intent = Intent(context, PoPBroadcast::class.java).apply {
-            putExtra(NOSO_INTENT_POP_ADDRESS,minerAddress)
-            putExtra(NOSO_INTENT_POP_PASSWORD,minerPassword)
-            putExtra(NOSO_INTENT_POP_POOLS, ArrayList(poolList))
-            putExtra(NOSO_INTENT_POP_BLOCK, currentBlock)
-            action = NOSO_POP_RECURRENT_ACTION
-        }
+            Log.e("PPS","[$updatedBlock] Time of next participation -> $longTimeFormat")
+            val intent = Intent(context, PoPBroadcast::class.java).apply {
+                putExtra(NOSO_INTENT_POP_ADDRESS,minerAddress)
+                putExtra(NOSO_INTENT_POP_PASSWORD,minerPassword)
+                putExtra(NOSO_INTENT_POP_POOLS, ArrayList(poolList))
+                putExtra(NOSO_INTENT_POP_BLOCK, currentBlock)
+                action = NOSO_POP_RECURRENT_ACTION
+            }
 
-        val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        val pendingIntent = PendingIntent.getBroadcast(context, NOSO_POP_RECURRENT_TASK_CODE, intent, flags)
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+popInterval, pendingIntent)
+            val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            val pendingIntent = PendingIntent.getBroadcast(context, NOSO_POP_RECURRENT_TASK_CODE, intent, flags)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+popInterval, pendingIntent)
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {

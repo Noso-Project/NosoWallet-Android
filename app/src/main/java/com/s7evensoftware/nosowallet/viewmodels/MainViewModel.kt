@@ -217,7 +217,9 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
     private suspend fun syncMNodes(){
         withContext(Dispatchers.IO){
             var list = listOf<ServerObject>()
-            while(list.isEmpty()){
+            var retries = 5
+            while(list.isEmpty() && retries > 0){
+                if(retries == 5) delay(0L) else delay(5000L)
                 val randomServer = mpFunctions.getRandomServer(DBManager.getServers(realmDB))
                 list = mpNetwork.getMasterNodeList(
                     targetAddress = randomServer.Address,
@@ -226,6 +228,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
                     syncDelay = syncDelay,
                     syncStatus = syncStatus
                 )
+                retries -= 1
             }
             DBManager.updateNodes(list, realmDB)
             _serverList.clear()
@@ -254,7 +257,9 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
             }
 
             // Sync Pool List
-            while(poolList.isEmpty()){
+            var retryPoolData = 5
+            while(poolList.isEmpty() && retryPoolData > 0){
+                if(retryPoolData == 5) delay(0L) else delay(5000)
                 val syncNode = mpFunctions.getRandomServer(nodeArray)
                 val nosoCFG = mpNetwork.getNosoCFG(
                     targetAddress = syncNode.Address,
@@ -265,6 +270,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
 
                 _poolList.clear()
                 _poolList.addAll(mpFunctions.getPoolListFromCFG(nosoCFG))
+                retryPoolData -= 1
             }
 
             if(nodeArray.size > 0){
