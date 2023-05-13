@@ -102,6 +102,7 @@ fun Main(
     val pasteQRToDestination = rememberLauncherForActivityResult(ScanContract()){ result ->
         result.contents?.let { content ->
             viewModel.fundsDestination = content
+            viewModel.validateDestination(viewModel.fundsDestination)
         }
     }
 

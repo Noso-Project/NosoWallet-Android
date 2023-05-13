@@ -30,7 +30,10 @@ import java.io.File
 
 class MainViewModel(private val app:Application): AndroidViewModel(app) {
 
-    private val config = RealmConfiguration.Builder(setOf(ServerObject::class, OrderObject::class, SumaryData::class)).build()
+    private val config = RealmConfiguration
+        .Builder(setOf(ServerObject::class, OrderObject::class, SumaryData::class))
+        .schemaVersion(NOSO_DB_VERSION)
+        .build()
     private val realmDB = Realm.open(config)
 
     //mainList
@@ -48,6 +51,7 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
     //Funds Variables
     var sourceWallet by mutableStateOf(WalletObject())
     var fundsDestination by mutableStateOf("")
+    var fundsDestinationHash:String = ""
     var isValidDestination by mutableStateOf(false)
     var fundsAmount by mutableStateOf("0.00000000")
     var fundsReference by mutableStateOf("")
@@ -320,17 +324,29 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
     }
 
     fun validateDestination(destination:String) {
-        if(mpParser.IsValidAddress(destination)){
+        if(destination.trim().isEmpty()){
+            isValidDestination = false
+            fundsDestinationHash = ""
+        }else if(mpParser.IsValidAddress(destination)){
             isValidDestination = true
+            fundsDestinationHash = destination
         }else{
-            isValidDestination = DBManager.isAliasUsed(destination, realmDB)
+            DBManager.getSummaryByAlias(destination, realmDB).let { sm ->
+                if(sm != null){
+                    isValidDestination = true
+                    fundsDestinationHash = sm.Hash
+                }else{
+                    isValidDestination = false
+                    fundsDestinationHash = ""
+                }
+            }
         }
     }
 
     suspend fun processOrder(source: WalletObject, sourceList: MutableList<WalletObject>):String{
         var failCount = 0
         val outgoing = source.Hash?:""
-        val incoming = fundsDestination
+        val incoming = fundsDestinationHash
         val balance = fundsAmount.replace(".", "").replace(",","").toLong()
         val ref = fundsReference.replace(" ","_")
 
@@ -351,18 +367,23 @@ class MainViewModel(private val app:Application): AndroidViewModel(app) {
             if(res != ""){
                 if(res == MISSING_FUNDS){
                     return "Not enough funds to complete order"
-                }else{
+                }else if(res == "10") {
+                    return "Invalid destination noso address"
+                }else if(res == "100") {
+                    return "Low limit fee, send more noso"
+                }else {
                     Log.e("Main","Order success, OrderID: $res")
                     for(w in sourceList){
                         Log.e("MVM", "${w.Hash} -> -${w.Outgoing}")
                     }
-                    val newOrder = OrderObject()
-                    newOrder.OrderID = res
-                    newOrder.Destination = incoming
-                    newOrder.Amount = balance
+                    val newOrder = OrderObject().apply {
+                        OrderID = res
+                        Destination = incoming
+                        Amount = balance+mpCoin.GetFee(balance)
+                        Timestamp = System.currentTimeMillis()
+                    }
                     _orderList.add(newOrder)
                     DBManager.insertOrder(newOrder, realmDB)
-
                     return "Order sent to mainnet"
                 }
             }else{

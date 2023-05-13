@@ -80,6 +80,7 @@ class DBManager {
                     OrderID = order.OrderID
                     Destination = order.Destination
                     Amount = order.Amount
+                    Timestamp = order.Timestamp
                 }
                 result.add(o)
             }
@@ -114,8 +115,12 @@ class DBManager {
             return null
         }
 
-        fun isAliasUsed(custom_name:String, realmDB: Realm):Boolean {
-            return realmDB.query<SumaryData>("Custom = $0", custom_name).first().find() != null
+        fun getSummaryByAlias(custom_name:String, realmDB: Realm): SumaryData? {
+            return realmDB.query<SumaryData>("Custom = $0", custom_name).first().find()
+        }
+
+        fun isAliasUsed(custom_name:String, realmDB: Realm): Boolean {
+            return getSummaryByAlias(custom_name = custom_name, realmDB = realmDB) != null
         }
 
         suspend fun addSummaryFromList(addressSummary: ArrayList<SumaryData>, realmDB: Realm) {

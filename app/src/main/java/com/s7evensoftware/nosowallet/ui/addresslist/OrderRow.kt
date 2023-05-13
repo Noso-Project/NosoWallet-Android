@@ -22,10 +22,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.s7evensoftware.nosowallet.model.OrderObject
 import com.s7evensoftware.nosowallet.R
+import com.s7evensoftware.nosowallet.model.OrderObject
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 import com.s7evensoftware.nosowallet.ui.theme.NosoWalletTheme
+import com.s7evensoftware.nosowallet.util.toDateTime
 import com.s7evensoftware.nosowallet.util.toNoso
 
 @Composable
@@ -48,9 +49,15 @@ fun OrderRow(
             Text(text = order.OrderID, fontSize = 12.sp, lineHeight = 12.sp)
         }
         Spacer(modifier = Modifier.width(10.dp))
-        Column(modifier = Modifier.weight(0.45f)) {
-            Text(text = stringResource(id = R.string.wallet_outgoing_balance), fontSize = 10.sp)
-            Text(text = order.Amount.toNoso(), fontSize = 12.sp, color = Color.Red)
+        Column(modifier = Modifier.weight(0.45f) ) {
+            Column() {
+                Text(text = stringResource(id = R.string.wallet_outgoing_balance), fontSize = 10.sp)
+                Text(text = order.Amount.toNoso(), fontSize = 12.sp, color = Color.Red)
+            }
+            Column() {
+                Text(text = stringResource(id = R.string.wallet_outgoing_timestamp), fontSize = 10.sp)
+                Text(text = order.Timestamp.toDateTime(), fontSize = 12.sp, color = Color.Blue)
+            }
         }
 
         IconButton(

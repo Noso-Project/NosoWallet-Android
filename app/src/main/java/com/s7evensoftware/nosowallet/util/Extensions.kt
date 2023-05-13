@@ -1,5 +1,7 @@
 package com.s7evensoftware.nosowallet.util
 
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.absoluteValue
 
 fun Long.toNoso():String {
@@ -13,4 +15,13 @@ fun Long.toNoso():String {
 
 fun String.toNoso():Long {
     return replace(".","").replace(",","").toLong()
+}
+
+fun Long.toDateTime():String {
+    if(this == 0L) return "-/-/- -:-"
+    val cal = Calendar.getInstance()
+    val dF = SimpleDateFormat("dd/M/yyyy H:mm", Locale.getDefault())
+    cal.timeInMillis = this
+
+    return dF.format(cal.time)
 }

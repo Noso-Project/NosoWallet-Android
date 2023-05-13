@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.result.ActivityResultLauncher
-import com.s7evensoftware.nosowallet.*
+import com.s7evensoftware.nosowallet.R
 import com.s7evensoftware.nosowallet.model.*
 import com.s7evensoftware.nosowallet.util.Log
 import io.realm.kotlin.Realm
@@ -14,7 +14,6 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
-import kotlin.collections.ArrayList
 
 class mpParser {
     companion object{

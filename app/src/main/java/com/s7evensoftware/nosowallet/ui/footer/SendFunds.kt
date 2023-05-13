@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,15 +28,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.s7evensoftware.nosowallet.R
-import com.s7evensoftware.nosowallet.nosocore.mpParser
 import com.s7evensoftware.nosowallet.ui.customcomposable.Button
 import com.s7evensoftware.nosowallet.ui.customcomposable.OutlinedTextField
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
-import com.s7evensoftware.nosowallet.ui.theme.NosoWalletTheme
 import com.s7evensoftware.nosowallet.ui.theme.confirm
 import com.s7evensoftware.nosowallet.ui.theme.success
 import com.s7evensoftware.nosowallet.ui.theme.walletColor
@@ -111,7 +109,7 @@ fun SendFunds(
             },
             trailingIcon = {
                 Icon(
-                    imageVector = Icons.Default.Check,
+                    imageVector = if(isValidDestination) Icons.Default.Check else Icons.Default.Close,
                     contentDescription = null,
                     tint = if(isValidDestination) success else Color.Red
                 )

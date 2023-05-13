@@ -112,5 +112,6 @@
     <string name="dialog_lock_failed_psswd_empty">Password can\'t be empty</string>
     <string name="title_activity_dummy_composable">DummyComposable</string>
     <string name="general_send_funds_to_placeholder">Select an address from the list</string>
+    <string name="wallet_outgoing_timestamp">Date/Time</string>
 
 </resources>

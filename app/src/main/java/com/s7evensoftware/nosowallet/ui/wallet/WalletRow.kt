@@ -22,11 +22,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.s7evensoftware.nosowallet.R
 import com.s7evensoftware.nosowallet.model.WalletObject
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
+import com.s7evensoftware.nosowallet.ui.theme.NosoWalletTheme
 import com.s7evensoftware.nosowallet.ui.theme.walletPressed
 import com.s7evensoftware.nosowallet.util.toNoso
 import kotlinx.coroutines.CoroutineScope
@@ -79,7 +81,7 @@ fun WalletRow(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(modifier = Modifier.width(IntrinsicSize.Max)) {
+            Column(modifier = Modifier.weight(0.8f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(id = R.string.wallet_address_label),
@@ -92,7 +94,7 @@ fun WalletRow(
                         modifier = Modifier.width(10.dp).height(10.dp)
                     )
                 }
-                Text(text = if((wallet.Custom?:"").isEmpty()) wallet.Hash?:"Invalid Address" else wallet.Custom?:"", fontSize = 15.sp)
+                Text(text = if((wallet.Custom?:"").isEmpty()) wallet.Hash?:"Invalid Address" else wallet.Custom?:"", fontSize = 13.sp)
                 Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
                     WalletBalance(label = stringResource(id = R.string.wallet_incoming_balance), value = wallet.Incoming.toNoso(), if(wallet.Incoming > 0) Color.Green else Color.Black)
                     Spacer(modifier = Modifier.width(10.dp))
@@ -101,7 +103,7 @@ fun WalletRow(
                     WalletBalance(label = stringResource(id = R.string.wallet_address_balance), value = wallet.Balance.toNoso())
                 }
             }
-            Row(modifier = Modifier.padding(5.dp)) {
+            Row(modifier = Modifier.padding(5.dp).weight(0.2f)) {
                 IconButton(
                     onClick = {
                         clipManager.setText(AnnotatedString(wallet.Hash?:"InvalidHash"))
@@ -177,16 +179,14 @@ fun WalletBalance(label:String, value:String, color: Color = Color.Black) {
     }
 }
 
-//@Preview
-//@Composable
-//fun previewAddress(){
-//    NosoWalletTheme {
-//        WalletRow(
-//            wallet = WalletObject().apply {
-//                Hash = "Nasdf77123eihj34sidufhasdf8239rdg"
-//            }
-//        ){
-//
-//        }
-//    }
-//}
+@Preview
+@Composable
+fun previewAddress(){
+    NosoWalletTheme {
+        WalletRow(
+            wallet = WalletObject().apply {
+                Hash = "Nasdf77123eihj34sidufhasdf8239rdg"
+            }
+        ){ _,_ -> }
+    }
+}

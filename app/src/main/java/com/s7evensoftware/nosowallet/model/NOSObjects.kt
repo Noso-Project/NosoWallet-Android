@@ -69,6 +69,7 @@ class OrderObject: RealmObject {
     @PrimaryKey var OrderID: String = "-1"
     var Destination:String? = null
     var Amount:Long = 0L
+    var Timestamp:Long = 0L
 }
 
 class PendingInfo {
@@ -87,7 +88,7 @@ class OrderData : Serializable {
     var TimeStamp:Long = -1L
     var Reference:String? = null
     var TrxLine:Int = -1
-    var Sender:String? = null // La clave publica de quien envia
+    var Sender:String? = null // Public Key of who is sending the noso
     var Address:String? = null
     var Receiver:String? = null
     var AmountFee:Long = -1

@@ -10,7 +10,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -25,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.s7evensoftware.nosowallet.model.ServerObject
-import com.s7evensoftware.nosowallet.ui.customcomposable.Switch
 import com.s7evensoftware.nosowallet.ui.main.NosoAction
 import com.s7evensoftware.nosowallet.ui.nodes.NodeRow
 import com.s7evensoftware.nosowallet.ui.theme.walletColor
@@ -54,6 +52,7 @@ fun SettingsDialog(
             color = Color.Black
         )
         Spacer(modifier = Modifier.height(5.dp))
+        /* Disable PoP From Wallet, now is deprecated
         Row (
             verticalAlignment = Alignment.CenterVertically
         ){
@@ -82,7 +81,7 @@ fun SettingsDialog(
                 }
             )
         }
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(5.dp)) */
         LazyColumn(
             modifier = Modifier
                 .background(color = walletColor, shape = RoundedCornerShape(10.dp))
