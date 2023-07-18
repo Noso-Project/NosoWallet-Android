@@ -52,7 +52,7 @@
 - Removed unused library for zip management (wasn't need anymore)
 
 ## Version 1.0.6
-- Log report implemented, log file is saved now to device storage path: /Android/data/com.s7evensoftware.nosowallet/files/NOSODATA/LOGS/error_log.txt
+- Log report implemented, log file is saved now to device storage path: /Android/data/com.nosoproject.nosowallet/files/NOSODATA/LOGS/error_log.txt
 - Time format changed, remove the AM/PM label
 - Minor layout changes
 

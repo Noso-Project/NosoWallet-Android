@@ -24,7 +24,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.s7evensoftware.nosowallet"
+        applicationId "com.nosoproject.nosowallet"
         minSdk 23
         targetSdk 33
         versionCode 21
@@ -44,8 +44,6 @@ android {
     }
 
     buildFeatures {
-        viewBinding true
-        dataBinding true
         compose true
     }
 
@@ -61,7 +59,7 @@ android {
         abortOnError true
         checkReleaseBuilds false
     }
-    namespace 'com.s7evensoftware.nosowallet'
+    namespace 'com.nosoproject.nosowallet'
     composeOptions {
         kotlinCompilerExtensionVersion '1.3.2'
     }

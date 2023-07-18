@@ -19,12 +19,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NosoWallet">
-        <service android:name=".popservice.PoPService" android:exported="true" />
-        <receiver android:name=".popservice.PoPBroadcast" android:enabled="true" android:exported="true">
-            <intent-filter>
-                <action android:name="com.s7evensoftware.nosowallet.PPB_NOSO_ACTION"/>
-            </intent-filter>
-        </receiver>
         <activity
             android:name=".MainActivity"
             android:exported="true"
